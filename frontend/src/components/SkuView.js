@@ -62,7 +62,7 @@ const GridTwo = () => {
 
 
     return (
-        <div className="ag-theme-quartz-dark" style={{ height: 800, width: 1270 }}>
+        <div className="ag-theme-quartz-dark" style={{ height: '68vh', width: 1270 }}>
 
             <SearchBar title='SKUs' titlecount={rowData.length} search={search} setSearch={setSearch} />
             <AgGridReact

@@ -122,10 +122,11 @@ export const GridPsku = () => {
             headerName: 'CSKU IDS',
             field: 'skus',
             minWidth: 200,
-            valueFormatter: params => params.value ? params.value.join(' , ') : ''
+            valueFormatter: params => params.value ? params.value.join(' ') : ''
         },
         { headerName: 'Description', field: 'description', width: 120 },
         { headerName: 'Product Tag', field: 'product_tag', width: 140 },
+        { headerName: 'Total Cogs', field: 'total_cogs', minWidth: 60},
     ])
 
 
@@ -270,7 +271,7 @@ export const GridPsku = () => {
 
 
     return (
-        <div className="ag-theme-quartz-dark" style={{ height: 1000, width: 1270 }}>
+        <div className="ag-theme-quartz-dark" style={{ height: '85vh', width: 1270 }}>
 
             <SearchBar title='Parent SKUs' titlecount={rowData.length} search={search} setSearch={setSearch} />
 

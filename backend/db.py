@@ -1,12 +1,29 @@
 from data_imports.get_data import *
 from models import *
 from db_shipping import init_shipping_db
+from db_init import files_in_dir
 
+DATA_DIR = '../dataDir/'
+MODELS_DIR = f'{DATA_DIR}Models/'
+SHIPPING_DIR = f'{DATA_DIR}shipping/'
+WAREHOUSE_DIR_DEFAULT = 'WarehouseMain/'
+
+available_shippins = []
+
+# models = ['Vendor', 'SKU', 'Packaging' 'PSKU', 'Warehouse', 'PackagingWarehouse', 'PackagingVendor']
 # lst = ['Warehouse']
-lst = ['Vendor', 'SKU', 'ProductTag', 'PSKU', 'Packaging', 'Warehouse']
+lst = ['Vendor', 'SKU', 'ProductTag', 'PSKU', 'Warehouse']
+
+
+try:
+    my_lst = files_in_dir(MODELS_DIR)
+    for i in my_lst:
+        print(f'AddingSuccesfully {i} to lst')
+except Exception as e:
+    raise RuntimeError("An error occurred when calling files_in_dir") from e
+
 
 db_model = {} 
-
 def do_psku(instance):
     global db_model
     product_tag = instance.product_tag #.lower() but also need to change it in the productDB
@@ -31,6 +48,7 @@ def do_psku(instance):
 def do_shipping(instance):
     return
 
+
 ptr_model = None
 for name in lst:
     dataframe, attr = read_excel_to_json('data_imports/DB_SEEDING.xlsx', name)
@@ -40,7 +58,7 @@ for name in lst:
     
     # we need try if else here
     for data in dataframe:
-        print(f'Adding {name} to data: ', data)
+        # print(f'Adding {name} to data: ', data)
         
         instance = ptr_model(**data)
 

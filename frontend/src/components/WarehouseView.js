@@ -69,7 +69,7 @@ const GridWarehouse = () => {
     window.ptr = rowData;
 
     return (
-        <div className="ag-theme-quartz-dark" style={{ height: 800, width: 1270 }}>
+        <div className="ag-theme-quartz-dark" style={{ height: '70vh', width: 1270 }}>
             <SearchBar title='Warehouse' titlecount={rowData.length} search={search} setSearch={setSearch} />
             <AgGridReact
                 columnDefs={colData}

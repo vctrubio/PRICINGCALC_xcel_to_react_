@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException, File, UploadFile, Query
 from fastapi.middleware.cors import CORSMiddleware
-from models import Vendor, SKU, PSKU, Shipping, Warehouse, ProductTag, Packaging
+from models import Vendor, SKU, PSKU, Shipping, Warehouse, ProductTag, PackagingWarehouse
 from db import db_model
 import json
 
@@ -8,7 +8,7 @@ import json
 vendors = {v.name_id: v for v in db_model['Vendor'].values()}
 skus = {v.name_id: v for v in db_model['SKU'].values()}
 warehouse = list(db_model['Warehouse'].values())
-packaging = list(db_model['Packaging'].values())
+# packagingWarehouse = list(db_model['PackagingWarehouse'].values())
 pskus = {v.name_id: v for v in db_model['PSKU'].values()}
 shipping = list(db_model['Shipping'].values())
 
@@ -197,18 +197,19 @@ async def create_warehouse(ptr: Warehouse):
 
 
 
-'''Packaging'''
+'''Packaging
 @app.get("/packaging")
 async def root():
-    return packaging
+    return packagingWarehouse
 
 @app.post("/packaging")
-async def create_packaging(packaging: Packaging):
-    if packaging.name_id not in db_model['Packaging']:
-        db_model['Packaging'][packaging.name_id] = packaging
+async def create_packaging(packaging: PackagingWarehouse):
+    if packaging.name_id not in db_model['PackagingWarehouse']:
+        db_model['PackagingWarehouse'][packaging.name_id] = packaging
         return {"message": "Packaging created successfully"}
     raise HTTPException(status_code=400, detail="Packaging already exists")
 
+'''
 '''ProductTag'''
 @app.get("/producttag")
 async def root():
