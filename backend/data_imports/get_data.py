@@ -14,8 +14,27 @@ def rtn_header_to_attr(header):
     
     return header
 
-def read_excel_to_json(file, sheet):
+def read_excel_to_json_sheet(file, sheet):
     df = pd.read_excel(file, sheet_name=sheet)
+    get_attr = []
+    for i in df.columns.tolist():
+        if not i.startswith('/'):
+            get_attr.append(rtn_header_to_attr(i))
+    
+    df = df.drop(columns=[col for col in df.columns if col.startswith('/')])
+    df.columns = get_attr
+    
+    data = []
+    for _, row in df.iterrows():
+        ptr = {attr: row[attr] for attr in get_attr if not pd.isna(row[attr])}
+        if not ptr:
+            break
+        data.append(ptr)
+
+    return data, get_attr
+
+def read_excel_to_json(file):
+    df = pd.read_excel(file)
     get_attr = []
     for i in df.columns.tolist():
         if not i.startswith('/'):

@@ -86,7 +86,7 @@ const ConsumerPPFee = () => {
 
     return (
         <div className="ag-theme-quartz-dark" style={{ height: 510, width: 1270 }}>
-            <SearchBar title='Payments' titlecount={null} search={search} setSearch={setSearch} />
+            <SearchBar title='Payments' titlecount={null} search={search} setSearch={setSearch} data={rowData}/>
             <AgGridReact 
                 columnDefs={colDefs3}
                 defaultColDef={{ flex: 1 }}

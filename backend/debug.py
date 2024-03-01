@@ -14,3 +14,8 @@ def models_in_globals():
         print(f'Found {i}')
         
     return class_names
+
+# w = db_model['Warehouse']
+# for i in w:
+#     print(f'Warehouse Name: {i}')
+    

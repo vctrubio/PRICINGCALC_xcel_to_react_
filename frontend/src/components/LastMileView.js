@@ -77,7 +77,7 @@ const LastMileGrid = () => {
     const [rowData, setRowData] = useState([])
     const [colData, setColData] = useState(
         [
-            { headerName: 'Courier', field: 'Courrier', maxWidth: 120 },
+            { headerName: 'Courier', field: 'Courier', maxWidth: 120 },
             { headerName: 'Type', field: 'Type', width: 150 },
             { headerName: 'Weight', field: 'Weight', width: 80 },
             {
@@ -116,7 +116,7 @@ const LastMileGrid = () => {
                     Object.entries(courier.shipping_table).forEach(([service_type, shipping_table]) => {
                         Object.entries(shipping_table.price_zone).forEach(([weight, zones]) => {
                             const row = {
-                                Courrier: name_id,
+                                Courier: name_id,
                                 Type: service_type,
                                 Weight: weight,
                                 Countries: {
@@ -158,7 +158,7 @@ const LastMileGrid = () => {
     window.t = selectedWarehouse
     return (
         <div className="ag-theme-quartz-dark" style={{ height: 800, width: 1270 }}>
-            <SearchBar title='Last Mile' titlecount={rowData ? rowData.length : 0} search={search} setSearch={setSearch} />
+            <SearchBar title='Last Mile' titlecount={rowData ? rowData.length : 0} search={search} setSearch={setSearch} data={rowData}/>
 
             <div className='d-flex flex-start pb-2'>
                 <Dropdown>

@@ -1,11 +1,11 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Button, TextField, Grid, FormHelperText, Select, MenuItem, FormControl, InputLabel, Paper } from '@material-ui/core';
 import Autocomplete from '@material-ui/lab/Autocomplete';
-import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
-import { createTheme } from '@material-ui/core/styles'
+import { createTheme, createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
 import switchOff from '../assets/switchoff.png';
 import switchOn from '../assets/switchon.png';
 
+import axios from 'axios';
 import { useSkuForm } from './CskuForm';
 import '../App.css';
 import { red } from '@mui/material/colors';
@@ -18,6 +18,9 @@ function transformWarehouse(warehouse) {
             warehouseID: details.name_id,
             originID: details.origin,
             productTags: productTag
+            // shipping couriers
+            // shipping types
+            // shipping countries
         };
     });
 }
@@ -48,10 +51,14 @@ selected country to ship - gets what data to calculate
 
 
 function WarehousesSort({ warehouses }) {
-    const transformedWarehouses = warehouses ? Object.values(warehouses).flatMap(transformWarehouse) : [];
+    const transformedWarehouses = warehouses
+        ? Object.values(warehouses)
+            .flatMap(transformWarehouse)
+            .filter(warehouse => Object.keys(warehouse).length !== 0)
+        : [];
+
     const uniqueIds = Array.from(new Set(transformedWarehouses.map(item => JSON.stringify({ warehouseID: item.warehouseID, originID: item.originID }))), JSON.parse);
     return uniqueIds.sort((a, b) => a.originID.localeCompare(b.originID));
-
 }
 
 function getDataByTag(warehouse, tags) {
@@ -68,22 +75,9 @@ function getDataByTag(warehouse, tags) {
     return resultArray;
 }
 
-export const countries = {
-    'Spain': 'zone_1',
-    'Germany': 'zone_1',
-    'France': 'zone_1',
-    'Italy': 'zone_1',
-    'Portugal': 'zone_1',
-    'Netherlands': 'zone_1',
-    'Thailand': 'zone_2',
-    'China': 'zone_2',
-    'Japan': 'zone_2',
-    'Australia': 'zone_3',
-    'USA': 'zone_3',
-    'Canada': 'zone_4',
-    'Mexico': 'zone_4',
-    'Brazil': 'zone_14',
-}
+
+//we can include wich warehouse have this option as value
+//db_model['Shipping'].keys
 export const shippings = {
     'DHL': 'zone_1',
     'Fedex': 'zone_1',
@@ -98,41 +92,34 @@ export const carriers = {
 
 
 
-
-
 export const FormX = () => {
 
     const { getData } = useSkuForm();
 
-    const [collapsedStates, setCollapsedStates] = useState({});
     const [selectedWh, setSelectedWh] = useState(null);
     const [selectedSku, setSelectedSku] = useState([]);
     const [selectedPT, setSelectedPT] = useState([]);
     const [showSku, setShowSku] = useState([]);
     const [allWh, setAllWh] = useState({});
     const [allSku, setAllSku] = useState([]);
-    const [searchTab, setsearchTab] = useState('');
     const [cSkus, setCSkus] = useState([]);
-
-    const [selectedUiCountry, setSelectedUiCountry] = useState('');
-
+    const [countries, setCountries] = useState([])
 
     window.skus = allSku
     window.wh = allWh
     window.sels = selectedSku
     window.selw = selectedWh
     window.selhey = selectedPT
-
-    console.log('see me: ', allWh)
+    window.c = countries
+    // console.log('see me: ', allWh)
     useEffect(() => {
         const fetch = async () => {
             try {
                 const [wh, sku, csku] = await Promise.all([
                     getData('warehouse', 'value'),
                     getData('psku', 'value'),
-                    getData('sku', 'value')
+                    getData('sku', 'value'),
                 ]);
-
                 const tempWh = wh.reduce((acc, warehouse) => {
                     const warehouseId = Object.values(warehouse)[0].name_id;
                     acc[warehouseId] = warehouse;
@@ -146,8 +133,20 @@ export const FormX = () => {
                 console.error('Error Pricing Calculator Caling API:', error);
             }
         }
+        const fetchSingular = async (name) => {
+            try{
+                const response = await axios.get(`http://localhost:8000/${name}`)
+                if (response.data)
+                    setCountries(response.data)
+            }
+            catch (error) {
+                console.log('fetchSingular threw an error, ', error);
+            }
+        }
         fetch()
+        fetchSingular('country')
     }, []);
+
     window.milo = cSkus;
 
     useEffect(() => {
@@ -238,8 +237,6 @@ export const FormX = () => {
     };
 
     const handleWhToggleTag = (key) => {
-
-
         setSelectedPT(prevSelectedPT => {
             if (prevSelectedPT.includes(key)) {
                 // If key is already in selectedPT, remove it
@@ -317,11 +314,10 @@ export const FormX = () => {
         }));
     };
 
-    window.t3 = selectedUiCountry
     const [uiShipping, setUiShipping] = useState({
         country: '',
         shipping: '',
-        carrier: '',
+        type: '',
         b2c: true,
     });
 
@@ -370,9 +366,6 @@ export const FormX = () => {
                 }
             }
         }
-
-
-
     }, [selectedSku, selectedWh, selectedPT, uiOM, uiDC, uiShipping])
 
     window.cc = CalcOutput.priceWithDiscount
@@ -386,7 +379,7 @@ export const FormX = () => {
                         <div type='button'
                             style={{ color: uiShipping.country ? '#696862' : '', paddingLeft: 5 }}
 
-                            onClick={() => toggleDropdown('country')}>
+                            onClick={() => { toggleDropdown('country'); setUiShipping({ ...uiShipping, country: null }); }}>
                             Country
                         </div>
                         {showDropdown.country && (
@@ -398,7 +391,6 @@ export const FormX = () => {
                                                 ...prevState,
                                                 country: country
                                             }));
-                                            setSelectedUiCountry(country)
                                             toggleDropdown('country');
                                         }}
                                     >{country}</div>
@@ -415,8 +407,8 @@ export const FormX = () => {
                             <div type='button'
                                 style={{ color: uiShipping.shipping ? '#696862' : '' }}
 
-                                onClick={() => toggleDropdown('shippingName')}>
-                                Corrier
+                                onClick={() => { toggleDropdown('shippingName'); setUiShipping({ ...uiShipping, shipping: null }) }}>
+                                Courier
                             </div>
                             {showDropdown.shippingName && (
                                 <div className='align-dropwdown-down'>
@@ -442,27 +434,27 @@ export const FormX = () => {
                         <div className='d-flex flex-column' style={{ textAlign: 'left', position: 'relative' }}>
 
                             <div type='button'
-                                style={{ color: uiShipping.carrier ? '#696862' : '', paddingRight: 5 }}
-                                onClick={() => toggleDropdown('shippingType')}>
+                                style={{ color: uiShipping.type ? '#696862' : '', paddingRight: 5 }}
+                                onClick={() => {toggleDropdown('shippingType'); setUiShipping({... uiShipping, type: null})}}>
                                 Type
                             </div>
                             {showDropdown.shippingType && (
                                 <div className='align-dropwdown-down width-100'>
-                                    {Object.keys(carriers).map((carrier, index) => (
+                                    {Object.keys(carriers).map((type, index) => (
                                         <div type='button' className='align-dropdown-bec' key={index}
                                             onClick={() => {
                                                 setUiShipping(prevState => ({
                                                     ...prevState,
-                                                    carrier: carrier
+                                                    type: type
                                                 }));
                                                 toggleDropdown('shippingType');
                                             }}
-                                        >{carrier}</div>
+                                        >{type}</div>
                                     ))}
                                 </div>
                             )}
                             <div className='pt-2' s>
-                                {uiShipping.carrier}
+                                {uiShipping.type}
                             </div>
                         </div>
                     </div>
@@ -587,19 +579,19 @@ export const FormX = () => {
                                             )
                                         )
                                         : WarehousesSort({ warehouses: allWh })
-                                            .filter(wh => selectedUiCountry.length > 0 ? wh.originID === selectedUiCountry : true)
+                                            .filter(wh => uiShipping.country && uiShipping.country.length > 0 ? wh.originID === uiShipping.country : true) //not origin . it is countries to ship to
                                             .map((wh, index) => (
-                                            <div key={index} onClick={() => setSelectedWh(wh)}>
-                                                <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', width: '100%' }}>
-                                                    <div>
-                                                        {wh.originID}
-                                                    </div>
-                                                    <div>
-                                                        {wh.warehouseID}
+                                                <div key={index} onClick={() => setSelectedWh(wh)}>
+                                                    <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', width: '100%' }}>
+                                                        <div>
+                                                            {wh.originID}
+                                                        </div>
+                                                        <div>
+                                                            {wh.warehouseID}
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                        )))
+                                            )))
                             }
                         </div>
                         {selectedWh ?
@@ -609,7 +601,6 @@ export const FormX = () => {
                                 <Button style={{ fontSize: 24, paddingBottom: 2 }}><i onClick={themometerOn} class="bi bi-thermometer-high" title="Select All"></i></Button>
                             </div>
                             : selectedSku.length > 0 ? <div className='d-flex justify-content-around'> WH Fees: Unit | Storage | Pick n Pack | Custom | Total </div> :
-
 
                                 null}
                     </div>

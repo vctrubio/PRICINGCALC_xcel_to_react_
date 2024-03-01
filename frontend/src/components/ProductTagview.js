@@ -83,53 +83,54 @@ export const ProductTag = () => {
 
     return (
         <div className="ag-theme-quartz-dark" style={{ height: 800, width: 1270 }}>
+            <div className='container m-5' style={{border: '1px solid black'}}>
 
-            <SearchBar title='Product Tags' titlecount={rowData.length} />
-
-            <main className='d-flex'>
-                <div className="col-md-4">
-                    {rowData.map((tag, index) => (
-                        <div key={index} className="col-md-10">
-                            <div className="card p-1 pb-0 mb-2">
-                                <div className="d-flex justify-content-between align-items-baseline" style={{ fontSize: 24, alignItems: 'center', marginLeft: 9 }}>
-                                    <p>{tag}</p>
-                                    <Button className="btn btn-dark mb-1 mt-1" onClick={() => handleDelTag(tag)}>
-                                        <i className="bi bi-trash"></i>
-                                    </Button>
+                <main className='d-flex'>
+                    <div className="col-md-4">
+                        <h1>Product Tag</h1>
+                        {rowData.map((tag, index) => (
+                            <div key={index} className="col-md-10">
+                                <div className="card p-1 pb-0 mb-2">
+                                    <div className="d-flex justify-content-between align-items-baseline" style={{ fontSize: 24, alignItems: 'center', marginLeft: 9 }}>
+                                        <p>{tag}</p>
+                                        <Button className="btn btn-dark mb-1 mt-1" onClick={() => handleDelTag(tag)}>
+                                            <i className="bi bi-trash"></i>
+                                        </Button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    ))}
-                    <div className="col-md-10">
-                        <div className="card mb-4">
-                            <div className="row p-2">
-                                <div className="col-md-9 p-2 d-flex align-items-stretch">
-                                    <input
-                                        type="text"
-                                        className="form-control"
-                                        placeholder="Product Tag Name"
-                                        value={newTag}
-                                        onChange={handleInputChange}
-                                        onKeyPress={handleKeyPress}
-                                    />
-                                </div>
-                                <div className="col-md-1 d-flex align-items-stretch" style={{marginLeft: 16}}>
-                                    <button className="btn btn-primary" onClick={handleAddTag}><i class="bi bi-plus-square-fill"></i></button>
+                        ))}
+                        <div className="col-md-10">
+                            <div className="card mb-4">
+                                <div className="row p-2">
+                                    <div className="col-md-9 p-2 d-flex align-items-stretch">
+                                        <input
+                                            type="text"
+                                            className="form-control"
+                                            placeholder="Product Tag Name"
+                                            value={newTag}
+                                            onChange={handleInputChange}
+                                            onKeyPress={handleKeyPress}
+                                        />
+                                    </div>
+                                    <div className="col-md-1 d-flex align-items-stretch" style={{ marginLeft: 16 }}>
+                                        <button className="btn btn-primary" onClick={handleAddTag}><i class="bi bi-plus-square-fill"></i></button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div className='d-flex flex-start'>
-                </div>
-            </main>
+                    <div className='d-flex flex-start'>
+                    </div>
+                </main>
 
-            <div className='row'>
-                {showAlert && (
-                    <Alert severity="error" onClose={() => setShowAlert(false)}>
-                        Product Tag already exists.
-                    </Alert>
-                )}
+                <div className='row'>
+                    {showAlert && (
+                        <Alert severity="error" onClose={() => setShowAlert(false)}>
+                            Product Tag already exists.
+                        </Alert>
+                    )}
+                </div>
             </div>
         </div >
     );

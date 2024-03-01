@@ -64,7 +64,7 @@ const GridTwo = () => {
     return (
         <div className="ag-theme-quartz-dark" style={{ height: '68vh', width: 1270 }}>
 
-            <SearchBar title='SKUs' titlecount={rowData.length} search={search} setSearch={setSearch} />
+            <SearchBar title='SKUs' titlecount={rowData.length} search={search} setSearch={setSearch} data={rowData}/>
             <AgGridReact
                 columnDefs={colData}
                 defaultColDef={{ flex: 1 }}                    

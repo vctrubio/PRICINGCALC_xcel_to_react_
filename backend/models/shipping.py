@@ -3,15 +3,15 @@ from typing import List, Tuple, Dict
 from .warehouse import Warehouse
 
 
-class Zone(BaseModel):
-    int_id: str
-    country_list: list[str] = []
+# class Zone(BaseModel):
+#     int_id: str
+#     country_list: list[str] = []
     
-    def get_zone(self, country):
-        for i in self.country_list:
-            if i == country:
-                return self.int_id
-        return None
+#     def get_zone(self, country):
+#         for i in self.country_list:
+#             if i == country:
+#                 return self.int_id
+#         return None
     
 
 class ShippingTable(BaseModel):
@@ -33,7 +33,8 @@ class ShippingTable(BaseModel):
         
 class Shipping(BaseModel):
     name_id: str #DHL
-    zones: list[Zone] = [] #what zones it coveres #not completed methods
+    warehouses: List[str] = [] #what zones it coveres #not completed methods
+    #BUT i thnkg ^ should be warehouses
     shipping_table: Dict[str, ShippingTable] = {}
     
     def get_price(self, country, weight):
@@ -44,14 +45,12 @@ class Shipping(BaseModel):
                     return i.price_zone[zone]
         return None
     
-    def get_zone(self, country):
-        for i in self.zones:
-            if i.get_zone(country):
-                return i.get_zone(country)
-        return None
+    # def get_zone(self, country):
+    #     for i in self.zones:
+    #         if i.get_zone(country):
+    #             return i.get_zone(country)
+    #     return None
     
-    def append_zone(self, zone: Zone):
-        self.zones.append(zone)
     
     def append_shipping_table(self, shipping_table: ShippingTable):
         self.shipping_table[shipping_table.name_id] = shipping_table

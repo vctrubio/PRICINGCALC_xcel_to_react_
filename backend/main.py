@@ -1,9 +1,9 @@
-from fastapi import FastAPI, HTTPException, File, UploadFile, Query
+from fastapi import FastAPI, HTTPException, File, UploadFile, Query, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from models import Vendor, SKU, PSKU, Shipping, Warehouse, ProductTag, PackagingWarehouse
 from db import db_model
 import json
-
+import os
 
 vendors = {v.name_id: v for v in db_model['Vendor'].values()}
 skus = {v.name_id: v for v in db_model['SKU'].values()}
@@ -11,6 +11,7 @@ warehouse = list(db_model['Warehouse'].values())
 # packagingWarehouse = list(db_model['PackagingWarehouse'].values())
 pskus = {v.name_id: v for v in db_model['PSKU'].values()}
 shipping = list(db_model['Shipping'].values())
+
 
 app = FastAPI()
 
@@ -28,6 +29,18 @@ async def get_disposable_models():
     lst = [model.lower() for model in db_model]
     return {'Models': lst}
    
+@app.post("/upload")
+async def upload_file(file_name: str, file: UploadFile = File(...)):
+    parent_directory = os.path.dirname(os.getcwd())
+    directory = os.path.join(parent_directory, 'dataDir/Models')
+    file_location = f"{directory}/{file_name}"
+    try:
+        with open(file_location, "wb+") as file_object:
+            file_object.write(file.file.read())
+        return {"info": "file uploaded successfully"}
+    except Exception as e:
+        print(f"Error uploading file: {e}")
+        return {"error": "Internal Server Error"}
 
 ''' VENDORS ''' 
 @app.get("/vendor")
@@ -106,9 +119,10 @@ async def create_sku(sku: SKU):
 @app.get("/psku")
 async def root():
     try:
-        return pskus
+        return [sku.get_json() for sku in pskus.values()]
     except Exception as e:
         raise HTTPException(status_code=422, detail=str(e))
+
     
 @app.get("/pskujson")
 async def root():
@@ -210,6 +224,15 @@ async def create_packaging(packaging: PackagingWarehouse):
     raise HTTPException(status_code=400, detail="Packaging already exists")
 
 '''
+@app.get("/packagingvendor")
+async def root():
+    return db_model['PackagingVendor']
+
+@app.get("/packagingwarehouse")
+async def root():
+    return db_model['PackagingWarehouse']
+
+
 '''ProductTag'''
 @app.get("/producttag")
 async def root():
@@ -236,12 +259,27 @@ async def delete_producttag(name_id: str):
 async def root():
     return [psku.get_json() for psku in pskus]
 
+'''WarehouseConfig'''
+@app.get("/warehouseconfig/{name_id}")
+async def root(name_id: str):
+    if name_id in db_model['WarehouseConfig']:
+        return db_model['WarehouseConfig'][name_id]
+    raise HTTPException(status_code=404, detail="WarehouseConfig not found")
+
+@app.get("/warehouseconfig")
+async def root():
+    return db_model['WarehouseConfig']
 
 '''Zone'''
 @app.get("/zone")
 async def root():
     return db_model['Zone']
 
+
+'''Country'''
+@app.get("/country")
+async def root():
+    return db_model['Country']
 
 '''Shipping'''
 @app.get("/shipping")

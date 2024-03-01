@@ -57,7 +57,7 @@ const GridVendor = () => {
     return (
         // style={{ height: 800, width: 1270 }}>
         <div className="ag-theme-quartz-dark maincontent" style={{ height: '70vh', width: 1270 }}>
-            <SearchBar title='Vendor' titlecount={rowData.length} search={search} setSearch={setSearch} />
+            <SearchBar title='Vendor' titlecount={rowData.length} search={search} setSearch={setSearch} data={rowData}/>
             <AgGridReact
                 columnDefs={colData}
                 rowData={rowData}

@@ -1,9 +1,10 @@
 import React, { useEffect, useRef, useState, useMemo } from 'react'
 import { Form, Dropdown, Button, ButtonGroup, Col } from 'react-bootstrap';
 
+import { CSVLink } from 'react-csv';
 
-
-export const SearchBar = ({ title, titlecount, search, setSearch }) => {
+//to upload get title add .xlsx and post to api
+export const SearchBar = ({ title, titlecount, data, search, setSearch }) => {
 
 
     return (
@@ -30,17 +31,19 @@ export const SearchBar = ({ title, titlecount, search, setSearch }) => {
                     </ButtonGroup>
                 </searchbar>
                 <button className="btn btn-dark"
-                    style={{ marginLeft: '10px', fontSize: '20px' }}
-                    title={`Download '${title}'`}>
-                    <i class="bi bi-download"></i>
+                    style={{ marginLeft: '10px', fontSize: '20px',textAlign: 'center' }}
+                    title={`Upload CSV: '${title}'`}>
+                    <i class="bi bi-upload"></i>
                 </button>
-                <button className="btn btn-dark"
-                    style={{ marginLeft: '10px', fontSize: '20px', paddingTop: 8 }}
-                    title={`Download '${title}'`}>
-                    <i class="bi bi-cloud-upload"></i>
-                </button>
+                <CSVLink className="btn btn-dark"
+                    style={{ marginLeft: '10px', fontSize: '20px', paddingTop: 19 }}
+                    title={`Download CSV:'${title}'`}
+                    filename={title}
+                    data={data}
+                >
+                    <i class="bi bi-cloud-download"></i>
+                </CSVLink>
             </div>
-
         </div>
     )
 }

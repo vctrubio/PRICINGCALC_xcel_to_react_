@@ -5,11 +5,7 @@ import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-quartz.css'
 import '../AppGrid.css';
 import { Form, Dropdown, Button, ButtonGroup } from 'react-bootstrap';
-import SkuLink from './SkuLink';
-import MyModal from './MyModal'
 import { getData, vendorData, setVendorData, mySku, useSkuForm, productTag, setProductTag, generatePId } from './CskuForm';
-import WarehouseForm from './WarehouseForm'
-
 import { SearchBar } from './SearchBar'
 
 export const NavPskuBar = ({ productTag, setPT, LinkSkuBtn, pskuId, setPskuId, pDes, setPDes }) => {
@@ -124,9 +120,10 @@ export const GridPsku = () => {
             minWidth: 200,
             valueFormatter: params => params.value ? params.value.join(' ') : ''
         },
-        { headerName: 'Description', field: 'description', width: 120 },
+        { headerName: 'Total Cogs €', field: 'total_cogs', minWidth: 60},
+        { headerName: 'Total Weight KG', field: 'total_weight', minWidth: 60},
         { headerName: 'Product Tag', field: 'product_tag', width: 140 },
-        { headerName: 'Total Cogs', field: 'total_cogs', minWidth: 60},
+        { headerName: 'Description', field: 'description', width: 120 },
     ])
 
 
@@ -273,8 +270,7 @@ export const GridPsku = () => {
     return (
         <div className="ag-theme-quartz-dark" style={{ height: '85vh', width: 1270 }}>
 
-            <SearchBar title='Parent SKUs' titlecount={rowData.length} search={search} setSearch={setSearch} />
-
+            <SearchBar title='Parent SKUs' titlecount={rowData.length} search={search} setSearch={setSearch} data={rowData}/>
             <AgGridReact
                 columnDefs={colData}
                 defaultColDef={{ flex: 1 }}

@@ -2,15 +2,24 @@ from data_imports.get_data import *
 from models import *
 
 
+
+'''
+grab all warehouses, see which directory exist of the warehouse
+go into directory, split the file to get courier,
+see sheets to see types of shipping
+parse data into appropiate model
+'''
+
+
+
+
 def shipping_courier(file, name):
-    dataframe, attr = read_excel_to_json(file, name)
+    dataframe, attr = read_excel_to_json_sheet(file, name)
     tmp = ShippingTable(name_id=name)
     origin = []
 
     for data in dataframe:
         weight = data['weight_kg']
-        # if data['origin']:
-        #     origin.append(data['origin'])
         result = {}
         for key, value in data.items():
             if 'zone' in key:
@@ -21,20 +30,10 @@ def shipping_courier(file, name):
     return tmp
 
 
-def parse_shipping_table(xcel_file, *sheets):
-    name = xcel_file.split('_')[2].split('.')[0]
+def parse_shipping_table(xcel_file, name, *sheets):
     shipping = Shipping(name_id=name)
     for i in sheets:
         for value in i:
             table = shipping_courier(xcel_file, value)
             shipping.append_shipping_table(table)
     return shipping
-
-
-def init_shipping_db(filename='data_imports/Shipping_DHL.xlsx', *args):
-    from db import db_model
-    if not 'Shipping' in db_model:
-        db_model['Shipping'] = {}
-
-    shipping = parse_shipping_table(filename, args)
-    db_model['Shipping'][shipping.name_id] = shipping

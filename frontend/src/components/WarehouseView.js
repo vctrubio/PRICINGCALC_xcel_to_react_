@@ -70,7 +70,7 @@ const GridWarehouse = () => {
 
     return (
         <div className="ag-theme-quartz-dark" style={{ height: '70vh', width: 1270 }}>
-            <SearchBar title='Warehouse' titlecount={rowData.length} search={search} setSearch={setSearch} />
+            <SearchBar title='Warehouse' titlecount={rowData.length} search={search} setSearch={setSearch} data={rowData}/>
             <AgGridReact
                 columnDefs={colData}
                 defaultColDef={{ flex: 1 }}

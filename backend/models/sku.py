@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, validator
 from .vendor import Vendor
 from .producttag import ProductTag
 from typing import Optional, List
@@ -25,6 +25,8 @@ class SKU(BaseModel):
         except Exception as e:
             print(e)
 
+    def weight(self):
+        return self.weight_kg
     # get pp suplier cost
     def get_pp_supplier(self):
         return self.cogs * self.vendor().pp_rate_ / 100 
@@ -36,7 +38,6 @@ class SKU(BaseModel):
     # get total cost
     def get_total_cost(self):
         return self.get_pp_supplier() + self.get_exchange_fee() + self.cogs +self.first_mile
-        return self.cogs +self.first_mile
     
     def get_json(self):
         details = {
@@ -60,14 +61,23 @@ class PSKU(BaseModel):
     product_tag: str
     skus: list[str] = []
     description: Optional[str] = None 
+
+    @property
+    def total_cogs(self):
+        return sum(self.sku_to_sku(sku).get_total_cost() for sku in self.skus)
     
+    @property
+    def total_weight(self):
+        return sum(self.sku_to_sku(sku).weight() for sku in self.skus)
+    
+  
     def __init__(self, name_id: str, skus: str, product_tag:None, description:None):
         if product_tag is not None:
             super().__init__(name_id=name_id, product_tag=product_tag, description=description)
         else:
             super().__init__(name_id=name_id)
         self.skus = self.get_skus(skus)
-    
+
     def append_sku(self, sku: SKU):
         if sku.name_id not in self.skus:
             self.skus.append(sku.name_id)
@@ -81,7 +91,6 @@ class PSKU(BaseModel):
         return skus
         #for i in skus: if sku is not present in db, throw error
     
-    @classmethod
     def sku_to_sku(cls, sku_id: str):
         from db import db_model
         try:
@@ -89,37 +98,15 @@ class PSKU(BaseModel):
         except Exception as e:
             print(e)
             return None  # Return None if SKU is not found
-
-    @property
-    def description(self) -> str:
-        return ", ".join(self.sku_to_sku(sku).description for sku in self.skus)
-
-    @property
-    def cogs(self) -> int:
-        return sum(self.sku_to_sku(sku).cogs for sku in self.skus)
-
-    @property
-    def first_mile(self) -> int:
-        return sum(self.sku_to_sku(sku).first_mile for sku in self.skus)
-   
-    @property
-    def weight_kg(self) -> float:
-        return sum(self.sku_to_sku(sku).weight_kg for sku in self.skus)
-    
-    @property
-    def total(self) -> float:
-        return sum(self.sku_to_sku(sku).get_total_cost() for sku in self.skus)
+    #we need to get all warehouse ids for this sku
 
     def get_json(self):
         details = {
             'name_id': self.name_id,
             'product_tag': self.product_tag,
             'skus': self.skus,
-            'total_cost': self.total,
-            'cogs': self.cogs,
-            'first_mile': self.first_mile,
-            'weight_kg': self.weight_kg,
+            'description': self.description,
+            'total_cogs': round(self.total_cogs, 2),
+            'total_weight': self.total_weight,
         }
         return details
-    
-    #we need to get all warehouse ids for this sku
