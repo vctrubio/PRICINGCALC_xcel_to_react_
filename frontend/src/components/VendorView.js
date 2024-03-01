@@ -14,7 +14,6 @@ async function getData(model) {
         const response = await axios.get(`http://localhost:8000/${model}`);
         const dataArray = Object.values(response.data);
         window.ptr = dataArray;
-        console.log(model, ' Data from API:', dataArray);
         return dataArray;
     } catch (error) {
         console.error('There was a BIGFAT error!', error);

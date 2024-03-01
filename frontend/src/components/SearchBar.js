@@ -11,8 +11,8 @@ export const SearchBar = ({ title, titlecount, data, search, setSearch }) => {
         if (header.endsWith('_')) {
             header = header.slice(0, -1) + '%';
         }
-        else if (header.startsWith('_')) {
-            header = header.replace('_', '/')
+        if (header.startsWith('_')) {
+            header = header.replace('_', '/');
         }
 
         header = header.replace(/_/g, ' ');
@@ -20,7 +20,7 @@ export const SearchBar = ({ title, titlecount, data, search, setSearch }) => {
             .split(' ')
             .map((word, index) => {
                 if (word.charAt(0) === '/') {
-                    return '_' + word.charAt(1).toUpperCase() + word.slice(2);
+                    return '/' + word.charAt(1).toUpperCase() + word.slice(2);
                 } else {
                     return word.charAt(0).toUpperCase() + word.slice(1);
                 }
@@ -29,6 +29,7 @@ export const SearchBar = ({ title, titlecount, data, search, setSearch }) => {
         return header;
     }
 
+    
     const handleExport = () => {
         const title_name = title + '.xlsx';
 

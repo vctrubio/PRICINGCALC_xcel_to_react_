@@ -56,7 +56,7 @@ class SKU(BaseModel):
             'first_mile': self.first_mile,
             'vendor': vendor,
             'weight_kg': self.weight_kg,
-            'pp_rate': vendor.pp_rate_ if vendor else None,
+            'pp_rate_': vendor.pp_rate_ if vendor else None,
             '_pp_supplier': self.get_pp_supplier(),
             '_exchange_rate': vendor.exchange_rate_ if vendor else None,
             '_exchange_fee': self.get_exchange_fee(),
