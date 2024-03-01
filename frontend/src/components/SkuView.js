@@ -6,7 +6,6 @@ import 'ag-grid-community/styles/ag-theme-quartz.css'
 import '../AppGrid.css';
 
 import { SkuForm } from './SkuForm';
-import VendorForm from './VendorForm';
 import { SearchBar } from './SearchBar';
 
 

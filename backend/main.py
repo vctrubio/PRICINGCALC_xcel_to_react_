@@ -1,6 +1,7 @@
 from fastapi import FastAPI, HTTPException, File, UploadFile, Query, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from models import Vendor, SKU, PSKU, Shipping, Warehouse, ProductTag, PackagingWarehouse
+from fastapi.responses import JSONResponse
+from models import Vendor, SKU, PSKU, Shipping, Warehouse, ProductTag, PackagingWarehouse, PackagingVendor
 from db import db_model
 import json
 import os
@@ -228,9 +229,35 @@ async def create_packaging(packaging: PackagingWarehouse):
 async def root():
     return db_model['PackagingVendor']
 
+@app.post("/packagingvendor")
+async def create_packagingvendor(packaging: PackagingVendor):
+    #to check for product tag to exist. but thats handled in the front end
+    for list in db_model['PackagingVendor']:
+        if list.vendor_id == packaging.vendor_id and list.product_tag == packaging.product_tag:
+            list.cost_of_packaging = packaging.cost_of_packaging
+            return JSONResponse(status_code=202, content={"message": "PackagingVendor updated successfully"})
+    try:
+         db_model['PackagingVendor'].append(packaging)
+    except Exception as e:
+        raise HTTPException(status_code=422, detail=str(e))
+    return {"message": "PackagingVendor created successfully"}
+
+
 @app.get("/packagingwarehouse")
 async def root():
     return db_model['PackagingWarehouse']
+
+@app.post("/packagingwarehouse")
+async def create_packagingwarehouse(packaging: PackagingWarehouse):
+    for list in db_model['PackagingWarehouse']:
+        if list.product_tag == packaging.product_tag:
+            list.cost_of_packaging = packaging.cost_of_packaging
+            return JSONResponse(status_code=202, content={"message": "PackagingWarehouse updated successfully"})
+    try:
+         db_model['PackagingWarehouse'].append(packaging)
+    except Exception as e:
+        raise HTTPException(status_code=422, detail=str(e))
+    return {"message": "PackagingWarehouse created successfully"}
 
 
 '''ProductTag'''
