@@ -10,6 +10,7 @@ class Warehouse(BaseModel):
     storage_fee: int
     pick_and_pack_fee: int
     custom_fee: int
+
     def append_sku(self, sku: str):
         self.skus.append(sku)
 

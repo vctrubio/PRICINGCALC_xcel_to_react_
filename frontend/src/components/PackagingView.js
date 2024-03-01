@@ -127,15 +127,46 @@ const GridPackaging = () => {
         }
     }
 
+    const handleCellValueChangedVendor = async (event) => {
+        try {
+            for (let key in event.data) {
+                if (event.data[key] === undefined || event.data[key] === null) {
+                    console.error(`Error: ${key} is empty`);
+                    return;  // Exit the function if an empty field is found
+                }
+            }
+            const response = await axios.patch(`http://localhost:8000/packagingvendor/${event.data.vendor_id}/${event.data.product_tag}`, event.data);
+        }
+        catch (error) {
+            console.error('Error updating Vendor Packaging data:', error);
+        }
+    }
+
+    const handleCellValueChangedWarehouse = async (event) => {
+        try {
+            for (let key in event.data) {
+                if (event.data[key] === undefined || event.data[key] === null) {
+                    console.error(`Error: ${key} is empty`);
+                    return;  // Exit the function if an empty field is found
+                }
+            }
+            const response = await axios.patch(`http://localhost:8000/packagingwarehouse/${event.data.product_tag}`, event.data);
+        }
+        catch (error) {
+            console.error('Error updating Warehouse Packaging data:', error);
+        }
+    }
+
     return (
         <div className='mt-3 d-flex' style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
 
             <div className="ag-theme-quartz-dark" style={{ height: 800, width: 600, textAlign: 'left' }}>
-                <h3>Vendor's Packaging Fees</h3>
+                <SearchBar title='PackagingVendor' titlecount={rowData.length} search={''} setSearch={''} data={rowData} />
                 <AgGridReact
                     columnDefs={colData}
                     defaultColDef={{ flex: 1 }}
                     rowData={rowData}
+                    onCellValueChanged={handleCellValueChangedVendor}
                 >
                 </AgGridReact>
                 <div style={{ width: '100%', height: '4em', marginTop: '1em', paddingRight: 20 }}>
@@ -200,12 +231,14 @@ const GridPackaging = () => {
                 </div>
             </div>
 
-            <div className="ag-theme-quartz-dark" style={{ height: 800, width: 400, textAlign: 'left' }}>
-                <h3>Generic Packaging Fees</h3>
+            <div className="ag-theme-quartz-dark" style={{ height: 800, width: 600, textAlign: 'left' }}>
+                <SearchBar title='PackagingWarehouse' titlecount={rowData2.length} search={''} setSearch={''} data={rowData2} />
                 <AgGridReact
                     columnDefs={colData2}
                     defaultColDef={{ flex: 1 }}
-                    rowData={rowData2}>
+                    rowData={rowData2}
+                    onCellValueChanged={handleCellValueChangedWarehouse}
+                    >
                 </AgGridReact>
                 <div style={{ width: '100%', height: '4em', marginTop: '1em', paddingLeft: 5 }}>
                     <Form onSubmit={handleSubmitWarehouse}>

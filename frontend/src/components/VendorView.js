@@ -35,7 +35,7 @@ const GridVendor = () => {
     )
 
     const [showForm, setShowForm] = useState(false);
-
+    window.row = rowData
 
     useEffect(() => {
         getData('vendor').then(data => {
@@ -47,7 +47,21 @@ const GridVendor = () => {
         try {
             const updatedData = await getData('vendor');
             setRowData(updatedData);
-            console.log('Updated Vendor Data:', updatedData)
+        } catch (error) {
+            console.error('Error updating Vendor data:', error);
+            // Handle error appropriately (e.g., display a message)
+        }
+    }
+
+    const handleCellValueChanged = async (event) => {
+        try {
+            for (let key in event.data) {
+                if (event.data[key] === undefined || event.data[key] === null) {
+                    console.error(`Error: ${key} is empty`);
+                    return;  // Exit the function if an empty field is found
+                }
+            }
+            const response = await axios.patch(`http://localhost:8000/vendor/${event.data.name_id}`, event.data);
         } catch (error) {
             console.error('Error updating Vendor data:', error);
             // Handle error appropriately (e.g., display a message)
@@ -57,11 +71,12 @@ const GridVendor = () => {
     return (
         // style={{ height: 800, width: 1270 }}>
         <div className="ag-theme-quartz-dark maincontent" style={{ height: '70vh', width: 1270 }}>
-            <SearchBar title='Vendor' titlecount={rowData.length} search={search} setSearch={setSearch} data={rowData}/>
+            <SearchBar title='Vendor' titlecount={rowData.length} search={search} setSearch={setSearch} data={rowData} />
             <AgGridReact
                 columnDefs={colData}
                 rowData={rowData}
                 defaultColDef={{ flex: 1 }}
+                onCellValueChanged={handleCellValueChanged}
             />
             <div className='mt-4'>
                 <Button variant={showForm ? "dark" : "primary"} onClick={() => setShowForm(!showForm)}>

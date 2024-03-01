@@ -4,3 +4,4 @@ pydantic
 uvicorn
 openpyxl
 python-multipart
+xlsx

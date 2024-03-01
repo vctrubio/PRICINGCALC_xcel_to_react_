@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, File, UploadFile, Query, UploadFile
+from fastapi import FastAPI, HTTPException, File, UploadFile, Query, UploadFile, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from models import Vendor, SKU, PSKU, Shipping, Warehouse, ProductTag, PackagingWarehouse, PackagingVendor
@@ -31,10 +31,11 @@ async def get_disposable_models():
     return {'Models': lst}
    
 @app.post("/upload")
-async def upload_file(file_name: str, file: UploadFile = File(...)):
+async def upload_file(file: UploadFile = File(...),  filename: str = Form(...)):
+    print(f"Uploading file: {filename}")
     parent_directory = os.path.dirname(os.getcwd())
     directory = os.path.join(parent_directory, 'dataDir/Models')
-    file_location = f"{directory}/{file_name}"
+    file_location = f"{directory}/{filename}"
     try:
         with open(file_location, "wb+") as file_object:
             file_object.write(file.file.read())
@@ -55,9 +56,10 @@ async def root(name_id: str):
     raise HTTPException(status_code=404, detail="Vendor not found")
 
 @app.patch("/vendor/{name_id}")
-async def update_vendor(name_id: str, vendor: Vendor):
-    if name_id in vendors:  # check if the vendor exists in the vendors dictionary
-        vendors[name_id] = vendor.dict()  # update the vendor
+async def update_vendor(vendor: Vendor):
+    print(f'patching vendor {vendor}')
+    if vendor.name_id in vendors:  # check if the vendor exists in the vendors dictionary
+        vendors[vendor.name_id] = vendor.dict()  # update the vendor
         return {"message": "Vendor updated successfully"}
     raise HTTPException(status_code=404, detail="Vendor not found")
 
@@ -124,7 +126,15 @@ async def root():
     except Exception as e:
         raise HTTPException(status_code=422, detail=str(e))
 
-    
+
+@app.patch("/psku/{name_id}")
+async def update_psku(psku: PSKU):
+    if psku.name_id in pskus:
+        pskus[psku.name_id] = psku
+        return {"message": "PSKU updated successfully"}
+    raise HTTPException(status_code=404, detail="PSKU not found")
+ 
+ 
 @app.get("/pskujson")
 async def root():
     try:
@@ -210,21 +220,15 @@ async def create_warehouse(ptr: Warehouse):
         print(str(e))
         raise HTTPException(status_code=422, detail=str(e))
 
+@app.patch("/warehouse/{name_id}/{product_tag}")
+async def update_warehouse(warehouse: Warehouse):
+    print(f'patching warehouse {warehouse} for {warehouse.name_id} and {warehouse.product_tag}')
+    if warehouse.name_id in db_model['Warehouse']:
+        db_model['Warehouse'][warehouse.name_id][warehouse.product_tag] = warehouse
+        return {"message": "Warehouse updated successfully"}
+    raise HTTPException(status_code=404, detail="Warehouse not found")
 
-
-'''Packaging
-@app.get("/packaging")
-async def root():
-    return packagingWarehouse
-
-@app.post("/packaging")
-async def create_packaging(packaging: PackagingWarehouse):
-    if packaging.name_id not in db_model['PackagingWarehouse']:
-        db_model['PackagingWarehouse'][packaging.name_id] = packaging
-        return {"message": "Packaging created successfully"}
-    raise HTTPException(status_code=400, detail="Packaging already exists")
-
-'''
+'''PackagingVendor and PackagingWarehouse'''
 @app.get("/packagingvendor")
 async def root():
     return db_model['PackagingVendor']
@@ -241,6 +245,14 @@ async def create_packagingvendor(packaging: PackagingVendor):
     except Exception as e:
         raise HTTPException(status_code=422, detail=str(e))
     return {"message": "PackagingVendor created successfully"}
+
+@app.patch("/packagingvendor/{vendor_id}/{product_tag}")
+async def update_packagingvendor(packaging: PackagingVendor):
+    for list in db_model['PackagingVendor']:   
+        if list.vendor_id == packaging.vendor_id and list.product_tag == packaging.product_tag:
+            list.cost_of_packaging = packaging.cost_of_packaging 
+            return {"message": "PackagingVendor updated successfully"}
+    raise HTTPException(status_code=404, detail="PackagingVendor not found")   
 
 
 @app.get("/packagingwarehouse")
@@ -259,6 +271,13 @@ async def create_packagingwarehouse(packaging: PackagingWarehouse):
         raise HTTPException(status_code=422, detail=str(e))
     return {"message": "PackagingWarehouse created successfully"}
 
+@app.patch("/packagingwarehouse/{product_tag}")
+async def update_packagingwarehouse(packaging: PackagingWarehouse):
+    for list in db_model['PackagingWarehouse']:
+        if list.product_tag == packaging.product_tag:
+            list.cost_of_packaging = packaging.cost_of_packaging
+            return {"message": "PackagingWarehouse updated successfully"}
+    raise HTTPException(status_code=404, detail="PackagingWarehouse not found")
 
 '''ProductTag'''
 @app.get("/producttag")

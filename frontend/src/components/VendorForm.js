@@ -26,6 +26,7 @@ const VendorForm = ({ addVendor, rowData }) => {
         )
     }
 
+    
     const handleChange = (event) => {
         const { name, value } = event.target;
         setVendorData({ ...vendorData, [name]: value });

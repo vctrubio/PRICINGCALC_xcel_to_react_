@@ -120,10 +120,10 @@ export const GridPsku = () => {
             minWidth: 200,
             valueFormatter: params => params.value ? params.value.join(' ') : ''
         },
-        { headerName: 'Total Cogs €', field: 'total_cogs', minWidth: 60},
-        { headerName: 'Total Weight KG', field: 'total_weight', minWidth: 60},
+        { headerName: 'Cogs €', field: '_total_cogs', minWidth: 60},
+        { headerName: 'Weight KG', field: '_total_weight', minWidth: 60},
         { headerName: 'Product Tag', field: 'product_tag', width: 140 },
-        { headerName: 'Description', field: 'description', width: 120 },
+        { headerName: 'Description', field: 'description', width: 120, editable: true},
     ])
 
 
@@ -266,15 +266,37 @@ export const GridPsku = () => {
         setPskuId(generatePId());
     }
 
+    const handleCellValueChanged = async (event) => {
+        try {
+            for (let key in event.data) {
+                if (event.data[key] === undefined || event.data[key] === null) {
+                    console.error(`Error: ${key} is empty`);
+                    return;
+                }
+            }
+            const data = {
+                name_id: event.data.name_id,
+                product_tag: event.data.product_tag,
+                skus: event.data.skus,
+                description: event.data.description,
+            };
+
+            const response = await axios.patch(`http://localhost:8000/psku/${event.data.name_id}`, data);
+        } catch (error) {
+            console.error('Error updating PSKU data:', error);
+        }
+    }
+
 
     return (
         <div className="ag-theme-quartz-dark" style={{ height: '85vh', width: 1270 }}>
 
-            <SearchBar title='Parent SKUs' titlecount={rowData.length} search={search} setSearch={setSearch} data={rowData}/>
+            <SearchBar title='PSKU' titlecount={rowData.length} search={search} setSearch={setSearch} data={rowData}/>
             <AgGridReact
                 columnDefs={colData}
                 defaultColDef={{ flex: 1 }}
                 rowData={rowData}
+                onCellValueChanged={handleCellValueChanged}
             />
 
             {showPostMessage && (

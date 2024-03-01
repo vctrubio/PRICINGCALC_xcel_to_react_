@@ -24,8 +24,8 @@ const GridWarehouse = () => {
     const [colData, setColData] = useState(
         [
             { headerName: 'WH ID', field: 'name_id', minWidth: 300 },
-            { headerName: 'Country Oirigin', field: 'origin', editable: true, width: 150 },
-            { headerName: 'Product Tag', field: 'product_tag', editable: true, width: 200 },
+            { headerName: 'Country Oirigin', field: 'origin',  width: 150 }, //this needs chaning schemas.... 
+            { headerName: 'Product Tag', field: 'product_tag', width: 200 }, //dropdown for selecting product tag to do 
             {
                 headerName: 'Fees', children: [
                     { headerName: 'Unit', field: 'unit_fee', editable: true, maxWidth: 100 },
@@ -51,7 +51,6 @@ const GridWarehouse = () => {
                     flattenedData.push({ warehouse, product_tag, ...item });
                 }
             }
-            console.log(flattenedData)
             setRowData(prevRowData => {
                 const newData = [...prevRowData];
                 flattenedData.forEach(item => {
@@ -68,14 +67,31 @@ const GridWarehouse = () => {
 
     window.ptr = rowData;
 
+    const handleCellValueChanged = async (event) => {
+        try {
+            console.log('event.data', event.data)
+            for (let key in event.data) {
+                if (event.data[key] === undefined || event.data[key] === null) {
+                    console.error(`Error: ${key} is empty`);
+                    return;
+                }
+            }
+            const response = await axios.patch(`http://localhost:8000/warehouse/${event.data.name_id}/${event.data.product_tag}`, event.data);
+        } catch (error) {
+            console.error('Error updating Warehouse data:', error);
+            // Handle error appropriately (e.g., display a message)
+        }
+    }
+
     return (
         <div className="ag-theme-quartz-dark" style={{ height: '70vh', width: 1270 }}>
             <SearchBar title='Warehouse' titlecount={rowData.length} search={search} setSearch={setSearch} data={rowData}/>
             <AgGridReact
                 columnDefs={colData}
                 defaultColDef={{ flex: 1 }}
-                rowData={rowData}>
-
+                rowData={rowData}
+                onCellValueChanged={handleCellValueChanged}
+                >
             </AgGridReact>
             <WarehouseForm addWh={updateWhData} />
         </div>

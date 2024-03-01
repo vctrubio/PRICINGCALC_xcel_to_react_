@@ -1,7 +1,7 @@
 all: back front
 
 back:
-	cd backend && uvicorn main:app --reload
+	cd backend && uvicorn main:app --reload 
 
 front:
 	cd frontend && npm start

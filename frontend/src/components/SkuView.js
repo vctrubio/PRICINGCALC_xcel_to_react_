@@ -28,15 +28,15 @@ const GridTwo = () => {
     const [rowData, setRowData] = useState([])
     const [colData, setColData] = useState(
         [
-            { headerName: 'Vendor ID', field: 'vendor_id', editable: true, width: 140 },
-            { headerName: 'SKU ID', field: 'name_id', editable: true, width: 140 },
+            { headerName: 'Vendor ID', field: 'vendor_id', width: 140 },
+            { headerName: 'SKU ID', field: 'name_id', width: 140 },
             { headerName: 'Description', field: 'description', editable: true, width: 300 },
             { headerName: 'COGS', field: 'cogs', editable: true, width: 100 },
             { headerName: 'First Mile', field: 'first_mile', editable: true, width: 100 },
-            { headerName: 'Weight KG', field: 'weight', editable: true, width: 110 },
-            { headerName: 'PP Supplier', field: 'pp_supplier', width: 120, valueFormatter: params => `${parseFloat(params.value).toFixed(2)}` },
-            { headerName: 'Exchange Fee', field: 'exchange_fee', width: 120, valueFormatter: params => `${parseFloat(params.value).toFixed(2)}` },
-            { headerName: 'Total', field: 'total_cost', width: 150, valueFormatter: params => `${parseFloat(params.value).toFixed(2)}` },
+            { headerName: 'Weight KG', field: 'weight_kg', editable: true, width: 110 },
+            { headerName: 'PP Supplier', field: '_pp_supplier', width: 120, valueFormatter: params => `${parseFloat(params.value).toFixed(2)}` },
+            { headerName: 'Exchange Fee', field: '_exchange_fee', width: 120, valueFormatter: params => `${parseFloat(params.value).toFixed(2)}` },
+            { headerName: 'Total', field: '_total_cost', width: 150, valueFormatter: params => `${parseFloat(params.value).toFixed(2)}` },
         ]
     )
 
@@ -59,15 +59,32 @@ const GridTwo = () => {
         });
     }, []);
 
+    window.test = rowData
+    const handleCellValueChanged = async (event) => {
+        try {
+            for (let key in event.data) {
+                if (event.data[key] === undefined || event.data[key] === null) {
+                    console.error(`Error: ${key} is empty`);
+                    return;  // Exit the function if an empty field is found
+                }
+            }
+            const response = await axios.patch(`http://localhost:8000/sku/${event.data.name_id}`, event.data);
+        } catch (error) {
+            console.error('Error updating SKU data:', error);
+            // Handle error appropriately (e.g., display a message)
+        }
+    }
 
     return (
         <div className="ag-theme-quartz-dark" style={{ height: '68vh', width: 1270 }}>
 
-            <SearchBar title='SKUs' titlecount={rowData.length} search={search} setSearch={setSearch} data={rowData}/>
+            <SearchBar title='SKU' titlecount={rowData.length} search={search} setSearch={setSearch} data={rowData} />
             <AgGridReact
                 columnDefs={colData}
-                defaultColDef={{ flex: 1 }}                    
-                rowData={rowData}>
+                defaultColDef={{ flex: 1 }}
+                rowData={rowData}
+                onCellValueChanged={handleCellValueChanged}
+            >
             </AgGridReact>
             <SkuForm addSku={updateSkuData} rowData={rowData} />
         </div>

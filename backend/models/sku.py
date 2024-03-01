@@ -27,32 +27,40 @@ class SKU(BaseModel):
 
     def weight(self):
         return self.weight_kg
-    # get pp suplier cost
-    def get_pp_supplier(self):
-        return self.cogs * self.vendor().pp_rate_ / 100 
     
-    # get exchnage fee
+    def get_pp_supplier(self):
+        vendor = self.vendor()
+        if vendor is None:
+            return None
+        return self.cogs * vendor.pp_rate_ / 100
+    
     def get_exchange_fee(self):
+        vendor = self.vendor()
+        if vendor is None:
+            return None
         return self.cogs * self.vendor().exchange_rate_ / 100
 
-    # get total cost
     def get_total_cost(self):
-        return self.get_pp_supplier() + self.get_exchange_fee() + self.cogs +self.first_mile
-    
+        vendor = self.vendor()
+        if vendor is None:
+            return None
+        return self.get_pp_supplier() + self.get_exchange_fee() + self.cogs + self.first_mile
+
     def get_json(self):
+        vendor = self.vendor()
         details = {
             'vendor_id': self.vendor_id,
             'name_id': self.name_id,
             'description': self.description,
             'cogs': self.cogs,
             'first_mile': self.first_mile,
-            'vendor': self.vendor(),
-            'weight': self.weight_kg,
-            'pp_rate': self.vendor().pp_rate_,
-            'pp_supplier': self.get_pp_supplier(),
-            'exchange_rate': self.vendor().exchange_rate_,
-            'exchange_fee': self.get_exchange_fee(),
-            'total_cost': self.get_total_cost(),
+            'vendor': vendor,
+            'weight_kg': self.weight_kg,
+            'pp_rate': vendor.pp_rate_ if vendor else None,
+            '_pp_supplier': self.get_pp_supplier(),
+            '_exchange_rate': vendor.exchange_rate_ if vendor else None,
+            '_exchange_fee': self.get_exchange_fee(),
+            '_total_cost': self.get_total_cost(),
         }
         return details
 
@@ -106,7 +114,7 @@ class PSKU(BaseModel):
             'product_tag': self.product_tag,
             'skus': self.skus,
             'description': self.description,
-            'total_cogs': round(self.total_cogs, 2),
-            'total_weight': self.total_weight,
+            '_total_cogs': round(self.total_cogs, 2),
+            '_total_weight': self.total_weight,
         }
         return details

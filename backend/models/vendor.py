@@ -17,8 +17,8 @@ class Vendor(BaseModel):
         details = {
             'name_id': self.name_id,
             'origin': self.origin,
-            'pp_rate': self.pp_rate_,
-            'exchange_rate': self.exchange_rate_,
+            'pp_rate_': self.pp_rate_,
+            'exchange_rate_': self.exchange_rate_,
             'skus': self.get_skus()
         }
         return details
