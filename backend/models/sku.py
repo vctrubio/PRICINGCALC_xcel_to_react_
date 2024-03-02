@@ -13,7 +13,6 @@ class SKU(BaseModel):
     first_mile: Optional[int] = 0
     weight_kg: Optional[float] = None
     
-    
     def __init__(self, **data):
         super().__init__(**data)
         

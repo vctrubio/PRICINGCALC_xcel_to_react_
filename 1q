@@ -1,0 +1,10 @@
+FROM python:3.9
+
+WORKDIR backend
+
+COPY  backend/requirements.txt ./
+
+EXPOSE 8000
+
+CMD ["ls"]
+
