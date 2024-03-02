@@ -21,10 +21,8 @@ run:
 exec:
 	docker-compose exec backend_fastapi fish
 
-
-stop:
+down:
 	docker-compose down
 
 clean:
 	docker container prune -f	docker-compose up --build -d
-

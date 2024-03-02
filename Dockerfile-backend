@@ -5,7 +5,7 @@ RUN python -c "import os; print(os.name)"
 
 WORKDIR /app
 
-COPY dataDir/Models/ dataDir/Models
+COPY dataDir/ dataDir/
 
 WORKDIR /app/backend/
 
@@ -14,17 +14,13 @@ COPY backend/requirements.txt .
 COPY backend/models models
 COPY backend/*.py .
 
-# RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 SHELL ["fish", "-c"]
 
 EXPOSE 8000
 
-#CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
 
-#CMD ["echo", "Hello, there!"]
-
-#CMD ["tail", "-f", "/dev/null"]
-
-CMD ["fish"]
-
+# docker build -t backend_test .    
+# docker run -p 8000:8000 backend_test
