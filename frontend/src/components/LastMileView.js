@@ -126,7 +126,6 @@ const LastMileGrid = () => {
                                     zone_3: zones.zone_3,
                                 }
                             };
-
                             rowData.push(row);
                         });
                     });

@@ -33,8 +33,13 @@ class ShippingTable(BaseModel):
         
 class Shipping(BaseModel):
     name_id: str #DHL
-    warehouses: List[str] = [] #what zones it coveres #not completed methods
-    #BUT i thnkg ^ should be warehouses
+    warehouses: List[str] = [] #what warehouse it shipps from #not completed methods. this needs restructued in the db_model to 
+    
+    #EXAMPLES for later
+    # db_model['Warehouse']['name_id'] = Warehouse
+    # Warehouse.shipping
+    # Warehouse.products
+    
     shipping_table: Dict[str, ShippingTable] = {}
     
     def get_price(self, country, weight):
@@ -57,7 +62,6 @@ class Shipping(BaseModel):
     
     def get_shipping_quote(self, carrier, weight):
         try:
-            #find origin in list before, otherwise raise does not ship to zone ect.
             return self.shipping_table[carrier].get_quote(weight)
         except:
             print(f'Carrier: {carrier} not found')
