@@ -47,7 +47,7 @@ def do_zone(dataframe, attr):
 
 def do_warehouse_linking():
     db_model['WarehouseConfig'] = {}
-    warehouse_dataframe, attr = read_excel_to_json(SHIPPING_DIR + 'WarehouseConfig.xlsx')
+    warehouse_dataframe, attr = read_excel_to_json(MODELS_DIR + 'WarehouseConfig.xlsx')
     # print(f'hellomother: {warehouse_dataframe}')
     for data in warehouse_dataframe:
         if data['name_id'] in db_model['Warehouse']:
@@ -114,15 +114,13 @@ for name in my_lst:
         continue
        
     dataframe, attr = read_excel_to_json(MODELS_DIR + name + '.xlsx')
-    print(f'hellomyniger {attr} : {name}')
-    # print(f'hellomyniger : {name}')
+    # print(f'hellomyniger {attr} : {name}')
     ptr_model = locals()[name]
     
     if name not in db_model and name != 'PackagingWarehouse' and name != 'PackagingVendor':
         db_model[name] = {}
     else:
         db_model[name] = []
-    
     
     if name == 'Zone':
         do_zone(dataframe, attr)
