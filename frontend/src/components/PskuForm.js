@@ -88,32 +88,13 @@ const PskuForm = ({ pskuData, setPskuData, index, onRemove}) => {
                 </Col>
                 <Col md={1}>
                     <Button
-                        variant='success'
-                        className='form-button'
-                        style={{ opacity: 0.5, fontSize: '22px' }}
-
-                    >
-                        <i class="bi bi-clipboard-check"></i>
-                    </Button>
-                </Col>
-                <Col md={1}>
-                    <Button
                         className='form-button'
                         id='del-button'
                         variant='danger'
-                        style={{ opacity: 0.5, fontSize: '22px' }}
+                        style={{ opacity: 0.5, fontSize: '22px', height: 38}}
                         onClick={() => onRemove(index)}
                     >
                          <i className="bi bi-trash"></i>
-                    </Button>
-                </Col>
-                <Col md={1}>
-                    <Button
-                        className='form-button'
-                        variant='dark'
-                        style={{ opacity: 0.5, fontSize: '22px' }}
-                    >
-                        <i class="bi bi-chat-left-text"></i>
                     </Button>
                 </Col>
             </div>

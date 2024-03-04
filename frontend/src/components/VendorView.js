@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { Form, Button } from 'react-bootstrap';
 
 import axios from 'axios'
@@ -42,15 +42,9 @@ const GridVendor = () => {
         });
     }, []);
 
-    const updateVendorData = async () => {
-        try {
-            const updatedData = await getData('vendor');
-            setRowData(updatedData);
-        } catch (error) {
-            console.error('Error updating Vendor data:', error);
-            // Handle error appropriately (e.g., display a message)
-        }
-    }
+    const updateVendorData = useCallback( (param) => {
+        setRowData([param, ...rowData])
+    })
 
     const handleCellValueChanged = async (event) => {
         try {
@@ -61,21 +55,27 @@ const GridVendor = () => {
                 }
             }
             const response = await axios.patch(`http://localhost:8000/vendor/${event.data.name_id}`, event.data);
+            //update all skus with vendor id... 
         } catch (error) {
             console.error('Error updating Vendor data:', error);
             // Handle error appropriately (e.g., display a message)
         }
     }
 
+    const getrowId = useCallback( params => {
+        return params.data.name_id
+    })
+
     return (
-        // style={{ height: 800, width: 1270 }}>
         <div className="ag-theme-quartz-dark maincontent" style={{ height: '70vh', width: 1270 }}>
             <SearchBar title='Vendor' titlecount={rowData.length} search={search} setSearch={setSearch} data={rowData} />
             <AgGridReact
+                getRowId={getrowId}
                 columnDefs={colData}
                 rowData={rowData}
                 defaultColDef={{ flex: 1 }}
                 onCellValueChanged={handleCellValueChanged}
+                animateRows={true}
             />
             <div className='mt-4'>
                 <Button variant={showForm ? "dark" : "primary"} onClick={() => setShowForm(!showForm)}>

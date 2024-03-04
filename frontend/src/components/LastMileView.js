@@ -75,26 +75,27 @@ const OneGrid = ({ rowData, colData }) => {
 const LastMileGrid = () => {
     const [search, setSearch] = useState('');
     const [rowData, setRowData] = useState([])
+    const [selectedWarehouse, setSelectedWarehouse] = useState(null);
     const [colData, setColData] = useState(
         [
             { headerName: 'Courier', field: 'Courier', maxWidth: 120 },
-            { headerName: 'Type', field: 'Type', width: 150 },
-            { headerName: 'Weight', field: 'Weight', width: 80 },
+            { headerName: 'Type', field: 'Type', width: 80 },
+            { headerName: 'Weight KG', field: 'Weight', width: 80 },
             {
-                headerName: 'Countries', children: [
+                headerName: 'Zones', children: [
                     {
-                        headerName: 'Spain', valueGetter: function (params) {
-                            return params.data['Countries']['Spain'];
+                        headerName: '1', valueGetter: function (params) {
+                            return params.data['Zones']['zone_1'];
                         }
                     },
                     {
-                        headerName: 'France', valueGetter: function (params) {
-                            return params.data['Countries']['France'];
+                        headerName: '2', valueGetter: function (params) {
+                            return params.data['Zones']['zone_2'];
                         }
                     },
                     {
-                        headerName: 'Italy', valueGetter: function (params) {
-                            return params.data['Countries']['Italy'];
+                        headerName: '3', valueGetter: function (params) {
+                            return params.data['Zones']['zone_3'];
                         }
                     },
                 ]
@@ -119,10 +120,10 @@ const LastMileGrid = () => {
                                 Courier: name_id,
                                 Type: service_type,
                                 Weight: weight,
-                                Countries: {
-                                    Spain: zones.zone_1,
-                                    France: zones.zone_2,
-                                    Italy: zones.zone_3,
+                                Zones: {
+                                    zone_1: zones.zone_1,
+                                    zone_2: zones.zone_2,
+                                    zone_3: zones.zone_3,
                                 }
                             };
 
@@ -139,28 +140,15 @@ const LastMileGrid = () => {
     }, []);
 
     window.row = rowData
-
-
-    const [selectedWarehouse, setSelectedWarehouse] = useState(null);
-
-    const warehouses = [
-        { name_id: 'SwiftStore Warehousing', origin: 'Spain' },
-        { name_id: 'Atlas Logistics Center', origin: 'France' },
-        { name_id: 'Evergreen Distribution Hub', origin: 'Germany' },
-        { name_id: 'Apex Fulfillment Services', origin: 'China' },
-        { name_id: 'Horizon Storage Solutions', origin: 'California' }
-    ];
-    const handleSelect = (warehouse) => {
-        console.log('warehouse: ', JSON.stringify(warehouse));
-        setSelectedWarehouse(warehouse);
-    };
-
     window.t = selectedWarehouse
+
+    //dropdown to show type.... 
+
     return (
         <div className="ag-theme-quartz-dark" style={{ height: 800, width: 1270 }}>
-            <SearchBar title='Last Mile' titlecount={rowData ? rowData.length : 0} search={search} setSearch={setSearch} data={rowData}/>
+            <SearchBar title='Last Mile' titlecount={null} search={search} setSearch={setSearch} data={rowData}/>
 
-            <div className='d-flex flex-start pb-2'>
+            {/* <div className='d-flex flex-start pb-2'>
                 <Dropdown>
                     <Dropdown.Toggle variant="light" id="dropdown-basic" className="align-items-baseline" style={{ width: '256px', height: '38px', textDecoration: 'none', fontSize: 18, textAlign: 'left' }}>
                         {selectedWarehouse ? `${selectedWarehouse.name_id}` : 'Select Warehouse'}
@@ -175,7 +163,8 @@ const LastMileGrid = () => {
                         ))}
                     </Dropdown.Menu>
                 </Dropdown>
-            </div>
+            </div> */}
+            
             <AgGridReact
                 columnDefs={colData}
                 rowData={rowData}
@@ -186,3 +175,19 @@ const LastMileGrid = () => {
 }
 
 export default LastMileGrid;
+
+
+/*
+    const warehouses = [
+        { name_id: 'SwiftStore Warehousing', origin: 'Spain' },
+        { name_id: 'Atlas Logistics Center', origin: 'France' },
+        { name_id: 'Evergreen Distribution Hub', origin: 'Germany' },
+        { name_id: 'Apex Fulfillment Services', origin: 'China' },
+        { name_id: 'Horizon Storage Solutions', origin: 'California' }
+    ];
+
+    const handleSelect = (warehouse) => {
+        console.log('warehouse: ', JSON.stringify(warehouse));
+        setSelectedWarehouse(warehouse);
+    };
+*/

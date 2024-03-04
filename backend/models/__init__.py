@@ -5,5 +5,5 @@ from .shipping import ShippingTable, Shipping
 from .packaging import PackagingVendor, PackagingWarehouse
 from .producttag import ProductTag
 from .zone import Zone
-from .payment import PaymentProcessingCard, PaymentProcessing, PaymentPopCountry
+from .payment import PaymentProcessingCard, PaymentProcessingCountry, PaymentPopCountry
 

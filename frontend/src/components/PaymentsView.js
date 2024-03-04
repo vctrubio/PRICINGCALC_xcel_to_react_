@@ -4,6 +4,7 @@ import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-quartz.css'
 import '../AppGrid.css';
 
+import axios from 'axios'
 import { getData, useSkuForm } from './CskuForm';
 import { SkuForm } from './SkuForm';
 import { Form, Button } from 'react-bootstrap';
@@ -11,24 +12,6 @@ import { SearchBar } from './SearchBar';
 
 const ConsumerPPFee = () => {
     const [search, setSearch] = useState('');
-    const rowData = [
-        { 'Payment Processing Option': 'Visa', 'Rate %': 2, 'Fee': 0.2 },
-        { 'Payment Processing Option': 'Mastercard', 'Rate %': 3, 'Fee': 0.4 },
-        { 'Payment Processing Option': 'PayPal', 'Rate %': 3, 'Fee': 0.3 },
-        { 'Payment Processing Option': 'American Express', 'Rate %': 3.5, 'Fee': 0.35 },
-        { 'Payment Processing Option': 'Stripe', 'Rate %': 2.9, 'Fee': 0.3 },
-        { 'Payment Processing Option': 'Square', 'Rate %': 2.6, 'Fee': 0.1 },
-        { 'Payment Processing Option': 'Apple Pay', 'Rate %': 2.5, 'Fee': 0.25 },
-        { 'Payment Processing Option': 'Google Pay', 'Rate %': 2.8, 'Fee': 0.2 },
-        { 'Payment Processing Option': 'Amazon Pay', 'Rate %': 2.9, 'Fee': 0.3 },
-        { 'Payment Processing Option': 'Klarna', 'Rate %': 3.5, 'Fee': 0.4 },
-    ];
-    window.row = rowData
-    const columnDefs = [
-        { headerName: 'Payment Processing Option', field: 'Payment Processing Option', width: 200 },
-        { headerName: 'Rate %', field: 'Rate %', width: 100 },
-        { headerName: 'Fee', field: 'Fee', width: 100 },
-    ];
 
     const rowData2 = [
         { 'Country': 'Spain', 'Sales Fee %': 2, 'Sales Fee $': 0.5 },
@@ -82,50 +65,124 @@ const ConsumerPPFee = () => {
         { headerName: 'Amazon Pay', field: 'Amazon Pay', width: 100 },
         { headerName: 'Klarna', field: 'Klarna', width: 80 },
     ];
-
-
+    
+    
     return (
-        <div className="ag-theme-quartz-dark" style={{ height: 510, width: 1270 }}>
-            <SearchBar title='Payments' titlecount={null} search={search} setSearch={setSearch} data={rowData}/>
+        <div className="ag-theme-quartz-dark" style={{ height: 210, width: 1270 }}>
             <AgGridReact 
                 columnDefs={colDefs3}
                 defaultColDef={{ flex: 1 }}
                 rowData={rowData3}
-            />
-            <AgGridReact className='mt-3'
-                columnDefs={columnDefs}
-                rowData={rowData}
-                defaultColDef={{ flex: 1 }}
-            />
+                />
             <AgGridReact className='mt-3'
                 columnDefs={colData2}
                 defaultColDef={{ flex: 1 }}
                 rowData={rowData2}
-            />
+                />
         </div>
     )
 }
 
-export const CountrySales = () => {
+const PaymentProcessingCard = () => 
+{
+    const [rowData, setRowData] = useState([]);
+    const colData  = [
+        { headerName: 'Card', field: 'name_id', minWidth: 150},
+        { headerName: 'Rate %', field: 'rate_', minWidth: 150, editable: true },
+        { headerName: 'Fee', field: 'fee', minWidth: 150, editable: true },
+    ]
+    
+    useEffect(() => {
+        getData('paymentprocessingcard', 'value').then(data => {
+            console.log('data: ', data)
+            setRowData(data);
+        });
+    },[]);
 
+    window.ppc = rowData
+    
+    const handleChangeCell = async (event) => {
+        try {
+            for (let key in event.data) {
+                if (event.data[key] === undefined || event.data[key] === null) {
+                    console.error(`Error: ${key} is empty`);
+                    return;  // Exit the function if an empty field is found
+                }
+            }
+            const response = await axios.patch(`http://localhost:8000/paymentprocessingcard/${event.data.name_id}`, event.data);
+        } catch (error) {
+            console.error('Error updating Payment Processing Card data:', error);
+        }
+    }
 
     return (
-        <div className="ag-theme-quartz-dark" style={{ height: 480, width: 1270 }}>
-            <div>
-
-            </div>
+        <div style={{height: 420, width: 1270, marginBottom: 100}}>
+            <SearchBar title='PaymentProcessingCard' titlecount={rowData.length} search={null} setSearch={null} data={rowData}></SearchBar>
+            <AgGridReact
+                columnDefs={colData}
+                defaultColDef={{ flex: 1 }}
+                rowData={rowData}
+                onCellValueChanged={handleChangeCell}
+            >
+            </AgGridReact>
         </div>
-    );
-};
+    )
+}
+
+
+const PaymentProcessingCountry = () =>
+{
+    const [rowData, setRowData] = useState([]);
+    const colData  = [
+        { headerName: 'Country', field: 'name_id', minWidth: 150},
+        { headerName: 'Sales Fee %', field: 'sales_fee', minWidth: 150, editable: true },
+        { headerName: 'Sales Fee €', field: 'sales_fee', minWidth: 150, editable: true },
+    ]
+    
+    useEffect(() => {
+        getData('paymentprocessingcountry', 'value').then(data => {
+            console.log('data: ', data)
+            setRowData(data);
+        });
+    },[]);
+
+    window.ppc = rowData
+    
+    const handleChangeCell = async (event) => {
+        try {
+            for (let key in event.data) {
+                if (event.data[key] === undefined || event.data[key] === null) {
+                    console.error(`Error: ${key} is empty`);
+                    return;  // Exit the function if an empty field is found
+                }
+            }
+            const response = await axios.patch(`http://localhost:8000/paymentprocessingcountry/${event.data.name_id}`, event.data);
+        } catch (error) {
+            console.error('Error updating Payment Processing Country data:', error);
+        }
+    }
+
+    return (
+        <div style={{height: 420, width: 1270, marginBottom: 100}}>
+            <SearchBar title='PaymentProcessingCountry' titlecount={rowData.length} search={null} setSearch={null}  data={rowData}></SearchBar>
+            <AgGridReact
+                columnDefs={colData}
+                defaultColDef={{ flex: 1 }}
+                rowData={rowData}
+                onCellValueChanged={handleChangeCell}
+            >
+            </AgGridReact>
+        </div>
+    )
+}
 
 
 export const Payments = () => {
 
     return (
-        <div className=''>
-
-            <ConsumerPPFee />
-            {/* <CountrySales /> */}
+        <div className='ag-theme-quartz-dark'>
+            <PaymentProcessingCountry/>
+            <PaymentProcessingCard/>
         </div>
     )
 };

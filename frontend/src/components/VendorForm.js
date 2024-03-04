@@ -38,8 +38,6 @@ const VendorForm = ({ addVendor, rowData }) => {
     const handleSubmit = async (event) => {
         event.preventDefault();
 
-        console.log(isFormValidated)
-
         const newMissingFields = Object.keys(vendorData).filter(key => !vendorData[key]);
         setMissingFields(newMissingFields);
 
@@ -49,20 +47,18 @@ const VendorForm = ({ addVendor, rowData }) => {
             return; // Don't submit when there are missing fields
         }
 
-        setIsFormValidated(true); // Show success styles if needed
+        setIsFormValidated(true); // Show success styles if needed //but this is all BS, we qare not using it 
 
         try {
             const response = await axios.post('http://localhost:8000/vendor', vendorData);
-            console.log(response.data);
+            if (addVendor && response.status == 200)
+                addVendor(vendorData)
             setVendorData({
                 name_id: '',
                 origin: '',
                 pp_rate_: '',
                 exchange_rate_: '',
             });
-            if (addVendor)
-                addVendor(response.data);
-
             setIsFormValidated(false);
         } catch (error) {
             console.error(error);

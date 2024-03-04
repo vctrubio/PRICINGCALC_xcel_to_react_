@@ -1,7 +1,7 @@
-from fastapi import FastAPI, HTTPException, File, UploadFile, Query, UploadFile, Form
+from fastapi import FastAPI, HTTPException, File, UploadFile, UploadFile, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from models import Vendor, SKU, PSKU, Shipping, Warehouse, ProductTag, PackagingWarehouse, PackagingVendor
+from models import Vendor, SKU, PSKU, Warehouse, ProductTag, PackagingWarehouse, PackagingVendor, PaymentProcessingCard, PaymentProcessingCountry, PaymentPopCountry
 from db import db_model
 import json
 import os
@@ -27,7 +27,8 @@ app.add_middleware(
 
 @app.get("/")
 async def get_disposable_models():
-    lst = [model.lower() for model in db_model]
+    # lst = [model.lower() for model in db_model]
+    lst = [model for model in db_model]
     return {'Models': lst}
    
 @app.post("/upload")
@@ -60,7 +61,7 @@ async def update_vendor(vendor: Vendor):
     print(f'patching vendor {vendor}')
     if vendor.name_id in vendors:  # check if the vendor exists in the vendors dictionary
         vendors[vendor.name_id] = vendor.dict()  # update the vendor
-        return {"message": "Vendor updated successfully"}
+        return {"message": "Vendor updated successfully", "vendor": vendor.dict}
     raise HTTPException(status_code=404, detail="Vendor not found")
 
 @app.post("/vendor")
@@ -300,10 +301,40 @@ async def delete_producttag(name_id: str):
         return {"message": "ProductTag deleted successfully"}
     raise HTTPException(status_code=404, detail="ProductTag not found")
 
-'''PSKU'''
-@app.get("/pskujson")
+'''Paymensts'''
+
+@app.get("/paymentprocessingcard")
 async def root():
-    return [psku.get_json() for psku in pskus]
+    return db_model["PaymentProcessingCard"]
+
+@app.patch("/paymentprocessingcard/{name_id}")
+async def update_paymentprocessingcard(card: PaymentProcessingCard):
+    name_id = card.name_id
+    if name_id in db_model["PaymentProcessingCard"]:
+        db_model["PaymentProcessingCard"][name_id] = card
+        return {"message": "PaymentProcessingCard updated successfully"}
+    raise HTTPException(status_code=404, detail="PaymentProcessingCard not found")
+
+
+@app.get("/paymentprocessingcountry")
+async def root():
+    return db_model["PaymentProcessingCountry"]
+
+@app.patch("/paymentprocessingcountry/{name_id}")
+async def update_paymentprocessingcountry(country: PaymentProcessingCountry):
+    name_id = country.name_id
+    if name_id in db_model["PaymentProcessingCountry"]:
+        db_model["PaymentProcessingCountry"][name_id] = country
+        return {"message": "PaymentProcessingCountry updated successfully"}
+    raise HTTPException(status_code=404, detail="PaymentProcessingCountry not found")
+
+
+
+
+
+
+
+
 
 '''WarehouseConfig'''
 @app.get("/warehouseconfig/{name_id}")

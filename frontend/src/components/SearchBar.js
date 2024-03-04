@@ -29,10 +29,12 @@ export const SearchBar = ({ title, titlecount, data, search, setSearch }) => {
         return header;
     }
 
-    
+
     const handleExport = () => {
         const title_name = title + '.xlsx';
-
+        if (!data)
+            return;
+        console.log('date me: ', data)
         const transformedData = data.map((row, index) => {
             let transformedRow = {};
             for (let key in row) {
@@ -101,14 +103,14 @@ export const SearchBar = ({ title, titlecount, data, search, setSearch }) => {
                     title={`Upload: '${title}'`}
                     onClick={handleImport}
                 >
-                    <i class="bi bi-upload"></i>
+                    <i className="bi bi-upload"></i>
                 </button>
                 <button className="btn btn-dark"
                     style={{ marginLeft: '10px', fontSize: '20px', paddingTop: 14 }}
                     title={`Download:'${title}'`}
                     onClick={handleExport}
                 >
-                    <i class="bi bi-cloud-download"></i>
+                    <i className="bi bi-cloud-download"></i>
                 </button>
             </div>
         </div>

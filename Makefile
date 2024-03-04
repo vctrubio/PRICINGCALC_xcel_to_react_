@@ -12,6 +12,8 @@ debug:
 
 
 #DOCKER
+start: build run
+
 build:
 	docker-compose up --build -d
 

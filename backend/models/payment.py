@@ -11,7 +11,7 @@ class PaymentProcessingCard(BaseModel):
         return self.rate_ * self.fee #tbc
     
 
-class PaymentProcessing(BaseModel):
+class PaymentProcessingCountry(BaseModel):
     name_id: str
     sales_fee_: float
     sales_fee: float

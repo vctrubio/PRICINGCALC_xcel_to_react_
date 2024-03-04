@@ -25,7 +25,8 @@ function transformWarehouse(warehouse) {
     });
 }
 
-const theme = createMuiTheme({
+// const theme = createMuiTheme({
+const theme = createTheme({
     overrides: {
         MuiAutocomplete: {
             paper: {

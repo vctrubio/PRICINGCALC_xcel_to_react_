@@ -79,6 +79,7 @@ const GridTwo = () => {
 
             <SearchBar title='SKU' titlecount={rowData.length} search={search} setSearch={setSearch} data={rowData} />
             <AgGridReact
+                enableCellChangeFlash={true}
                 columnDefs={colData}
                 defaultColDef={{ flex: 1 }}
                 rowData={rowData}
