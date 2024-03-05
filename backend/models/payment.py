@@ -24,5 +24,5 @@ class PaymentProcessingCountry(BaseModel):
     def pp_fee_rate(self):
         return self.sales_fee_ * self.sales_fee #tbc
     
-class PaymentPopCountry:
+class PaymentPopCountry():
     pass

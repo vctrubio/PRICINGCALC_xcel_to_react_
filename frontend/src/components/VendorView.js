@@ -66,6 +66,7 @@ const GridVendor = () => {
         return params.data.name_id
     })
 
+    window.pv = rowData
     return (
         <div className="ag-theme-quartz-dark maincontent" style={{ height: '70vh', width: 1270 }}>
             <SearchBar title='Vendor' titlecount={rowData.length} search={search} setSearch={setSearch} data={rowData} />

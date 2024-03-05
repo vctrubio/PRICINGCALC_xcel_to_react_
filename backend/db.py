@@ -109,8 +109,11 @@ def do_country_list():
 ptr_model = None
 for name in my_lst:
     if name == 'PaymentPopCountry':
-        df = pd.read_excel(MODELS_DIR + name + '.xlsx')
-        db_model[name] = df
+        try:
+            df = pd.read_excel(MODELS_DIR + name + '.xlsx')
+            db_model[name] = df.set_index('Country')
+        except:
+            print('Column Country not found in PaymentPopCountry.xlsx')
         continue
        
     dataframe, attr = read_excel_to_json(MODELS_DIR + name + '.xlsx')

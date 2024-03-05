@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, File, UploadFile, UploadFile, Form
+from fastapi import FastAPI, HTTPException, File, UploadFile, UploadFile, Form, Body
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from models import Vendor, SKU, PSKU, Warehouse, ProductTag, PackagingWarehouse, PackagingVendor, PaymentProcessingCard, PaymentProcessingCountry, PaymentPopCountry
@@ -328,13 +328,21 @@ async def update_paymentprocessingcountry(country: PaymentProcessingCountry):
         return {"message": "PaymentProcessingCountry updated successfully"}
     raise HTTPException(status_code=404, detail="PaymentProcessingCountry not found")
 
+@app.get("/paymentpopcountry")
+async def root():
+    df_json = db_model["PaymentPopCountry"].to_dict(orient='index')
+    return df_json
 
-
-
-
-
-
-
+@app.patch("/paymentpopcountry/{name_id}")
+async def update_paymentpopcountry(name_id: str, country: dict = Body(...)):
+    if name_id in db_model["PaymentPopCountry"].index:
+        existing_row = db_model["PaymentPopCountry"].loc[name_id].copy()
+        for key, value in country.items():
+            if key in existing_row.index:
+                existing_row[key] = value
+        db_model["PaymentPopCountry"].loc[name_id] = existing_row
+        return {"message": f"PaymentPopCountry {name_id} updated successfully"}
+    raise HTTPException(status_code=404, detail="PaymentPopCountry not found")
 
 '''WarehouseConfig'''
 @app.get("/warehouseconfig/{name_id}")
