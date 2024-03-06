@@ -21,7 +21,7 @@ function Sidebar() {
       <Link to="/packaging"><i className="fas fa-table"></i> Packaging</Link>
       <Link to="/lastmile"><i className="fas fa-table"></i> Last Mile</Link>
       <Link to="/payments"><i className="fas fa-table"></i> Payments</Link>
-      <Link to="/producttag"><i className="fas fa-list"></i> WH & Product Tags</Link>
+      <Link to="/producttag"><i className="fas fa-list"></i> Configs</Link>
     </div>
   );
 }
