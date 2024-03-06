@@ -329,9 +329,8 @@
 .ck-container {
   width: 480px;
   height: 600px;
-  /* margin: 50px; */
   margin: 3em;
-  margin-top: 1em !important;
+  margin-top: 0 !important;
   margin-bottom: 0 !important;
   color: #d8c8c8;
   border: 1px solid #696862;
@@ -443,13 +442,10 @@ input[type="search"] {
 
 
 .ck-head>* {
-  /* border: 1px solid #000000;
-  border-radius: 5px; */
   padding: 5px;
   margin: 5px;
   display: flex;
   width: 480px;  
-  
   justify-content: center;
   font-family: 'Monaco';
 }
