@@ -22,10 +22,10 @@ async function getData(model) {
 
 
 const GridVendor = () => {
-    const [search, setSearch] = useState('');
     const [gridApi, setGridApi] = useState(null);
-    const [showForm, setShowForm] = useState(false);
     const [selectedRows, setSelectedRows] = useState([]);
+    const [search, setSearch] = useState('');
+    const [showForm, setShowForm] = useState(false);
     const [rowData, setRowData] = useState([])
     const [colData, setColData] = useState(
         [

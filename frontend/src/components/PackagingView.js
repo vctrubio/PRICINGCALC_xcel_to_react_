@@ -11,18 +11,33 @@ import { SearchBar } from './SearchBar';
 
 const GridPackaging = () => {
     const { vendorData, productTag } = useSkuForm();
+    const [gridApi, setGridApi] = useState(null);
+    const [gridApi2, setGridApi2] = useState(null);
+    const [selectedRows, setSelectedRows] = useState([]);
+    const [selectedRows2, setSelectedRows2] = useState([]);
+
     const [rowData, setRowData] = useState([])
     const [rowData2, setRowData2] = useState([])
     const [colData, setColData] = useState(
         [
-            { headerName: 'Vendor ID', field: 'vendor_id', width: 150 },
+            {
+                headerName: 'Vendor ID', field: 'vendor_id', width: 150,
+                checkboxSelection: true,
+                headerCheckboxSelection: true,
+                headerCheckboxSelectionFilteredOnly: true
+            },
             { headerName: 'Product Tag', field: 'product_tag', width: 150 },
             { headerName: 'Cost of Packaging Fee', field: 'cost_of_packaging', editable: true, width: 200 },
         ]
     )
     const [colData2, setColData2] = useState(
         [
-            { headerName: 'Product Tag', field: 'product_tag', width: 150 },
+            {
+                headerName: 'Product Tag', field: 'product_tag', width: 150,
+                checkboxSelection: true,
+                headerCheckboxSelection: true,
+                headerCheckboxSelectionFilteredOnly: true
+            },
             { headerName: 'Cost of Packaging Fee', field: 'cost_of_packaging', editable: true, width: 200 },
         ]
     )
@@ -109,11 +124,11 @@ const GridPackaging = () => {
                 console.log('response.status', response.status);
                 setRowData2(rowData2.map(item =>
                     item.product_tag === sendWarehousePackaging.product_tag
-                    ? { ...sendWarehousePackaging, cost_of_packaging: fee }
-                    : item
-                    ));
-                }
-                else {
+                        ? { ...sendWarehousePackaging, cost_of_packaging: fee }
+                        : item
+                ));
+            }
+            else {
                 console.log('response.status2', response.status);
                 setRowData2([...rowData2, { ...sendWarehousePackaging, cost_of_packaging: fee }]);
             }
@@ -157,16 +172,46 @@ const GridPackaging = () => {
         }
     }
 
+    const onGridReady = params => {
+        setGridApi(params.api);
+    };
+
+    const onSelectionChanged = (param) => {
+        setSelectedRows(gridApi.getSelectedRows());
+    };
+
+    const onRowClicked = (event) => {
+        event.node.setSelected(!event.node.isSelected());
+    };
+
+    const onGridReady2 = params => {
+        setGridApi2(params.api);
+    };
+
+    const onSelectionChanged2 = (param) => {
+        setSelectedRows2(gridApi.getSelectedRows());
+    };
+
+    const onRowClicked2 = (event) => {
+        event.node.setSelected(!event.node.isSelected());
+    };
+
+
     return (
         <div className='mt-3 d-flex' style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
 
-            <div className="ag-theme-quartz-dark" style={{ height: 800, width: 600, textAlign: 'left' }}>
-                <SearchBar title='PackagingVendor' titlecount={rowData.length} search={''} setSearch={''} data={rowData} />
+            <div className="ag-theme-quartz-dark" style={{ height: 800, width: 700, textAlign: 'left' }}>
+                <SearchBar title='PackagingVendor' titlecount={rowData.length} search={''} setSearch={''} data={rowData} setData={setRowData} selectedRows={selectedRows}/>
                 <AgGridReact
+                    onGridReady={onGridReady}
                     columnDefs={colData}
-                    defaultColDef={{ flex: 1 }}
-                    rowData={rowData}
+                    defaultColDef={{ flex: 1, filter: true, sortable: true, floatingFilter: true }} rowData={rowData}
                     onCellValueChanged={handleCellValueChangedVendor}
+                    onSelectionChanged={onSelectionChanged}
+                    onRowClicked={onRowClicked}
+                    suppressRowClickSelection={true}
+                    animateRows={true}
+                    rowSelection={'multiple'}
                 >
                 </AgGridReact>
                 <div style={{ width: '100%', height: '4em', marginTop: '1em', paddingRight: 20 }}>
@@ -231,14 +276,20 @@ const GridPackaging = () => {
                 </div>
             </div>
 
-            <div className="ag-theme-quartz-dark" style={{ height: 800, width: 600, textAlign: 'left' }}>
-                <SearchBar title='PackagingWarehouse' titlecount={rowData2.length} search={''} setSearch={''} data={rowData2} />
+            <div className="ag-theme-quartz-dark" style={{ height: 800, width: 700, textAlign: 'left' }}>
+                <SearchBar title='PackagingWarehouse' titlecount={rowData2.length} search={''} setSearch={''} data={rowData2} setData={rowData2} selectedRows={selectedRows2} />
                 <AgGridReact
+                    onGridReady={onGridReady2}
                     columnDefs={colData2}
-                    defaultColDef={{ flex: 1 }}
+                    defaultColDef={{ flex: 1, filter: true, sortable: true, floatingFilter: true }}
                     rowData={rowData2}
                     onCellValueChanged={handleCellValueChangedWarehouse}
-                    >
+                    onSelectionChanged={onSelectionChanged2}
+                    onRowClicked={onRowClicked2}
+                    suppressRowClickSelection={true}
+                    animateRows={true}
+                    rowSelection={'multiple'}
+                >
                 </AgGridReact>
                 <div style={{ width: '100%', height: '4em', marginTop: '1em', paddingLeft: 5 }}>
                     <Form onSubmit={handleSubmitWarehouse}>

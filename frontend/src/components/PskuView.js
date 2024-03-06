@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useMemo } from 'react'
+import React, { useCallback, useEffect, useRef, useState, useMemo } from 'react'
 import axios from 'axios'
 import { AgGridReact } from 'ag-grid-react'
 import 'ag-grid-community/styles/ag-grid.css'
@@ -69,9 +69,9 @@ export const NavPskuBar = ({ productTag, setPT, LinkSkuBtn, pskuId, setPskuId, p
                         type="text"
                         name="description"
                         value={pDes}
-                        onChange={(event) => setPDes(event.target.value)} 
+                        onChange={(event) => setPDes(event.target.value)}
                         placeholder="PSKU Description"
-                        style={{ backgroundColor: pDes.length ? 'white' : 'grey', boxSizing: 'border-box'}}
+                        style={{ backgroundColor: pDes.length ? 'white' : 'grey', boxSizing: 'border-box' }}
                         className='p-2'
                         required
                     />
@@ -105,25 +105,32 @@ export const GridPsku = () => {
     const [focusIndex, setFocusIndex] = useState(1);
     const [pskuId, setPskuId] = useState(generatePId())
     const [pskuNames, setPskuNames] = useState([])
-    const [skuLink, setSkuLink] = useState([]);
     const [showPostMessage, setShowPostMessage] = useState(false);
+    const [gridApi, setGridApi] = useState(null);
+    const [selectedRows, setSelectedRows] = useState([]);
 
     const [selectedNames, setSelectedNames] = useState([]);
     const [showModal, setShowModal] = useState(false);
 
     const [rowData, setRowData] = useState([])
     const [colData, setColData] = useState([
-        { headerName: 'PSKU ID', field: 'name_id', maxWidth: 100 },
+        {
+            headerName: 'PSKU ID', field: 'name_id', minWidth: 100,
+            checkboxSelection: true,
+            headerCheckboxSelection: true,
+            headerCheckboxSelectionFilteredOnly: true,
+
+        },
         {
             headerName: 'CSKU IDS',
             field: 'skus',
             minWidth: 200,
             valueFormatter: params => params.value ? params.value.join(' ') : ''
         },
-        { headerName: 'Cogs €', field: '_total_cogs', minWidth: 60},
-        { headerName: 'Weight KG', field: '_total_weight', minWidth: 60},
+        { headerName: 'Cogs €', field: '_total_cogs', minWidth: 60 },
+        { headerName: 'Weight KG', field: '_total_weight', minWidth: 60 },
         { headerName: 'Product Tag', field: 'product_tag', width: 140 },
-        { headerName: 'Description', field: 'description', width: 120, editable: true},
+        { headerName: 'Description', field: 'description', width: 120, editable: true },
     ])
 
 
@@ -161,6 +168,23 @@ export const GridPsku = () => {
             setSkuNames(nameIds);
         });
     }, []);
+
+
+    const getrowId = useCallback(params => {
+        return params.data.name_id
+    })
+
+    const onGridReady = params => {
+        setGridApi(params.api);
+    };
+
+    const onSelectionChanged = (param) => {
+        setSelectedRows(gridApi.getSelectedRows());
+    };
+
+    const onRowClicked = (event) => {
+        event.node.setSelected(!event.node.isSelected());
+    };
 
 
     function addSkuInput(name) {
@@ -291,12 +315,17 @@ export const GridPsku = () => {
     return (
         <div className="ag-theme-quartz-dark" style={{ height: '85vh', width: 1270 }}>
 
-            <SearchBar title='PSKU' titlecount={rowData.length} search={search} setSearch={setSearch} data={rowData}/>
+            <SearchBar title='PSKU' titlecount={rowData.length} search={search} setSearch={setSearch} data={rowData} setData={setRowData} selectedRows={selectedRows} />
             <AgGridReact
+                onGridReady={onGridReady}
                 columnDefs={colData}
-                defaultColDef={{ flex: 1 }}
-                rowData={rowData}
+                defaultColDef={{ flex: 1, filter: true, sortable: true, floatingFilter: true }} rowData={rowData}
                 onCellValueChanged={handleCellValueChanged}
+                onSelectionChanged={onSelectionChanged}
+                onRowClicked={onRowClicked}
+                suppressRowClickSelection={true}
+                animateRows={true}
+                rowSelection={'multiple'}
             />
 
             {showPostMessage && (

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 import { AgGridReact } from 'ag-grid-react'
 import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-quartz.css'
@@ -40,6 +40,7 @@ const OneGrid = ({ rowData, colData }) => {
         { name_id: 'FEDEX', type: ['Standard', 'Express'] },
         { name_id: 'UPS', type: ['Standard', 'Express'] },
     ];
+
     window.pp = selectedCourier
     window.pe = courierType
 
@@ -73,12 +74,19 @@ const OneGrid = ({ rowData, colData }) => {
 
 
 const LastMileGrid = () => {
+    const [gridApi, setGridApi] = useState(null);
+    const [selectedRows, setSelectedRows] = useState([]);
     const [search, setSearch] = useState('');
     const [rowData, setRowData] = useState([])
     const [selectedWarehouse, setSelectedWarehouse] = useState(null);
     const [colData, setColData] = useState(
         [
-            { headerName: 'Courier', field: 'Courier', maxWidth: 120 },
+            {
+                headerName: 'Courier', field: 'Courier', minWidth: 120,
+                checkboxSelection: true,
+                headerCheckboxSelection: true,
+                headerCheckboxSelectionFilteredOnly: true
+            },
             { headerName: 'Type', field: 'Type', width: 80 },
             { headerName: 'Weight KG', field: 'Weight', width: 80 },
             {
@@ -141,11 +149,29 @@ const LastMileGrid = () => {
     window.row = rowData
     window.t = selectedWarehouse
 
+
+    const getrowId = useCallback(params => {
+        return params.data.name_id
+    })
+
+    const onGridReady = params => {
+        setGridApi(params.api);
+    };
+
+    const onSelectionChanged = (param) => {
+        setSelectedRows(gridApi.getSelectedRows());
+    };
+
+    const onRowClicked = (event) => {
+        event.node.setSelected(!event.node.isSelected());
+    };
+
+
     //dropdown to show type.... 
 
     return (
         <div className="ag-theme-quartz-dark" style={{ height: 800, width: 1270 }}>
-            <SearchBar title='Last Mile' titlecount={null} search={search} setSearch={setSearch} data={rowData}/>
+            <SearchBar title='Last Mile' titlecount={null} search={search} setSearch={setSearch} data={rowData} setData={setRowData} selectedRows={selectedRows} />
 
             {/* <div className='d-flex flex-start pb-2'>
                 <Dropdown>
@@ -163,11 +189,16 @@ const LastMileGrid = () => {
                     </Dropdown.Menu>
                 </Dropdown>
             </div> */}
-            
+
             <AgGridReact
+                onGridReady={onGridReady}
                 columnDefs={colData}
                 rowData={rowData}
-                defaultColDef={{ flex: 1 }}
+                defaultColDef={{ flex: 1, filter: true, sortable: true, floatingFilter: true }}
+                onRowClicked={onRowClicked}
+                suppressRowClickSelection={true}
+                animateRows={true}
+                rowSelection={'multiple'}
             />
         </div>
     )

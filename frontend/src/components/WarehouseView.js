@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import axios from 'axios'
 import { AgGridReact } from 'ag-grid-react'
 import 'ag-grid-community/styles/ag-grid.css'
@@ -19,12 +19,19 @@ async function getData(model) {
 
 
 const GridWarehouse = () => {
+    const [gridApi, setGridApi] = useState(null);
+    const [selectedRows, setSelectedRows] = useState([]);
     const [search, setSearch] = useState('');
     const [rowData, setRowData] = useState([])
     const [colData, setColData] = useState(
         [
-            { headerName: 'WH ID', field: 'name_id', minWidth: 300 },
-            { headerName: 'Country Oirigin', field: 'origin',  width: 150 }, //this needs chaning schemas.... 
+            {
+                headerName: 'WH ID', field: 'name_id', minWidth: 300,
+                checkboxSelection: true,
+                headerCheckboxSelection: true,
+                headerCheckboxSelectionFilteredOnly: true
+            },
+            { headerName: 'Country Oirigin', field: 'origin', width: 150 }, //this needs chaning schemas.... 
             { headerName: 'Product Tag', field: 'product_tag', width: 200 }, //dropdown for selecting product tag to do 
             {
                 headerName: 'Fees', children: [
@@ -83,15 +90,32 @@ const GridWarehouse = () => {
         }
     }
 
+    const onGridReady = params => {
+        setGridApi(params.api);
+    };
+
+    const onSelectionChanged = (param) => {
+        setSelectedRows(gridApi.getSelectedRows());
+    };
+
+    const onRowClicked = (event) => {
+        event.node.setSelected(!event.node.isSelected());
+    };
+
+
     return (
         <div className="ag-theme-quartz-dark" style={{ height: '70vh', width: 1270 }}>
-            <SearchBar title='Warehouse' titlecount={rowData.length} search={search} setSearch={setSearch} data={rowData}/>
+            <SearchBar title='Warehouse' titlecount={rowData.length} search={search} setSearch={setSearch} data={rowData} setData={setRowData} selectedRows={selectedRows} />
             <AgGridReact
                 columnDefs={colData}
-                defaultColDef={{ flex: 1 }}
-                rowData={rowData}
+                defaultColDef={{ flex: 1, filter: true, sortable: true, floatingFilter: true}}                rowData={rowData}
                 onCellValueChanged={handleCellValueChanged}
-                >
+                onSelectionChanged={onSelectionChanged}
+                onRowClicked={onRowClicked}
+                suppressRowClickSelection={true}
+                animateRows={true}
+                rowSelection={'multiple'}
+            >
             </AgGridReact>
             <WarehouseForm addWh={updateWhData} />
         </div>

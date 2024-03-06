@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import axios from 'axios'
 import { AgGridReact } from 'ag-grid-react'
 import 'ag-grid-community/styles/ag-grid.css'
@@ -23,12 +23,19 @@ async function getData(model) {
 
 
 const GridTwo = () => {
+    const [gridApi, setGridApi] = useState(null);
+    const [selectedRows, setSelectedRows] = useState([]);
     const [search, setSearch] = useState('');
     const [rowData, setRowData] = useState([])
     const [colData, setColData] = useState(
         [
+            {
+                headerName: 'SKU ID', field: 'name_id', minWidth: 140,
+                checkboxSelection: true,
+                headerCheckboxSelection: true,
+                headerCheckboxSelectionFilteredOnly: true
+            },
             { headerName: 'Vendor ID', field: 'vendor_id', width: 140 },
-            { headerName: 'SKU ID', field: 'name_id', width: 140 },
             { headerName: 'Description', field: 'description', editable: true, width: 300 },
             { headerName: 'COGS', field: 'cogs', editable: true, width: 100 },
             { headerName: 'First Mile', field: 'first_mile', editable: true, width: 100 },
@@ -74,16 +81,38 @@ const GridTwo = () => {
         }
     }
 
+    const getrowId = useCallback(params => {
+        return params.data.name_id
+    })
+
+    const onGridReady = params => {
+        setGridApi(params.api);
+    };
+
+    const onSelectionChanged = (param) => {
+        setSelectedRows(gridApi.getSelectedRows());
+    };
+
+    const onRowClicked = (event) => {
+        event.node.setSelected(!event.node.isSelected());
+    };
+
+
     return (
         <div className="ag-theme-quartz-dark" style={{ height: '68vh', width: 1270 }}>
 
-            <SearchBar title='SKU' titlecount={rowData.length} search={search} setSearch={setSearch} data={rowData} />
+            <SearchBar title='SKU' titlecount={rowData.length} search={search} setSearch={setSearch} data={rowData}  setData={setRowData} selectedRows={selectedRows}/>
             <AgGridReact
+                onGridReady={onGridReady}
                 enableCellChangeFlash={true}
                 columnDefs={colData}
-                defaultColDef={{ flex: 1 }}
-                rowData={rowData}
+                defaultColDef={{ flex: 1, filter: true, sortable: true, floatingFilter: true }} rowData={rowData}
                 onCellValueChanged={handleCellValueChanged}
+                onSelectionChanged={onSelectionChanged}
+                onRowClicked={onRowClicked}
+                suppressRowClickSelection={true}
+                animateRows={true}
+                rowSelection={'multiple'}
             >
             </AgGridReact>
             <SkuForm addSku={updateSkuData} rowData={rowData} />
