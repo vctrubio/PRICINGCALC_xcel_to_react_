@@ -12,7 +12,6 @@
   --blue: #8caad4;
 }
 
-
 .carglass{
   width: 100%;
 }
@@ -767,6 +766,25 @@ li {
   margin: 10px;
   /* Adds some margin around the list items */
 }
+
+.dropdown {
+  animation-name: dropdown;
+  animation-duration: .4s;
+  animation-fill-mode: backwards;
+}
+
+@keyframes dropdown {
+  0% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
 /* 
 @media (max-width: 200px) {
   .sidebar.collapsed {
@@ -784,23 +802,7 @@ li {
   }
 }
 
-@keyframes dropdown {
-  0% {
-    transform: translateY(-100%);
-    opacity: 0;
-  }
 
-  100% {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-.dropdown {
-  animation-name: dropdown;
-  animation-duration: .4s;
-  animation-fill-mode: backwards;
-}
 
 @keyframes dropup {
   0% {

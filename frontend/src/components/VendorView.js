@@ -23,17 +23,24 @@ async function getData(model) {
 
 const GridVendor = () => {
     const [search, setSearch] = useState('');
+    const [gridApi, setGridApi] = useState(null);
+    const [showForm, setShowForm] = useState(false);
+    const [selectedRows, setSelectedRows] = useState([]);
     const [rowData, setRowData] = useState([])
     const [colData, setColData] = useState(
         [
-            { headerName: 'Vendor ID', field: 'name_id' },
+            {
+                headerName: 'Vendor ID', field: 'name_id',
+                checkboxSelection: true,
+                headerCheckboxSelection: true,
+                headerCheckboxSelectionFilteredOnly: true
+            },
             { headerName: 'Origin', field: 'origin', editable: true },
             { headerName: 'PP Rate', field: 'pp_rate_', editable: true, valueFormatter: params => `${params.value}%` },
             { headerName: 'Ex Rate', field: 'exchange_rate_', editable: true, valueFormatter: params => `${params.value}%` },
         ]
     )
 
-    const [showForm, setShowForm] = useState(false);
     window.row = rowData
 
     useEffect(() => {
@@ -42,7 +49,7 @@ const GridVendor = () => {
         });
     }, []);
 
-    const updateVendorData = useCallback( (param) => {
+    const updateVendorData = useCallback((param) => {
         setRowData([param, ...rowData])
     })
 
@@ -51,38 +58,54 @@ const GridVendor = () => {
             for (let key in event.data) {
                 if (event.data[key] === undefined || event.data[key] === null) {
                     console.error(`Error: ${key} is empty`);
-                    return;  // Exit the function if an empty field is found
+                    return;
                 }
             }
             const response = await axios.patch(`http://localhost:8000/vendor/${event.data.name_id}`, event.data);
             //update all skus with vendor id... 
         } catch (error) {
             console.error('Error updating Vendor data:', error);
-            // Handle error appropriately (e.g., display a message)
         }
     }
 
-    const getrowId = useCallback( params => {
+    const getrowId = useCallback(params => {
         return params.data.name_id
     })
 
-    window.pv = rowData
+    const onGridReady = params => {
+        setGridApi(params.api);
+    };
+
+    const onSelectionChanged = (param) => {
+        setSelectedRows(gridApi.getSelectedRows());
+    };
+
+    const onRowClicked = (event) => {
+        event.node.setSelected(!event.node.isSelected());
+    };
+
+    window.trow = selectedRows
     return (
-        <div className="ag-theme-quartz-dark maincontent" style={{ height: '70vh', width: 1270 }}>
-            <SearchBar title='Vendor' titlecount={rowData.length} search={search} setSearch={setSearch} data={rowData} />
+        <div className="ag-theme-quartz-dark" style={{ height: '70vh', width: 1270 }}>
+            <SearchBar title='Vendor' titlecount={rowData.length} search={search} setSearch={setSearch} data={rowData} setData={setRowData} selectedRows={selectedRows}/>
             <AgGridReact
+                onGridReady={onGridReady}
                 getRowId={getrowId}
                 columnDefs={colData}
                 rowData={rowData}
-                defaultColDef={{ flex: 1 }}
+                defaultColDef={{ flex: 1, filter: true, sortable: true, floatingFilter: true}}
                 onCellValueChanged={handleCellValueChanged}
+                onSelectionChanged={onSelectionChanged}
+                onRowClicked={onRowClicked}
+                suppressRowClickSelection={true}
                 animateRows={true}
+                rowSelection={'multiple'}
             />
             <div className='mt-4'>
                 <Button variant={showForm ? "dark" : "primary"} onClick={() => setShowForm(!showForm)}>
                     {showForm ? 'Close Vendor' : 'New Vendor'}
                 </Button>
-                {showForm && <VendorForm addVendor={updateVendorData} rowData={rowData} onClose={() => setShowForm(false)} />}
+                {showForm && <VendorForm addVendor={updateVendorData} rowData={rowData} onClose={() => setShowForm(false)}/>}
             </div>
         </div >
     )

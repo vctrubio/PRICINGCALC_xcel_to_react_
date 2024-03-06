@@ -2,11 +2,24 @@ import React, { useEffect, useRef, useState, useMemo } from 'react'
 import { Form, Dropdown, Button, ButtonGroup, Col } from 'react-bootstrap';
 import * as XLSX from 'xlsx';
 import { CSVLink } from 'react-csv';
+import axios from 'axios';
 
 //to upload get title add .xlsx and post to api
-export const SearchBar = ({ title, titlecount, data, search, setSearch }) => {
+export const SearchBar = ({ title, titlecount, data, setData, search, setSearch, selectedRows }) => {
     const [selectedFile, setSelectedFile] = useState(null);
 
+    const deleteSelectedRows = async () => {
+        try {
+            const lowerCaseTitle = title.toLowerCase();
+            const promises = selectedRows.map(row => axios.delete(`http://localhost:8000/${lowerCaseTitle}/${row.name_id}`));
+            await Promise.all(promises);
+            const newData = data.filter(d => !selectedRows.some(row => row.name_id === d.name_id));
+            setData(newData);
+        } catch (error) {
+            console.error('Error deleting rows:', error);
+        }
+    };
+    
     function transformBack(header) {
         if (header.endsWith('_')) {
             header = header.slice(0, -1) + '%';
@@ -96,8 +109,24 @@ export const SearchBar = ({ title, titlecount, data, search, setSearch }) => {
     return (
         <div className="d-flex justify-content-between p-2 mt-2">
             <h1 style={{ fontFamily: 'Roboto', paddingTop: 16 }} >
-                {title} : {titlecount}</h1>
+                {title} :
+                <span style={{ color: selectedRows.length > 0 ? 'grey' : 'white', marginLeft: 12 }}>
+                    {selectedRows.length === 0 ? titlecount : selectedRows.length}
+                </span>
+            </h1>
             <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '12px' }}>
+                {
+                    selectedRows.length > 0 &&
+                    <Button
+                        variant='danger'
+                        className='dropdown'
+                        style={{ opacity: 0.8, fontSize: '24px', height: 48, width: 49, marginRight: 20 }}
+                        title='Delete Rows'
+                        onClick={deleteSelectedRows}
+                    >
+                        <i className="bi bi-trash"></i>
+                    </Button>
+                }
                 <button className="btn btn-dark"
                     style={{ marginLeft: '10px', fontSize: '20px', textAlign: 'center' }}
                     title={`Upload: '${title}'`}
@@ -106,7 +135,7 @@ export const SearchBar = ({ title, titlecount, data, search, setSearch }) => {
                     <i className="bi bi-upload"></i>
                 </button>
                 <button className="btn btn-dark"
-                    style={{ marginLeft: '10px', fontSize: '20px', paddingTop: 14 }}
+                    style={{ marginLeft: '10px', fontSize: '20px', paddingTop: 6 }}
                     title={`Download:'${title}'`}
                     onClick={handleExport}
                 >
