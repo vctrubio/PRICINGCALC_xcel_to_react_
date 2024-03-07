@@ -25,7 +25,6 @@ function transformWarehouse(warehouse) {
     });
 }
 
-// const theme = createMuiTheme({
 const theme = createTheme({
     overrides: {
         MuiAutocomplete: {
@@ -43,12 +42,6 @@ const theme = createTheme({
     },
 });
 
-
-/*
-when is shipping comming to play?
-waerehouse IDs do NOT hold skus in the warehouse
-selected country to ship - gets what data to calculate
-*/
 
 
 function WarehousesSort({ warehouses }) {
@@ -79,12 +72,6 @@ function getDataByTag(warehouse, tags) {
 
 //we can include wich warehouse have this option as value
 //db_model['Shipping'].keys
-export const shippings = {
-    'DHL': 'zone_1',
-    'Fedex': 'zone_1',
-    'Ups': 'zone_1',
-    'Correos': 'zone_1',
-}
 
 export const carriers = {
     'Express': 2.2,
@@ -106,7 +93,14 @@ export const FormX = () => {
     const [cSkus, setCSkus] = useState([]);
     const [countries, setCountries] = useState([])
     const [whConfig, setWhConfig] = useState({})
+    const [shipping, setShipping] = useState([])
 
+    /* shipping = {
+        warehouse: 
+        courier:
+        types: [type1, type2, type3]
+    }
+    */
     window.skus = allSku
     window.wh = allWh
     window.sels = selectedSku
@@ -114,10 +108,10 @@ export const FormX = () => {
     window.selhey = selectedPT
     window.c = countries
     window.wc = whConfig
+    window.s = shipping
 
     const configWh = async (data) => {
         for (const [key, obj] of Object.entries(data)) {
-            console.log(key)
             const reply = await axios.get(`http://localhost:8000/warehouseconfig/${key}`);
             setWhConfig(prevWhConfig => ({ ...prevWhConfig, [key]: reply.data }));
         }
@@ -154,8 +148,28 @@ export const FormX = () => {
             catch (error) {
             }
         }
+
+        const fetchShipping = async () => {
+            try {
+                const response = await axios.get(`http://localhost:8000/shipping`)
+                if (response.data)
+                {
+                    response.data.map(res => {
+                        const myDict = {
+                            warehouse: res.warehouse,
+                            courier: res.name_id,
+                            types: Object.keys(res.shipping_table)
+                        }
+                        setShipping(prevShipping => [...prevShipping, myDict]);
+                    })
+                }
+            }
+            catch (error) {
+            }
+        }
         fetch()
         fetchSingular('country')
+        fetchShipping()
     }, []);
 
     useEffect(() => {
@@ -329,7 +343,7 @@ export const FormX = () => {
         type: '',
         b2c: true,
     });
-
+    window.uis = uiShipping
 
     const [uiOM, setUiOM] = useState(null)
     const [uiDC, setUiDC] = useState(null)
@@ -421,16 +435,16 @@ export const FormX = () => {
                             </div>
                             {showDropdown.shippingName && (
                                 <div className='align-dropwdown-down'>
-                                    {Object.keys(shippings).map((shipping, index) => (
+                                    {shipping.map((shipping, index) => (
                                         <div type='button' className='align-dropdown-bec' key={index}
                                             onClick={() => {
                                                 setUiShipping(prevState => ({
                                                     ...prevState,
-                                                    shipping: shipping
+                                                    shipping: shipping.courier
                                                 }));
                                                 toggleDropdown('shippingName');
                                             }}
-                                        >{shipping}</div>
+                                        >{shipping.courier}</div>
                                     ))}
                                 </div>
                             )}

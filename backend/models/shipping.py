@@ -32,7 +32,7 @@ class ShippingTable(BaseModel):
         
 class Shipping(BaseModel):
     name_id: str #DHL
-    warehouses: Optional[str] = None #what warehouse it shipps from #not completed methods. this needs restructued in the db_model to 
+    warehouse: Optional[str] = None #what warehouse it shipps from #not completed methods. this needs restructued in the db_model to 
     
     #EXAMPLES for later
     # db_model['Warehouse']['name_id'] = Warehouse

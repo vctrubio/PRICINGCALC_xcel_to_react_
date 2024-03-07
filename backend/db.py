@@ -61,7 +61,7 @@ def do_shipping_db(full_path, courier, warehouse):
     courier_name = courier[:-5]
     type_courier = pd.ExcelFile(full_path + '/' + courier, engine='openpyxl').sheet_names
     shipping = parse_shipping_table(full_path + '/' + courier, courier_name, type_courier)
-    shipping.warehouses = warehouse
+    shipping.warehouse = warehouse
 
     if not 'Shipping' in db_model:
         db_model['Shipping'] = []  
