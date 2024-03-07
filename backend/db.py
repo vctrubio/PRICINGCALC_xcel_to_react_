@@ -58,21 +58,20 @@ def do_warehouse_linking():
 
             
 def do_shipping_db(full_path, courier, warehouse):
-    if not 'Shipping' in db_model:
-        db_model['Shipping'] = {}   
-
-    #OK so, do we want the same DHL rates for warehouse X and Y?
-    #OR, do we do that, 
-    # if (courier in db_model['Shipping']):
-    #     db_model['Shipping'][courier].warehouses.append(warehouse)
-    #     print(f'Warehouse {warehouse} added to {courier}')
-    #     print(f'We need to think about this....')
-    #     return 
-    
+    courier_name = courier[:-5]
     type_courier = pd.ExcelFile(full_path + '/' + courier, engine='openpyxl').sheet_names
-    shipping = parse_shipping_table(full_path + '/' + courier, courier[:-5], type_courier)
-    db_model['Shipping'][shipping.name_id] = shipping
+    shipping = parse_shipping_table(full_path + '/' + courier, courier_name, type_courier)
+    shipping.warehouses = warehouse
 
+    if not 'Shipping' in db_model:
+        db_model['Shipping'] = []  
+    db_model['Shipping'].append(shipping)
+   
+    if warehouse in db_model['WarehouseConfig']:
+        db_model['WarehouseConfig'][warehouse]['Shipping'] = {courier_name: shipping}
+    else:
+        print('Raise: Warehouse not found in WarehouseConfig')
+##^dependency problem that when we change db_modelSHipping it will not change in WarehouseConfig WH SHipping    
 
 def do_shipping():
     all_wh = [f for f in os.listdir(SHIPPING_DIR) if os.path.isdir(os.path.join(SHIPPING_DIR, f))]
@@ -105,11 +104,8 @@ def do_country_list():
         countries[leftover] = 'Zone_0'             
     
     db_model['Country'] = {k: countries[k] for k in sorted(countries)}
-                
-    #ok so, if country is defined in warehouse, but not in zone then we are not adding it....  
-    #we can have a function to see all countries that do not exist, and ask for zone confirmation first and then we can add it to the dict      
-   
-    
+
+
 ptr_model = None
 for name in my_lst:
     if name == 'PaymentPopCountry':
@@ -162,11 +158,11 @@ for name in my_lst:
                 if name == 'PackagingWarehouse':
                     db_model[name].append(instance)
 
-do_shipping()
 do_warehouse_linking()
 do_country_list()
+do_shipping()
 
-#WAREHouseCONFIG to do and link in the front end.
+
 
 #db_model['CLASS']['NAME ID']
 

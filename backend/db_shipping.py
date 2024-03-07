@@ -16,7 +16,6 @@ parse data into appropiate model
 def shipping_courier(file, name):
     dataframe, attr = read_excel_to_json_sheet(file, name)
     tmp = ShippingTable(name_id=name)
-    origin = []
 
     for data in dataframe:
         weight = data['weight_kg']
@@ -26,7 +25,6 @@ def shipping_courier(file, name):
                 result[key] = value
         tmp.price_zone[weight] = (result)
 
-    tmp.origin = origin
     return tmp
 
 

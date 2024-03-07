@@ -11,8 +11,7 @@ skus = {v.name_id: v for v in db_model['SKU'].values()}
 warehouse = list(db_model['Warehouse'].values())
 # packagingWarehouse = list(db_model['PackagingWarehouse'].values())
 pskus = {v.name_id: v for v in db_model['PSKU'].values()}
-shipping = list(db_model['Shipping'].values())
-
+shipping = list(db_model['Shipping'])
 
 app = FastAPI()
 
@@ -370,6 +369,20 @@ async def root():
 @app.get("/shipping")
 async def root():
     return db_model['Shipping']
+
+@app.get("/shipping/{name_id}")
+async def root(name_id: str):
+    if name_id in db_model['WarehouseConfig']:
+        return db_model['WarehouseConfig'][name_id]['Shipping']
+    raise HTTPException(status_code=404, detail="Shipping not found")
+
+@app.get("/shipping/{name_id}/{courier}")
+async def root(name_id: str, courier: str):
+    if name_id in db_model['WarehouseConfig']:
+        if courier in db_model['WarehouseConfig'][name_id]['Shipping']:
+            return db_model['WarehouseConfig'][name_id]['Shipping'][courier]
+    raise HTTPException(status_code=404, detail="Shipping not found")
+
 
 '''For Debugging'''
 @app.get("/test")

@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import List, Tuple, Dict
+from typing import List, Optional, Dict
 from .warehouse import Warehouse
 
 
@@ -16,7 +16,6 @@ from .warehouse import Warehouse
 
 class ShippingTable(BaseModel):
     name_id: str #type xpres or standard
-    origin: List[str] = [] #origin country list
     price_zone: Dict[int, Dict] = {} #weight, zone, price
 
     def get_quote(self, weight):
@@ -33,7 +32,7 @@ class ShippingTable(BaseModel):
         
 class Shipping(BaseModel):
     name_id: str #DHL
-    warehouses: List[str] = [] #what warehouse it shipps from #not completed methods. this needs restructued in the db_model to 
+    warehouses: Optional[str] = None #what warehouse it shipps from #not completed methods. this needs restructued in the db_model to 
     
     #EXAMPLES for later
     # db_model['Warehouse']['name_id'] = Warehouse
