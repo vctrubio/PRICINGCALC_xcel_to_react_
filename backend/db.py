@@ -93,17 +93,21 @@ def do_country_list():
         if value is not None:
             all_countries.append(value)
 
-
-    set_countries = set(country for sublist in all_countries for country in sublist)
+    set_countries = set(country for sublist in all_countries for country in sublist if len(country) > 1) 
+    
     for zone_name, zone in db_model['Zone'].items():
         for z in zone:
             if z in set_countries:
                 countries[z] = zone_name
+                set_countries.remove(z)
+                
+    for leftover in set_countries:
+        countries[leftover] = 'Zone_0'             
+    
+    db_model['Country'] = {k: countries[k] for k in sorted(countries)}
+                
     #ok so, if country is defined in warehouse, but not in zone then we are not adding it....  
     #we can have a function to see all countries that do not exist, and ask for zone confirmation first and then we can add it to the dict      
-    print(f'All countries: {countries}')
-    
-    db_model['Country'] = countries
    
     
 ptr_model = None
