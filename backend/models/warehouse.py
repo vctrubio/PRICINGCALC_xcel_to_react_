@@ -17,12 +17,13 @@ class Warehouse(BaseModel):
 
 
 class WarehouseConfig(BaseModel):
-    name_id: str
+    # name_id: str
+    # origin: str
     # countries_to_ship: List[str] = []
     # shipping_couriers: List[str] = []
-    def append_country(self, country: str):
-        self.countries_to_ship.append(country)
+    # def append_country(self, country: str):
+    #     self.countries_to_ship.append(country)
     
-    def append_courier(self, courier: str):
-        self.shipping_couriers.append(courier)
-    
+    # def append_courier(self, courier: str):
+    #     self.shipping_couriers.append(courier)
+    pass

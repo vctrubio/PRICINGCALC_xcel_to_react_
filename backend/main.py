@@ -383,6 +383,11 @@ async def root(name_id: str, courier: str):
             return db_model['WarehouseConfig'][name_id]['Shipping'][courier]
     raise HTTPException(status_code=404, detail="Shipping not found")
 
+'''Zone'''
+@app.get("/zone")
+async def root():
+    return db_model['Zone']
+
 
 '''For Debugging'''
 @app.get("/test")

@@ -9,7 +9,7 @@ import Alert from '@mui/material/Alert';
 import { SearchBar } from './SearchBar'
 import { getData } from './CskuForm'
 import { Button } from 'react-bootstrap'
-
+import { GridWarehouseConfig } from './WarehouseConfig'
 
 
 export function toTitleCase(str) {
@@ -83,7 +83,7 @@ export const ProductTag = () => {
 
     return (
         <div className="ag-theme-quartz-dark" style={{ height: 800, width: 1270 }}>
-            <div className='container m-5' style={{border: '1px solid black'}}>
+            <div className='container m-5' style={{ border: '1px solid black' }}>
 
                 <main className='d-flex'>
                     <div className="col-md-4">
@@ -122,6 +122,7 @@ export const ProductTag = () => {
                     </div>
                     <div className='d-flex flex-start'>
                     </div>
+                    <GridWarehouseConfig />
                 </main>
 
                 <div className='row'>
