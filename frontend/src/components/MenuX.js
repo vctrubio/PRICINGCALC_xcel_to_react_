@@ -105,6 +105,7 @@ export const FormX = () => {
     const [allSku, setAllSku] = useState([]);
     const [cSkus, setCSkus] = useState([]);
     const [countries, setCountries] = useState([])
+    const [whConfig, setWhConfig] = useState({})
 
     window.skus = allSku
     window.wh = allWh
@@ -112,7 +113,16 @@ export const FormX = () => {
     window.selw = selectedWh
     window.selhey = selectedPT
     window.c = countries
-    // console.log('see me: ', allWh)
+    window.wc = whConfig
+
+    const configWh = async (data) => {
+        for (const [key, obj] of Object.entries(data)) {
+            console.log(key)
+            const reply = await axios.get(`http://localhost:8000/warehouseconfig/${key}`);
+            setWhConfig(prevWhConfig => ({ ...prevWhConfig, [key]: reply.data }));
+        }
+    }
+
     useEffect(() => {
         const fetch = async () => {
             try {
@@ -127,6 +137,7 @@ export const FormX = () => {
                     return acc;
                 }, {});
                 setAllWh(tempWh)
+                configWh(tempWh)
                 setAllSku(sku)
                 setCSkus(csku)
             }
@@ -135,20 +146,17 @@ export const FormX = () => {
             }
         }
         const fetchSingular = async (name) => {
-            try{
+            try {
                 const response = await axios.get(`http://localhost:8000/${name}`)
                 if (response.data)
                     setCountries(response.data)
             }
             catch (error) {
-                console.log('fetchSingular threw an error, ', error);
             }
         }
         fetch()
         fetchSingular('country')
     }, []);
-
-    window.milo = cSkus;
 
     useEffect(() => {
         if (selectedSku && selectedSku.length > 0) {
@@ -370,7 +378,7 @@ export const FormX = () => {
     }, [selectedSku, selectedWh, selectedPT, uiOM, uiDC, uiShipping])
 
     window.cc = CalcOutput.priceWithDiscount
-
+    window.l = allWh
     return (
         <div style={{ marginLeft: 50 }}>
             <div className='ck-head'>
@@ -436,7 +444,7 @@ export const FormX = () => {
 
                             <div type='button'
                                 style={{ color: uiShipping.type ? '#696862' : '', paddingRight: 5 }}
-                                onClick={() => {toggleDropdown('shippingType'); setUiShipping({... uiShipping, type: null})}}>
+                                onClick={() => { toggleDropdown('shippingType'); setUiShipping({ ...uiShipping, type: null }) }}>
                                 Type
                             </div>
                             {showDropdown.shippingType && (
@@ -580,7 +588,7 @@ export const FormX = () => {
                                             )
                                         )
                                         : WarehousesSort({ warehouses: allWh })
-                                            .filter(wh => uiShipping.country && uiShipping.country.length > 0 ? wh.originID === uiShipping.country : true) //not origin . it is countries to ship to
+                                            .filter(wh => uiShipping.country && uiShipping.country.length > 0 ? whConfig[wh.warehouseID].countries_to_ship.includes(uiShipping.country) : true)
                                             .map((wh, index) => (
                                                 <div key={index} onClick={() => setSelectedWh(wh)}>
                                                     <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', width: '100%' }}>
