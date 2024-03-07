@@ -8,9 +8,6 @@ import switchOn from '../assets/switchon.png';
 import axios from 'axios';
 import { useSkuForm } from './CskuForm';
 import '../App.css';
-import { red } from '@mui/material/colors';
-import { Row } from 'react-bootstrap';
-
 
 function transformWarehouse(warehouse) {
     return Object.entries(warehouse).map(([productTag, details]) => {
@@ -18,9 +15,6 @@ function transformWarehouse(warehouse) {
             warehouseID: details.name_id,
             originID: details.origin,
             productTags: productTag
-            // shipping couriers
-            // shipping types
-            // shipping countries
         };
     });
 }
@@ -41,8 +35,6 @@ const theme = createTheme({
         },
     },
 });
-
-
 
 function WarehousesSort({ warehouses }) {
     const transformedWarehouses = warehouses
@@ -68,17 +60,6 @@ function getDataByTag(warehouse, tags) {
     }
     return resultArray;
 }
-
-
-//we can include wich warehouse have this option as value
-//db_model['Shipping'].keys
-
-export const carriers = {
-    'Express': 2.2,
-    'Standard': 1.3,
-}
-
-
 
 export const FormX = () => {
 
@@ -152,8 +133,7 @@ export const FormX = () => {
         const fetchShipping = async () => {
             try {
                 const response = await axios.get(`http://localhost:8000/shipping`)
-                if (response.data)
-                {
+                if (response.data) {
                     response.data.map(res => {
                         const myDict = {
                             warehouse: res.warehouse,
@@ -196,7 +176,6 @@ export const FormX = () => {
         }
     }, [selectedWh]);
 
-
     const handleReset = (name) => {
         if (name === 'wh') {
             if (selectedWh) {
@@ -222,7 +201,6 @@ export const FormX = () => {
         const transformedWarehouses = warehouses ? Object.values(warehouses).flatMap(transformWarehouse) : [];
         const uniqueIds = Array.from(new Set(transformedWarehouses.map(item => JSON.stringify({ warehouseID: item.warehouseID, originID: item.originID }))), JSON.parse);
         uniqueIds.sort((a, b) => a.originID.localeCompare(b.originID));
-
 
         return (
             <ThemeProvider theme={theme}>
@@ -429,8 +407,7 @@ export const FormX = () => {
                         <div className='d-flex flex-column' style={{ textAlign: 'left', position: 'relative', paddingLeft: 5 }}>
                             <div type='button'
                                 style={{ color: uiShipping.shipping ? '#696862' : '' }}
-
-                                onClick={() => { toggleDropdown('shippingName'); setUiShipping({ ...uiShipping, shipping: null }) }}>
+                                onClick={() => { toggleDropdown('shippingName'); setUiShipping({ ...uiShipping, shipping: null, type: null}) }}>
                                 Courier
                             </div>
                             {showDropdown.shippingName && (
@@ -453,27 +430,34 @@ export const FormX = () => {
                             </div>
                         </div>
 
-
                         <div className='d-flex flex-column' style={{ textAlign: 'left', position: 'relative' }}>
-
                             <div type='button'
                                 style={{ color: uiShipping.type ? '#696862' : '', paddingRight: 5 }}
-                                onClick={() => { toggleDropdown('shippingType'); setUiShipping({ ...uiShipping, type: null }) }}>
+                                onClick={() => {
+                                    if (uiShipping && uiShipping.shipping) {
+                                        toggleDropdown('shippingType');
+                                        setUiShipping({ ...uiShipping, type: null });
+                                    } else {
+                                        alert('Please select a Courier first.');
+                                    }
+                                }}>
                                 Type
                             </div>
-                            {showDropdown.shippingType && (
+                            {showDropdown.shippingType && uiShipping && uiShipping.shipping && (
                                 <div className='align-dropwdown-down width-100'>
-                                    {Object.keys(carriers).map((type, index) => (
-                                        <div type='button' className='align-dropdown-bec' key={index}
-                                            onClick={() => {
-                                                setUiShipping(prevState => ({
-                                                    ...prevState,
-                                                    type: type
-                                                }));
-                                                toggleDropdown('shippingType');
-                                            }}
-                                        >{type}</div>
-                                    ))}
+                                    {
+                                        shipping.find(shipping => shipping.courier === uiShipping.shipping).types.map((type, index) => (
+                                            <div type='button' className='align-dropdown-bec' key={index}
+                                                onClick={() => {
+                                                    setUiShipping(prevState => ({
+                                                        ...prevState,
+                                                        type: type
+                                                    }));
+                                                    toggleDropdown('shippingType');
+                                                }}
+                                            >{type}</div>
+                                        ))
+                                    }
                                 </div>
                             )}
                             <div className='pt-2' s>

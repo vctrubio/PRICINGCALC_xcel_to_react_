@@ -200,7 +200,7 @@ const GridPackaging = () => {
     return (
         <div className='mt-3 d-flex' style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
 
-            <div className="ag-theme-quartz-dark" style={{ height: 800, width: 700, textAlign: 'left' }}>
+            <div className="ag-theme-quartz-dark" style={{ height: 700, width: 700, textAlign: 'left' }}>
                 <SearchBar title='PackagingVendor' titlecount={rowData.length} search={''} setSearch={''} data={rowData} setData={setRowData} selectedRows={selectedRows}/>
                 <AgGridReact
                     onGridReady={onGridReady}
@@ -276,7 +276,7 @@ const GridPackaging = () => {
                 </div>
             </div>
 
-            <div className="ag-theme-quartz-dark" style={{ height: 800, width: 700, textAlign: 'left' }}>
+            <div className="ag-theme-quartz-dark" style={{ height: 700, width: 700, textAlign: 'left' }}>
                 <SearchBar title='PackagingWarehouse' titlecount={rowData2.length} search={''} setSearch={''} data={rowData2} setData={rowData2} selectedRows={selectedRows2} />
                 <AgGridReact
                     onGridReady={onGridReady2}
