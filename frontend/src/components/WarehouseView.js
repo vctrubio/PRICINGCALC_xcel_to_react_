@@ -31,7 +31,6 @@ const GridWarehouse = () => {
                 headerCheckboxSelection: true,
                 headerCheckboxSelectionFilteredOnly: true
             },
-            { headerName: 'Country Oirigin', field: 'origin', width: 150 }, //this needs chaning schemas.... 
             { headerName: 'Product Tag', field: 'product_tag', width: 200 }, //dropdown for selecting product tag to do 
             {
                 headerName: 'Fees', children: [
