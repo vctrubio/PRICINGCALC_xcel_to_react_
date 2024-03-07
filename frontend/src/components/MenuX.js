@@ -421,6 +421,7 @@ export const FormX = () => {
                                                 }));
                                                 toggleDropdown('shippingName');
                                             }}
+                                        // >{shipping.courier} - {shipping.warehouse}</div>
                                         >{shipping.courier}</div>
                                     ))}
                                 </div>

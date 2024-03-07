@@ -51,6 +51,8 @@ def do_warehouse_linking():
     # print(f'hellomother: {warehouse_dataframe}')
     for data in warehouse_dataframe:
         if data['name_id'] in db_model['Warehouse']:
+            # print(f'WarehouseConfig: {data["name_id"]} has origin {data["origin"]}')
+            # db_model['Warehouse'][data['name_id']].origin = data['origin']
             db_model['WarehouseConfig'][data['name_id']] = {}
             for key, value in data.items():
                 if key != 'name_id':
