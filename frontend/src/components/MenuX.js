@@ -193,7 +193,6 @@ export const FormX = () => {
             }
             else
                 setSelectedSku(JSON.parse(localStorage.getItem('selectedSku')));
-
         }
     }
 
@@ -369,8 +368,6 @@ export const FormX = () => {
         }
     }, [selectedSku, selectedWh, selectedPT, uiOM, uiDC, uiShipping])
 
-    window.cc = CalcOutput.priceWithDiscount
-    window.l = allWh
     return (
         <div style={{ marginLeft: 50 }}>
             <div className='ck-head'>
@@ -515,7 +512,6 @@ export const FormX = () => {
                         </div>
                     </div>
                 </div>
-
             </div>
 
 
@@ -526,7 +522,6 @@ export const FormX = () => {
                         <div className='ck-helloword'>Warehouse</div>
                         <div className='ck-search-bar'>
                             <WarehouseSearch warehouses={allWh} onWarehouseSelect={(event, newValue) => setSelectedWh(newValue)} />
-
                             <div className="btn" onClick={() => handleReset('wh')}>
                                 <i className="bi bi-repeat"></i>
                             </div>
@@ -609,7 +604,6 @@ export const FormX = () => {
                                 <Button style={{ fontSize: 24, paddingBottom: 2 }}><i onClick={themometerOn} class="bi bi-thermometer-high" title="Select All"></i></Button>
                             </div>
                             : selectedSku.length > 0 ? <div className='d-flex justify-content-around'> WH Fees: Unit | Storage | Pick n Pack | Custom | Total </div> :
-
                                 null}
                     </div>
                 </div>
@@ -625,7 +619,6 @@ export const FormX = () => {
                                     setSelectedSku([...selectedSku, newValue]);
                                 }}
                             />
-
                             <div className="btn" onClick={() => handleReset('sku')}>
                                 <i className="bi bi-repeat"></i>
                             </div>
@@ -674,7 +667,6 @@ export const FormX = () => {
                         </div>
                     </div>
                 </div>
-
             </div>
 
             <div className='d-footer'>
@@ -701,7 +693,6 @@ export const FormX = () => {
                         </span>
                     </div>
 
-
                 </div>
                 <div className='d-flex justify-content-end align-items-baseline' style={{ paddingLeft: 40 }}>
                     <div className='d-flex flex-row justify-content-between align-items-baseline'
@@ -726,7 +717,6 @@ export const FormX = () => {
                     </div>
                 </div>
             </div>
-
         </div >
     )
 }

@@ -90,6 +90,7 @@ const LastMileGrid = () => {
             { headerName: 'Type', field: 'Type', width: 80 },
             { headerName: 'Weight KG', field: 'Weight', width: 80 },
             {
+                //iterator to get the zones
                 headerName: 'Zones', children: [
                     {
                         headerName: '1', valueGetter: function (params) {

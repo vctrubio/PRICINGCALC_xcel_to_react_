@@ -19,7 +19,7 @@ export const SearchBar = ({ title, titlecount, data, setData, search, setSearch,
             console.error('Error deleting rows:', error);
         }
     };
-    
+
     function transformBack(header) {
         if (header.endsWith('_')) {
             header = header.slice(0, -1) + '%';
@@ -52,10 +52,15 @@ export const SearchBar = ({ title, titlecount, data, setData, search, setSearch,
             let transformedRow = {};
             for (let key in row) {
                 let value = row[key];
-                if (typeof value === 'object' || value === '' || value === null) {
+                if (key == 'skus') {
+                    console.log('value before join:', value);
+                    console.log('value after join:', value.join(' '));
+                    transformedRow[transformBack(key)] = value.join(' ');
+                }
+                else if (typeof value === 'object' || value === '' || value === null) {
                     continue;
                 }
-                if (data[index + 1] && data[index + 1][key]) {
+                else {
                     transformedRow[transformBack(key)] = value;
                 }
             }
