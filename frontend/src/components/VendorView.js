@@ -52,6 +52,7 @@ const GridVendor = () => {
             if (gridApi) {
                 console.log('calling row reredner'); 
                 setGridKey(prevKey => prevKey + 1);
+                gridApi.setRowData(data);
                 gridApi.refreshCells({ force: true }); 
             } 
         };
