@@ -43,21 +43,23 @@ const GridVendor = () => {
         ]
     )
 
+
     useEffect(() => {
-        console.log('rerender:', rerender);
+        if (rerender) {
+            console.log('rerendering needed');
+        }
+        
         const fetchData = async () => {
+            console.log('fetching data');
             const data = await getData('vendor');
             setRowData(data);
-            // Only perform refresh when gridApi is available
             if (gridApi) {
-                console.log('calling row reredner'); 
-                setGridKey(prevKey => prevKey + 1);
                 gridApi.setRowData(data);
-                gridApi.refreshCells({ force: true }); 
-            } 
+                console.log('data is: ', data);
+                gridApi.refreshCells({ force: true });
+            }
         };
         fetchData();
-    
     }, [rerender]);
 
     const updateVendorData = useCallback((param) => {

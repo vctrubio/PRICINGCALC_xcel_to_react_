@@ -368,6 +368,13 @@ export const FormX = () => {
         }
     }, [selectedSku, selectedWh, selectedPT, uiOM, uiDC, uiShipping])
 
+    const selectWhifEmpty = (item) => {
+        if (!selectedWh) {
+            console.log('selectWhifEmpty, ', item)
+            setSelectedWh(item)
+        }
+    }
+
     return (
         <div style={{ marginLeft: 50 }}>
             <div className='ck-head'>
@@ -554,7 +561,7 @@ export const FormX = () => {
                                         ? (
                                             Object.values(allWh).map((warehouse, warehouseIndex) =>
                                                 getDataByTag(warehouse, selectedPT).map((item, itemIndex) => (
-                                                    <div className='d-flex flex-column' key={`${warehouseIndex}-${itemIndex}`} width='100%'>
+                                                    <div className='d-flex flex-column' key={`${warehouseIndex}-${itemIndex}`} width='100%' onClick={() => selectWhifEmpty(item)}>
                                                         <div className='d-flex flex-row justify-content-between'>
                                                             <div>
                                                                 {` ${item.name_id}`}
