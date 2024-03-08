@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import { Form, Button } from 'react-bootstrap';
+import React, { useCallback, useEffect, useRef, useState } from 'react'
+import { Button } from 'react-bootstrap';
 
 import axios from 'axios'
 import { AgGridReact } from 'ag-grid-react'
@@ -27,6 +27,8 @@ const GridVendor = () => {
     const [search, setSearch] = useState('');
     const [showForm, setShowForm] = useState(false);
     const [rowData, setRowData] = useState([])
+    const [rerender, setRerender] = useState(false);
+    const [gridKey, setGridKey] = useState(1);
     const [colData, setColData] = useState(
         [
             {
@@ -41,13 +43,21 @@ const GridVendor = () => {
         ]
     )
 
-    window.row = rowData
-
     useEffect(() => {
-        getData('vendor').then(data => {
+        console.log('rerender:', rerender);
+        const fetchData = async () => {
+            const data = await getData('vendor');
             setRowData(data);
-        });
-    }, []);
+            // Only perform refresh when gridApi is available
+            if (gridApi) {
+                console.log('calling row reredner'); 
+                setGridKey(prevKey => prevKey + 1);
+                gridApi.refreshCells({ force: true }); 
+            } 
+        };
+        fetchData();
+    
+    }, [rerender]);
 
     const updateVendorData = useCallback((param) => {
         setRowData([param, ...rowData])
@@ -87,25 +97,26 @@ const GridVendor = () => {
     window.trow = selectedRows
     return (
         <div className="ag-theme-quartz-dark" style={{ height: '70vh', width: 1270 }}>
-            <SearchBar title='Vendor' titlecount={rowData.length} search={search} setSearch={setSearch} data={rowData} setData={setRowData} selectedRows={selectedRows}/>
+            <SearchBar title='Vendor' titlecount={rowData.length} search={search} setSearch={setSearch} data={rowData} setData={setRowData} selectedRows={selectedRows} setRerender={setRerender} />
             <AgGridReact
+                key={gridKey}
                 onGridReady={onGridReady}
                 getRowId={getrowId}
                 columnDefs={colData}
                 rowData={rowData}
-                defaultColDef={{ flex: 1, filter: true, sortable: true, floatingFilter: true}}
+                defaultColDef={{ flex: 1, filter: true, sortable: true, floatingFilter: true }}
                 onCellValueChanged={handleCellValueChanged}
                 onSelectionChanged={onSelectionChanged}
-                onRowClicked={onRowClicked}
+                // onRowClicked={onRowClicked}
                 suppressRowClickSelection={true}
-                animateRows={true}
+                animateRows={false}
                 rowSelection={'multiple'}
             />
             <div className='mt-4'>
                 <Button variant={showForm ? "dark" : "primary"} onClick={() => setShowForm(!showForm)}>
                     {showForm ? 'Close Vendor' : 'New Vendor'}
                 </Button>
-                {showForm && <VendorForm addVendor={updateVendorData} rowData={rowData} onClose={() => setShowForm(false)}/>}
+                {showForm && <VendorForm addVendor={updateVendorData} rowData={rowData} onClose={() => setShowForm(false)} />}
             </div>
         </div >
     )

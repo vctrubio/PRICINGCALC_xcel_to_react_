@@ -43,7 +43,7 @@ async def upload_file(file: UploadFile = File(...),  filename: str = Form(...)):
     except Exception as e:
         print(f"Error uploading file: {e}")
         return {"error": "Internal Server Error"}
-
+    
 ''' VENDORS ''' 
 @app.get("/vendor")
 async def root():

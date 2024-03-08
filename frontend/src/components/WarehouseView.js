@@ -20,6 +20,7 @@ async function getData(model) {
 
 const GridWarehouse = () => {
     const [gridApi, setGridApi] = useState(null);
+    const [rerender, setRerender] = useState(false)
     const [selectedRows, setSelectedRows] = useState([]);
     const [search, setSearch] = useState('');
     const [rowData, setRowData] = useState([])
@@ -104,10 +105,11 @@ const GridWarehouse = () => {
 
     return (
         <div className="ag-theme-quartz-dark" style={{ height: '70vh', width: 1270 }}>
-            <SearchBar title='Warehouse' titlecount={rowData.length} search={search} setSearch={setSearch} data={rowData} setData={setRowData} selectedRows={selectedRows} />
+            <SearchBar title='Warehouse' titlecount={rowData.length} search={search} setSearch={setSearch} data={rowData} setData={setRowData} selectedRows={selectedRows} setRerender={setRerender} />
             <AgGridReact
                 columnDefs={colData}
-                defaultColDef={{ flex: 1, filter: true, sortable: true, floatingFilter: true}}                rowData={rowData}
+                defaultColDef={{ flex: 1, filter: true, sortable: true, floatingFilter: true}}              
+                  rowData={rowData}
                 onCellValueChanged={handleCellValueChanged}
                 onSelectionChanged={onSelectionChanged}
                 onRowClicked={onRowClicked}

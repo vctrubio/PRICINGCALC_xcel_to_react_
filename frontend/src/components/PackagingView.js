@@ -15,7 +15,8 @@ const GridPackaging = () => {
     const [gridApi2, setGridApi2] = useState(null);
     const [selectedRows, setSelectedRows] = useState([]);
     const [selectedRows2, setSelectedRows2] = useState([]);
-
+    const [rerender, setRerender] = useState(false);
+    const [rerender2, setRerender2] = useState(false);
     const [rowData, setRowData] = useState([])
     const [rowData2, setRowData2] = useState([])
     const [colData, setColData] = useState(
@@ -201,7 +202,7 @@ const GridPackaging = () => {
         <div className='mt-3 d-flex' style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
 
             <div className="ag-theme-quartz-dark" style={{ height: 700, width: 700, textAlign: 'left' }}>
-                <SearchBar title='PackagingVendor' titlecount={rowData.length} search={''} setSearch={''} data={rowData} setData={setRowData} selectedRows={selectedRows}/>
+                <SearchBar title='PackagingVendor' titlecount={rowData.length} search={''} setSearch={''} data={rowData} setData={setRowData} selectedRows={selectedRows} setRerender={setRerender}/>
                 <AgGridReact
                     onGridReady={onGridReady}
                     columnDefs={colData}
@@ -277,7 +278,7 @@ const GridPackaging = () => {
             </div>
 
             <div className="ag-theme-quartz-dark" style={{ height: 700, width: 700, textAlign: 'left' }}>
-                <SearchBar title='PackagingWarehouse' titlecount={rowData2.length} search={''} setSearch={''} data={rowData2} setData={rowData2} selectedRows={selectedRows2} />
+                <SearchBar title='PackagingWarehouse' titlecount={rowData2.length} search={''} setSearch={''} data={rowData2} setData={rowData2} selectedRows={selectedRows2} setRerender={setRerender2} />
                 <AgGridReact
                     onGridReady={onGridReady2}
                     columnDefs={colData2}

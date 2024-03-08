@@ -131,6 +131,7 @@ for name in my_lst:
         do_zone(dataframe, attr)
     else:
         for data in dataframe:
+            # print(f'hello: {data}')
             instance = ptr_model(**data)
 
             if hasattr(instance, 'name_id'):

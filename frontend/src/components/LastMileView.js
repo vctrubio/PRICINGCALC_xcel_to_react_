@@ -172,7 +172,7 @@ const LastMileGrid = () => {
 
     return (
         <div className="ag-theme-quartz-dark" style={{ height: 800, width: 1270 }}>
-            <SearchBar title='Last Mile' titlecount={null} search={search} setSearch={setSearch} data={rowData} setData={setRowData} selectedRows={selectedRows} />
+            <SearchBar title='Last Mile' titlecount={null} search={search} setSearch={setSearch} data={rowData} setData={setRowData} selectedRows={selectedRows} setRerender={null} />
 
             {/* <div className='d-flex flex-start pb-2'>
                 <Dropdown>

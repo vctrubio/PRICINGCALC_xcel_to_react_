@@ -97,6 +97,7 @@ export const NavPskuBar = ({ productTag, setPT, LinkSkuBtn, pskuId, setPskuId, p
 
 export const GridPsku = () => {
     const [search, setSearch] = useState('');
+    const [rerender, setRerender] = useState(false);
     const { vendorData, productTag, setProductTag } = useSkuForm();
     const [selectedTag, setSelectedTag] = useState(null);
     const [pskuSelect, setPskuSelect] = useState([]);
@@ -315,7 +316,7 @@ export const GridPsku = () => {
     return (
         <div className="ag-theme-quartz-dark" style={{ height: '85vh', width: 1270 }}>
 
-            <SearchBar title='PSKU' titlecount={rowData.length} search={search} setSearch={setSearch} data={rowData} setData={setRowData} selectedRows={selectedRows} />
+            <SearchBar title='PSKU' titlecount={rowData.length} search={search} setSearch={setSearch} data={rowData} setData={setRowData} selectedRows={selectedRows} setRerender={setRerender}/>
             <AgGridReact
                 onGridReady={onGridReady}
                 columnDefs={colData}

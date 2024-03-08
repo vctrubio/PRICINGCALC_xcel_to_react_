@@ -23,6 +23,7 @@ async function getData(model) {
 
 
 const GridTwo = () => {
+    const [rerender, setRerender] = useState(false); // State for triggering a re-render
     const [gridApi, setGridApi] = useState(null);
     const [selectedRows, setSelectedRows] = useState([]);
     const [search, setSearch] = useState('');
@@ -101,7 +102,7 @@ const GridTwo = () => {
     return (
         <div className="ag-theme-quartz-dark" style={{ height: '68vh', width: 1270 }}>
 
-            <SearchBar title='SKU' titlecount={rowData.length} search={search} setSearch={setSearch} data={rowData}  setData={setRowData} selectedRows={selectedRows}/>
+            <SearchBar title='SKU' titlecount={rowData.length} search={search} setSearch={setSearch} data={rowData}  setData={setRowData} selectedRows={selectedRows} setRerender={setRerender}/>
             <AgGridReact
                 onGridReady={onGridReady}
                 enableCellChangeFlash={true}

@@ -13,6 +13,7 @@ import { SearchBar } from './SearchBar';
 const PaymentProcessingCard = () => {
     const [gridApi, setGridApi] = useState(null);
     const [selectedRows, setSelectedRows] = useState([]);
+    const [rerender, setRerender] = useState(false);
     const [rowData, setRowData] = useState([]);
     const colData = [
         { headerName: 'Card', field: 'name_id', minWidth: 150 },
@@ -44,7 +45,7 @@ const PaymentProcessingCard = () => {
 
     return (
         <div style={{ height: 420, width: 1270, marginBottom: 100 }}>
-            <SearchBar title='PaymentProcessingCard' titlecount={rowData.length} search={null} setSearch={null} data={rowData} setData={setRowData} selectedRows={selectedRows}></SearchBar>
+            <SearchBar title='PaymentProcessingCard' titlecount={rowData.length} search={null} setSearch={null} data={rowData} setData={setRowData} selectedRows={selectedRows} setRerender={setRerender}></SearchBar>
             <AgGridReact
                 columnDefs={colData}
                 defaultColDef={{ flex: 1 }}
@@ -60,7 +61,7 @@ const PaymentProcessingCard = () => {
 const PaymentProcessingCountry = () => {
     const [gridApi, setGridApi] = useState(null);
     const [selectedRows, setSelectedRows] = useState([]);
-
+    const [rerender, setRerender] = useState(false);
     const [rowData, setRowData] = useState([]);
     const colData = [
         { headerName: 'Country', field: 'name_id', minWidth: 150 },
@@ -92,7 +93,7 @@ const PaymentProcessingCountry = () => {
 
     return (
         <div style={{ height: 420, width: 1270, marginBottom: 100 }}>
-            <SearchBar title='PaymentProcessingCountry' titlecount={rowData.length} search={null} setSearch={null} data={rowData} setData={setRowData} selectedRows={selectedRows}></SearchBar>
+            <SearchBar title='PaymentProcessingCountry' titlecount={rowData.length} search={null} setSearch={null} data={rowData} setData={setRowData} selectedRows={selectedRows} setRerender={setRerender}></SearchBar>
             <AgGridReact
                 columnDefs={colData}
                 defaultColDef={{ flex: 1 }}
@@ -109,7 +110,7 @@ const PaymentDf = () => {
     const [selectedRows, setSelectedRows] = useState([]);
     const [rowData, setRowData] = useState([]);
     const [colData, setColData] = useState([]);
-
+    const [rerender, setRerender] = useState(false);
     const dfSetRows = (data) => {
         let ptrRow = [];
         let ptrCol = ['Country'];
@@ -168,7 +169,7 @@ const PaymentDf = () => {
 
     return (
         <div style={{ height: 420, width: 1270, marginBottom: 100 }}>
-            <SearchBar title='PaymentPopCountry' titlecount={rowData.length} search={null} setSearch={null} data={rowData} setData={setRowData} selectedRows={selectedRows}></SearchBar>
+            <SearchBar title='PaymentPopCountry' titlecount={rowData.length} search={null} setSearch={null} data={rowData} setData={setRowData} selectedRows={selectedRows} setRerender={setRerender}></SearchBar>
             <AgGridReact
                 columnDefs={colData}
                 defaultColDef={{ flex: 1 }}

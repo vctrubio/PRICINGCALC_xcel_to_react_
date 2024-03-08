@@ -4,8 +4,7 @@ import * as XLSX from 'xlsx';
 import { CSVLink } from 'react-csv';
 import axios from 'axios';
 
-//to upload get title add .xlsx and post to api
-export const SearchBar = ({ title, titlecount, data, setData, search, setSearch, selectedRows }) => {
+export const SearchBar = ({ title, titlecount, data, setData, search, setSearch, selectedRows, setRerender }) => {
     const [selectedFile, setSelectedFile] = useState(null);
 
     const deleteSelectedRows = async () => {
@@ -99,6 +98,7 @@ export const SearchBar = ({ title, titlecount, data, setData, search, setSearch,
                     body: formData,
                 });
                 console.log('response: ', response);
+                setRerender((prev) => !prev);
             }
         } catch (error) {
             console.error('Error uploading file:', error);

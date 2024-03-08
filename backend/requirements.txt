@@ -4,3 +4,5 @@ pydantic
 uvicorn
 openpyxl
 python-multipart
+watchgod
+asyncio
