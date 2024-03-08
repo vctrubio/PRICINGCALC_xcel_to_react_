@@ -558,6 +558,7 @@ export const FormX = () => {
                                         ? (
                                             Object.values(allWh).map((warehouse, warehouseIndex) =>
                                                 getDataByTag(warehouse, selectedPT).map((item, itemIndex) => (
+                                                    console.log('this is what needs checking to see if all keys are present in selectedPT, ', warehouse),
                                                     <div className='d-flex flex-column' key={`${warehouseIndex}-${itemIndex}`} width='100%' onClick={() => selectWhifEmpty(item)}>
                                                         <div className='d-flex flex-row justify-content-between'>
                                                             <div>
