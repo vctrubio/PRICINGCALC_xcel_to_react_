@@ -37,7 +37,7 @@ const theme = createTheme({
 });
 
 function WarehousesSort({ warehouses }) {
-    console.log('crashtest')
+    // console.log('crashtest')
     const transformedWarehouses = warehouses
         ? Object.values(warehouses)
             .flatMap(transformWarehouse)
@@ -142,6 +142,7 @@ export const FormX = () => {
                             types: Object.keys(res.shipping_table)
                         }
                         setShipping(prevShipping => [...prevShipping, myDict]);
+                        //needs to set the data, but also keep in mind whcih ids we have... also affects the types
                     })
                 }
             }
@@ -556,35 +557,39 @@ export const FormX = () => {
                                     )))
                                     : (selectedSku.length > 0 && allWh
                                         ? (
-                                            Object.values(allWh).map((warehouse, warehouseIndex) =>
-                                                getDataByTag(warehouse, selectedPT).map((item, itemIndex) => (
-                                                    console.log('this is what needs checking to see if all keys are present in selectedPT, ', warehouse),
-                                                    <div className='d-flex flex-column' key={`${warehouseIndex}-${itemIndex}`} width='100%' onClick={() => selectWhifEmpty(item)}>
-                                                        <div className='d-flex flex-row justify-content-between'>
-                                                            <div>
-                                                                {` ${item.name_id}`}
+                                            Object.values(allWh).map((warehouse, warehouseIndex) => {
+                                                const whPt = Object.keys(warehouse);
+                                                return getDataByTag(warehouse, selectedPT).map((item, itemIndex) => {
+                                                    console.log('this is what needs checking to see if all keys are present in selectedPT, ', whPt);
+                                                    console.log('vs ', selectedPT);
+                                                    return (
+                                                        <div className='d-flex flex-column' key={`${warehouseIndex}-${itemIndex}`} width='100%' onClick={() => selectWhifEmpty(item)}>
+                                                            <div className='d-flex flex-row justify-content-between'>
+                                                                <div>
+                                                                    {` ${item.name_id}`}
+                                                                </div>
+                                                                <div>
+                                                                    {`${item.origin} `}
+                                                                </div>
+                                                                <div>
+                                                                    {`${item.product_tag}`}
+                                                                </div>
                                                             </div>
-                                                            <div>
-                                                                {`${item.origin} `}
-                                                            </div>
-                                                            <div>
-                                                                {`${item.product_tag}`}
+                                                            <div className='d-flex flex-row justify-content-between'>
+                                                                <div className='d-flex flex-row justify-content-around ml-2' style={{ width: '100%' }}>
+                                                                    <div>{item.unit_fee}</div>
+                                                                    <div>{item.storage_fee}</div>
+                                                                    <div>{item.pick_and_pack_fee}</div>
+                                                                    <div>{item.storage_fee}</div>
+                                                                </div>
+                                                                <div style={{ fontWeight: 'bold' }}>
+                                                                    {`  ${item.unit_fee + item.storage_fee + item.pick_and_pack_fee}`}
+                                                                </div>
                                                             </div>
                                                         </div>
-                                                        <div className='d-flex flex-row justify-content-between'>
-                                                            <div className='d-flex flex-row justify-content-around ml-2' style={{ width: '100%' }}>
-                                                                <div>{item.unit_fee}</div>
-                                                                <div>{item.storage_fee}</div>
-                                                                <div>{item.pick_and_pack_fee}</div>
-                                                                <div>{item.storage_fee}</div>
-                                                            </div>
-                                                            <div style={{ fontWeight: 'bold' }}>
-                                                                {`  ${item.unit_fee + item.storage_fee + item.pick_and_pack_fee}`}
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                ))
-                                            )
+                                                    );
+                                                });
+                                            })
                                         )
                                         : WarehousesSort({ warehouses: allWh })
                                             .filter(wh => uiShipping.country && uiShipping.country.length > 0 ? whConfig[wh.warehouseID].countries_to_ship.includes(uiShipping.country) : true)
