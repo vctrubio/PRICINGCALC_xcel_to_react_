@@ -37,6 +37,7 @@ const theme = createTheme({
 });
 
 function WarehousesSort({ warehouses }) {
+    console.log('crashtest')
     const transformedWarehouses = warehouses
         ? Object.values(warehouses)
             .flatMap(transformWarehouse)
@@ -65,7 +66,7 @@ export const FormX = () => {
 
     const { getData } = useSkuForm();
 
-    const [selectedWh, setSelectedWh] = useState(null);
+    const [selectedWh, setSelectedWh] = useState("");
     const [selectedSku, setSelectedSku] = useState([]);
     const [selectedPT, setSelectedPT] = useState([]);
     const [showSku, setShowSku] = useState([]);
@@ -180,7 +181,7 @@ export const FormX = () => {
         if (name === 'wh') {
             if (selectedWh) {
                 localStorage.setItem('selectedWh', JSON.stringify(selectedWh));
-                setSelectedWh(null)
+                setSelectedWh("")
                 console.log('sept-- ', selectedPT)
             }
             else
@@ -259,7 +260,8 @@ export const FormX = () => {
     const SearchContent = () => {
         const [search, setSearch] = useState('');
 
-        if (!selectedWh)
+        console.log('selectedWh', selectedWh)
+        if (!selectedWh || !allWh[selectedWh.warehouseID])
             return;
 
         const handleChange = (event) => {
@@ -322,8 +324,8 @@ export const FormX = () => {
     });
     window.uis = uiShipping
 
-    const [uiOM, setUiOM] = useState(null)
-    const [uiDC, setUiDC] = useState(null)
+    const [uiOM, setUiOM] = useState("")
+    const [uiDC, setUiDC] = useState("")
 
     const [CalcOutput, setCalcOutput] = useState({
         priceWithDiscount: 0, //price with discount
@@ -370,8 +372,7 @@ export const FormX = () => {
 
     const selectWhifEmpty = (item) => {
         if (!selectedWh) {
-            console.log('selectWhifEmpty, ', item)
-            setSelectedWh(item)
+            setSelectedWh({ warehouseID: item.name_id, originID: item.origin });
         }
     }
 
@@ -383,7 +384,6 @@ export const FormX = () => {
                     <div className='d-flex flex-column' style={{ textAlign: 'left', position: 'relative' }}>
                         <div type='button'
                             style={{ color: uiShipping.country ? '#696862' : '', paddingLeft: 5 }}
-
                             onClick={() => { toggleDropdown('country'); setUiShipping({ ...uiShipping, country: null }); }}>
                             Country
                         </div>
@@ -411,7 +411,7 @@ export const FormX = () => {
                         <div className='d-flex flex-column' style={{ textAlign: 'left', position: 'relative', paddingLeft: 5 }}>
                             <div type='button'
                                 style={{ color: uiShipping.shipping ? '#696862' : '' }}
-                                onClick={() => { toggleDropdown('shippingName'); setUiShipping({ ...uiShipping, shipping: null, type: null}) }}>
+                                onClick={() => { toggleDropdown('shippingName'); setUiShipping({ ...uiShipping, shipping: null, type: null }) }}>
                                 Courier
                             </div>
                             {showDropdown.shippingName && (
@@ -471,8 +471,6 @@ export const FormX = () => {
                         </div>
                     </div>
 
-
-
                 </div>
 
                 <div className='ck-head-in'>
@@ -481,7 +479,6 @@ export const FormX = () => {
                             <div style={{ paddingLeft: 2, display: 'flex', justifyContent: 'space-between', paddingLeft: 5 }}>
                                 <div>
                                     Objective Margin
-
                                 </div>
                             </div>
                             <input className='input-secondary'
@@ -607,8 +604,8 @@ export const FormX = () => {
                         {selectedWh ?
                             <div className='d-flex flex-start dropup'>
                                 <SearchContent></SearchContent>
-                                <Button style={{ fontSize: 24, paddingBottom: 2 }} onClick={themometerOff} title="Deselect All"><i class="bi bi-thermometer"></i></Button>
-                                <Button style={{ fontSize: 24, paddingBottom: 2 }}><i onClick={themometerOn} class="bi bi-thermometer-high" title="Select All"></i></Button>
+                                <Button style={{ fontSize: 24, paddingBottom: 2 }} onClick={themometerOff} title="Deselect All"><i className="bi bi-thermometer"></i></Button>
+                                <Button style={{ fontSize: 24, paddingBottom: 2 }}><i onClick={themometerOn} className="bi bi-thermometer-high" title="Select All"></i></Button>
                             </div>
                             : selectedSku.length > 0 ? <div className='d-flex justify-content-around'> WH Fees: Unit | Storage | Pick n Pack | Custom | Total </div> :
                                 null}
@@ -636,7 +633,12 @@ export const FormX = () => {
                                     {selectedSku.map((sku, index) => (
                                         <div
                                             key={index}
-                                            onClick={() => setSelectedSku(selectedSku.filter(selected => selected.name_id !== sku.name_id))}
+                                            onClick={() => {
+                                                setSelectedSku(selectedSku.filter(selected => selected.name_id !== sku.name_id));
+                                                setSelectedPT(selectedPT.filter(selected =>
+                                                    selected !== sku.product_tag)
+                                                );
+                                            }}
                                         >
                                             <div className='ck-context' style={{ padding: 0, margin: 0 }}>
                                                 <div>
