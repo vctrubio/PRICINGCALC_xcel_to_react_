@@ -8,6 +8,7 @@ import switchOn from '../assets/switchon.png';
 import axios from 'axios';
 import { useSkuForm } from './CskuForm';
 import '../App.css';
+import { Calculate } from './Calculations';
 
 function transformWarehouse(warehouse) {
     return Object.entries(warehouse).map(([productTag, details]) => {
@@ -59,6 +60,7 @@ function getDataByTag(warehouse, tags) {
         }
 
     }
+    console.log('returning ....', resultArray)
     return resultArray;
 }
 
@@ -66,6 +68,8 @@ export const FormX = () => {
 
     const { getData } = useSkuForm();
 
+
+    const [calculationResult, setCalculationResult] = useState(null);
     const [selectedWh, setSelectedWh] = useState("");
     const [selectedSku, setSelectedSku] = useState([]);
     const [selectedPT, setSelectedPT] = useState([]);
@@ -82,15 +86,24 @@ export const FormX = () => {
         courier:
         types: [type1, type2, type3]
     }
+
+    -- to select
+    psku         | cogs, weight, ex fee, pp fee, pack fee, product tag
+    warehouse   | total cost, unit fee, storage fee, pick and pack fee, custom fee
+    shipping    | courier, type, zone
+    payment     | unit fee, % fee
     */
+
     window.skus = allSku
     window.wh = allWh
+    window.c = countries
+    window.wc = whConfig
+
     window.sels = selectedSku
     window.selw = selectedWh
     window.selhey = selectedPT
-    window.c = countries
-    window.wc = whConfig
-    window.s = shipping
+    window.selship = shipping
+    window.selp = null
 
     const configWh = async (data) => {
         for (const [key, obj] of Object.entries(data)) {
@@ -173,7 +186,6 @@ export const FormX = () => {
         else if (selectedWh && allWh[selectedWh.warehouseID]) {
 
             const warehouseKeys = Object.keys(allWh[selectedWh.warehouseID]);
-            console.log('warehouseKeys', warehouseKeys)
             setSelectedPT(warehouseKeys);
         }
     }, [selectedWh]);
@@ -261,7 +273,6 @@ export const FormX = () => {
     const SearchContent = () => {
         const [search, setSearch] = useState('');
 
-        console.log('selectedWh', selectedWh)
         if (!selectedWh || !allWh[selectedWh.warehouseID])
             return;
 
@@ -326,6 +337,8 @@ export const FormX = () => {
     window.uis = uiShipping
 
     const [uiOM, setUiOM] = useState("")
+    const [uiTax, setUiTax] = useState("")
+    const [uiMk, setUiMk] = useState("")
     const [uiDC, setUiDC] = useState("")
 
     const [CalcOutput, setCalcOutput] = useState({
@@ -371,6 +384,7 @@ export const FormX = () => {
         }
     }, [selectedSku, selectedWh, selectedPT, uiOM, uiDC, uiShipping])
 
+    
     const selectWhifEmpty = (item) => {
         if (!selectedWh) {
             setSelectedWh({ warehouseID: item.name_id, originID: item.origin });
@@ -490,29 +504,35 @@ export const FormX = () => {
                                 style={{ backgroundColor: (uiOM === null || uiOM === '' || uiOM === '0') ? 'transparent' : '', width: '100%' }}
                             />
                         </div>
+
                     </div>
                     <div>
-                        <div className='d-flex flex-column' style={{ width: '100%', paddingLeft: 4 }}>
-                            <div type='button' className='d-flex flex-row justify-content-between pb-1'
-                                onClick={() => setUiShipping(prevState => ({ ...prevState, b2c: !prevState.b2c }))}
-                            >
-                                <div className='d-flex' style={{ paddingLeft: 5 }}>
-                                    {uiShipping.b2c ? 'B2C' : 'B2B'}
-                                </div>
-                                <div className='d-flex'>
-                                    <img
-                                        style={{ height: 24, width: 24, color: 'white', marginRight: 0 }}
-                                        src={uiShipping.b2c ? switchOn : switchOff}
-                                        alt="Switch"
-                                    />
+                        <div className='d-flex flex-column justify-content-between' style={{ textAlign: 'left', width: '80%' }}>
+                            <div style={{ paddingLeft: 2, display: 'flex', justifyContent: 'space-between', paddingLeft: 5 }}>
+                                <div>
+                                    Tax
                                 </div>
                             </div>
                             <input className='input-secondary'
                                 type="number"
-                                placeholder='Discount %'
-                                value={uiDC}
-                                onChange={(e) => setUiDC(e.target.value)}
-                                style={{ backgroundColor: (uiDC === null || uiDC === '' || uiDC === '0') ? 'transparent' : '', width: '100%' }}
+                                placeholder='%'
+                                value={uiTax}
+                                onChange={(e) => setUiTax(e.target.value)}
+                                style={{ backgroundColor: (uiTax === null || uiTax === '' || uiTax === '0') ? 'transparent' : '', width: '100%' }}
+                            />
+                        </div>
+                        <div className='d-flex flex-column justify-content-between' style={{ textAlign: 'left', width: '80%', marginLeft: 4 }}>
+                            <div style={{ paddingLeft: 2, display: 'flex', justifyContent: 'space-between', paddingLeft: 5 }}>
+                                <div>
+                                    Marketing
+                                </div>
+                            </div>
+                            <input className='input-secondary'
+                                type="number"
+                                placeholder='%'
+                                value={uiMk}
+                                onChange={(e) => setUiMk(e.target.value)}
+                                style={{ backgroundColor: (uiMk === null || uiMk === '' || uiMk === '0') ? 'transparent' : '', width: '100%' }}
                             />
                         </div>
                     </div>
@@ -560,8 +580,8 @@ export const FormX = () => {
                                             Object.values(allWh).map((warehouse, warehouseIndex) => {
                                                 const whPt = Object.keys(warehouse);
                                                 return getDataByTag(warehouse, selectedPT).map((item, itemIndex) => {
-                                                    console.log('this is what needs checking to see if all keys are present in selectedPT, ', whPt);
-                                                    console.log('vs ', selectedPT);
+                                                    // console.log('this is what needs checking to see if all keys are present in selectedPT, ', whPt);
+                                                    // console.log('vs ', selectedPT);
                                                     return (
                                                         <div className='d-flex flex-column' key={`${warehouseIndex}-${itemIndex}`} width='100%' onClick={() => selectWhifEmpty(item)}>
                                                             <div className='d-flex flex-row justify-content-between'>
@@ -617,6 +637,7 @@ export const FormX = () => {
                                 null}
                     </div>
                 </div>
+
 
                 <div id='skus'>
                     <div className='ck-container'>

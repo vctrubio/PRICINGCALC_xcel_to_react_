@@ -77,7 +77,6 @@ class PSKU(BaseModel):
     def total_weight(self):
         return sum(self.sku_to_sku(sku).weight() for sku in self.skus)
     
-  
     def __init__(self, name_id: str, skus: str, product_tag:None, description:None):
         if product_tag is not None:
             super().__init__(name_id=name_id, product_tag=product_tag, description=description)

@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from models import Vendor, SKU, PSKU, Warehouse, ProductTag, PackagingWarehouse, PackagingVendor, PaymentProcessingCard, PaymentProcessingCountry, PaymentPopCountry
 from db import db_model
+from calculation import calculate, Calculate, CalcOptions, parse_total_cost
 import json
 import os
 
@@ -43,6 +44,17 @@ async def upload_file(file: UploadFile = File(...),  filename: str = Form(...)):
     except Exception as e:
         print(f"Error uploading file: {e}")
         return {"error": "Internal Server Error"}
+
+@app.post("/calctop")
+async def custom(item: Calculate):
+    rtn = calculate(item.warehouse_name, item.pskus, item.shipping_selection, item.zone)
+    total = sum(parse_total_cost(r) for r in rtn)
+    return total if total > 0 else None
+
+@app.post("/calcbot")
+async def custom(item: CalcOptions):
+    print(f'hello: {item}')
+    
     
 ''' VENDORS ''' 
 @app.get("/vendor")
@@ -318,6 +330,12 @@ async def update_paymentprocessingcard(card: PaymentProcessingCard):
 @app.get("/paymentprocessingcountry")
 async def root():
     return db_model["PaymentProcessingCountry"]
+
+@app.get("/paymentprocessingcountry/{name_id}")
+async def root(name_id: str):
+    if name_id in db_model['PaymentProcessingCountry']:
+        return db_model['PaymentProcessingCountry'][name_id]
+    raise HTTPException(status_code=404, detail="PaymentProcessingCountry not found")
 
 @app.patch("/paymentprocessingcountry/{name_id}")
 async def update_paymentprocessingcountry(country: PaymentProcessingCountry):
