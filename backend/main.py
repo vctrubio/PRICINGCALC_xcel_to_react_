@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from models import Vendor, SKU, PSKU, Warehouse, ProductTag, PackagingWarehouse, PackagingVendor, PaymentProcessingCard, PaymentProcessingCountry, PaymentPopCountry
 from db import db_model
-from calculation import calculate, Calculate, CalcOptions, parse_total_cost
+from calculation import calculate, Calculate, CalcOptions, parse_total_cost, calculate_options
 import json
 import os
 
@@ -45,17 +45,22 @@ async def upload_file(file: UploadFile = File(...),  filename: str = Form(...)):
         print(f"Error uploading file: {e}")
         return {"error": "Internal Server Error"}
 
-@app.post("/calctop")
-async def custom(item: Calculate):
-    rtn = calculate(item.warehouse_name, item.pskus, item.shipping_selection, item.zone)
-    total = sum(parse_total_cost(r) for r in rtn)
-    return total if total > 0 else None
+@app.post("/calculate")
+async def custom(item: dict, option: dict):
+    print('total start:')
+    rtn = calculate(item['warehouse_name'], item['pskus'], item['shipping_selection'], item['zone'])
+    print(f'{type(rtn)} : {rtn}')
 
-@app.post("/calcbot")
-async def custom(item: CalcOptions):
-    print(f'hello: {item}')
+    total = sum(parse_total_cost(r) for r in rtn)
+    if total < 0:
+        return None
+    print(f'{type(total)} : {total}')
+    v = calculate_options(option['objective_margin'], option['tax'], option['marketing'], option['country_input'])
+    print(f'{type(v)} : {v}')
     
-    
+    return 21.782
+
+
 ''' VENDORS ''' 
 @app.get("/vendor")
 async def root():

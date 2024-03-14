@@ -8,7 +8,6 @@ import switchOn from '../assets/switchon.png';
 import axios from 'axios';
 import { useSkuForm } from './CskuForm';
 import '../App.css';
-import { Calculate } from './Calculations';
 
 function transformWarehouse(warehouse) {
     return Object.entries(warehouse).map(([productTag, details]) => {
@@ -60,7 +59,6 @@ function getDataByTag(warehouse, tags) {
         }
 
     }
-    console.log('returning ....', resultArray)
     return resultArray;
 }
 
@@ -349,6 +347,13 @@ export const FormX = () => {
     })
 
     useEffect(() => {
+
+        function conditionApi() {
+            if (selectedSku.length > 0 && selectedWh && uiShipping.country && uiShipping.shipping && uiShipping.type
+                && uiOM && uiTax && uiMk)
+                return true;
+        }
+
         setCalcOutput(prevState => ({
             ...prevState,
             priceWithDiscount: 0,
@@ -360,31 +365,37 @@ export const FormX = () => {
             toWarehouseMargin: 0,
         }));
 
+        if (conditionApi()) {
+            const item = {
+                warehouse_name: selectedWh.warehouseID,
+                pskus: selectedSku.map(sku => sku.name_id),
+                shipping_selection: { "courier": uiShipping.shipping, "type": uiShipping.type },
+                zone: "zone_1"
+            }
+            const option = {
+                objective_margin: parseFloat(uiOM),
+                tax: parseFloat(uiTax),
+                marketing: parseFloat(uiMk),
+                country_input: uiShipping.country,
 
-        for (let sku of selectedSku) {
-            const cskus = sku.skus;
-
-            for (let csku of cskus) {
-                const foundSku = cSkus.find(s => s.name_id === csku);
-
-                let objectiveMarginDecimal = uiOM ? parseFloat(uiOM) : 0;
-                let objectDiscount = uiDC ? parseFloat(uiDC) : 0;
-                if (foundSku) {
+            }
+            axios.post('http://localhost:8000/calculate', { item, option })
+                .then(response => {
+                    console.log(response.data);
                     setCalcOutput(prevState => ({
                         ...prevState,
-                        priceWithoutDiscount: (prevState.priceWithoutDiscount + foundSku.total_cost) * (uiOM ? 1 + uiOM / 100 : 1),
-                        priceWithDiscount: (prevState.priceWithDiscount + (uiDC !== 0 ? foundSku.total_cost - (foundSku.total_cost * uiDC / 100) : foundSku.total_cost)) * (uiOM ? 1 + uiOM / 100 : 1),
-
-
-                        toWarehouseMargin: uiOM ? objectiveMarginDecimal + (10.3) : 0,
-                        toConsumerMargin: uiOM ? objectiveMarginDecimal + (4.3) : 0,
+                        priceWithoutDiscount: response.data,
                     }));
-                }
-            }
+                })
+                .catch(error => {
+                    console.error(error);
+                });
         }
-    }, [selectedSku, selectedWh, selectedPT, uiOM, uiDC, uiShipping])
 
-    
+
+    }, [selectedSku, selectedWh, selectedPT, uiOM, uiDC, uiShipping, uiMk, uiOM, uiTax]);
+
+
     const selectWhifEmpty = (item) => {
         if (!selectedWh) {
             setSelectedWh({ warehouseID: item.name_id, originID: item.origin });

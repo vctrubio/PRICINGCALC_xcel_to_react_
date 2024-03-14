@@ -2,7 +2,7 @@ from data_imports.get_data import *
 
 from db import db_model
 from models import *
-from calculation import calculate, parse_total_cost
+from calculation import calculate, parse_total_cost, calculate_options
 
 def models_in_globals():
     global_symbols = globals()

@@ -17,7 +17,6 @@ class CalcOptions(BaseModel):
 
 def get_packaging_by_warehouse(product_tag):
     #if packaging vendor exist.... try first. else
-    
     for pt in db_model['PackagingWarehouse']:
         if (pt.product_tag == product_tag):
             return pt.cost_of_packaging
@@ -83,6 +82,7 @@ def parse_total_cost(dict):
         dict['pick_and_pack_fee'] + dict['custom_fee'] + 
         float(dict['ShippingPrice'].replace(',', '.'))), 2)
 
+
 def calculate(warehouse_name, pskus, shipping_selection, zone):
     skus_names =[s for s in pskus] 
     lst = []
@@ -96,9 +96,19 @@ def calculate(warehouse_name, pskus, shipping_selection, zone):
             merge_dict = {**sku, **wh, **shipping}
             lst.append(merge_dict)
     except Exception as e:
-        print(f'Error in calculating .')
+        print(f'Error when calculate(ing): {str(e)}')
     return lst
     
-    
+def calculate_options(om, tax, marketing, country):
+    try:
+        ptr_country = db_model['PaymentProcessingCountry'][country]
+        ptr_country.sales_fee_
+        ptr_country.sales_fee
+        return (1 - om - tax - marketing ) # - ptr_country['pp_rate_'] - ptr_country['exchange_rate_'] - ptr_country['exchange_fee'])
+    except Exception as e:
+        print(f'Error in calculating options: {str(e)}')
+        
+        
+
     # sku = PSKU(skus_names[0])
     # print(f'total {skus_names[0].get_total_cost()}')
