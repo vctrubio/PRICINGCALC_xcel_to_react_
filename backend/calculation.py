@@ -99,16 +99,9 @@ def calculate(warehouse_name, pskus, shipping_selection, zone):
         print(f'Error when calculate(ing): {str(e)}')
     return lst
     
-def calculate_options(om, tax, marketing, country):
+def calculate_options(om, tax, marketing, sales_fee):
     try:
-        ptr_country = db_model['PaymentProcessingCountry'][country]
-        ptr_country.sales_fee_
-        ptr_country.sales_fee
-        return (1 - om - tax - marketing ) # - ptr_country['pp_rate_'] - ptr_country['exchange_rate_'] - ptr_country['exchange_fee'])
+        value = ((- om - tax - marketing - sales_fee)/100 )
+        return (1 + value)
     except Exception as e:
         print(f'Error in calculating options: {str(e)}')
-        
-        
-
-    # sku = PSKU(skus_names[0])
-    # print(f'total {skus_names[0].get_total_cost()}')

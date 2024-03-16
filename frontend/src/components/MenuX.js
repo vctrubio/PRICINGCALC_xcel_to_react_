@@ -9,12 +9,23 @@ import axios from 'axios';
 import { useSkuForm } from './CskuForm';
 import '../App.css';
 
+function transformWarehouse2(warehouse) {
+
+    const result = {
+        warehouseID: warehouse.name_id,
+        originID: warehouse.origin[0],
+        productTags: warehouse.products,
+        countries: warehouse.countries_to_ship
+    };
+    return result;
+}
+
 function transformWarehouse(warehouse) {
-    return Object.entries(warehouse).map(([productTag, details]) => {
+    return Object.entries(warehouse).map(([keys, details]) => {
         return {
             warehouseID: details.name_id,
             originID: details.origin,
-            productTags: productTag
+            productTags: keys
         };
     });
 }
@@ -38,9 +49,10 @@ const theme = createTheme({
 
 function WarehousesSort({ warehouses }) {
     // console.log('crashtest')
+    // console.log('warehouse:', warehouses)
     const transformedWarehouses = warehouses
         ? Object.values(warehouses)
-            .flatMap(transformWarehouse)
+            .flatMap(transformWarehouse2)
             .filter(warehouse => Object.keys(warehouse).length !== 0)
         : [];
 
@@ -49,6 +61,7 @@ function WarehousesSort({ warehouses }) {
 }
 
 function getDataByTag(warehouse, tags) {
+    console.log('getdataby tag:', warehouse, tags)
     const resultArray = [];
 
     for (const key in warehouse) {
@@ -62,41 +75,24 @@ function getDataByTag(warehouse, tags) {
     return resultArray;
 }
 
+
+
+
 export const FormX = () => {
 
     const { getData } = useSkuForm();
 
-
-    const [calculationResult, setCalculationResult] = useState(null);
     const [selectedWh, setSelectedWh] = useState("");
     const [selectedSku, setSelectedSku] = useState([]);
     const [selectedPT, setSelectedPT] = useState([]);
-    const [showSku, setShowSku] = useState([]);
-    const [allWh, setAllWh] = useState({});
     const [allSku, setAllSku] = useState([]);
-    const [cSkus, setCSkus] = useState([]);
     const [countries, setCountries] = useState([])
     const [whConfig, setWhConfig] = useState({})
     const [shipping, setShipping] = useState([])
 
-    /* shipping = {
-        warehouse: 
-        courier:
-        types: [type1, type2, type3]
-    }
-
-    -- to select
-    psku         | cogs, weight, ex fee, pp fee, pack fee, product tag
-    warehouse   | total cost, unit fee, storage fee, pick and pack fee, custom fee
-    shipping    | courier, type, zone
-    payment     | unit fee, % fee
-    */
-
-    window.skus = allSku
-    window.wh = allWh
     window.c = countries
+    window.skus = allSku
     window.wc = whConfig
-
     window.sels = selectedSku
     window.selw = selectedWh
     window.selhey = selectedPT
@@ -104,6 +100,7 @@ export const FormX = () => {
     window.selp = null
 
     const configWh = async (data) => {
+        // console.log('configwh: ', data)
         for (const [key, obj] of Object.entries(data)) {
             const reply = await axios.get(`http://localhost:8000/warehouseconfig/${key}`);
             setWhConfig(prevWhConfig => ({ ...prevWhConfig, [key]: reply.data }));
@@ -113,20 +110,17 @@ export const FormX = () => {
     useEffect(() => {
         const fetch = async () => {
             try {
-                const [wh, sku, csku] = await Promise.all([
+                const [wh, sku] = await Promise.all([
                     getData('warehouse', 'value'),
                     getData('psku', 'value'),
-                    getData('sku', 'value'),
                 ]);
                 const tempWh = wh.reduce((acc, warehouse) => {
                     const warehouseId = Object.values(warehouse)[0].name_id;
                     acc[warehouseId] = warehouse;
                     return acc;
                 }, {});
-                setAllWh(tempWh)
                 configWh(tempWh)
                 setAllSku(sku)
-                setCSkus(csku)
             }
             catch (error) {
                 console.error('Error Pricing Calculator Caling API:', error);
@@ -141,7 +135,6 @@ export const FormX = () => {
             catch (error) {
             }
         }
-
         const fetchShipping = async () => {
             try {
                 const response = await axios.get(`http://localhost:8000/shipping`)
@@ -160,6 +153,7 @@ export const FormX = () => {
             catch (error) {
             }
         }
+
         fetch()
         fetchSingular('country')
         fetchShipping()
@@ -181,9 +175,8 @@ export const FormX = () => {
         if (!selectedWh && !selectedSku) {
             setSelectedPT([])
         }
-        else if (selectedWh && allWh[selectedWh.warehouseID]) {
-
-            const warehouseKeys = Object.keys(allWh[selectedWh.warehouseID]);
+        else if (selectedWh && whConfig[selectedWh.warehouseID]) {
+            const warehouseKeys = Object.keys((whConfig[selectedWh.warehouseID]).products);
             setSelectedPT(warehouseKeys);
         }
     }, [selectedWh]);
@@ -193,7 +186,6 @@ export const FormX = () => {
             if (selectedWh) {
                 localStorage.setItem('selectedWh', JSON.stringify(selectedWh));
                 setSelectedWh("")
-                console.log('sept-- ', selectedPT)
             }
             else
                 setSelectedWh(JSON.parse(localStorage.getItem('selectedWh')));
@@ -201,7 +193,7 @@ export const FormX = () => {
         if (name === 'sku') {
             if (selectedSku.length > 0) {
                 localStorage.setItem('selectedSku', JSON.stringify(selectedSku));
-                setSelectedSku([]) //even though this will be a list someday
+                setSelectedSku([])
             }
             else
                 setSelectedSku(JSON.parse(localStorage.getItem('selectedSku')));
@@ -209,8 +201,11 @@ export const FormX = () => {
     }
 
     function WarehouseSearch({ warehouses, onWarehouseSelect }) {
+        // console.log('searching: ', warehouses);
         const transformedWarehouses = warehouses ? Object.values(warehouses).flatMap(transformWarehouse) : [];
+        // console.log('seeeing. ', transformWarehouse);
         const uniqueIds = Array.from(new Set(transformedWarehouses.map(item => JSON.stringify({ warehouseID: item.warehouseID, originID: item.originID }))), JSON.parse);
+        // console.log('knowing:,', uniqueIds);
         uniqueIds.sort((a, b) => a.originID.localeCompare(b.originID));
 
         return (
@@ -229,7 +224,7 @@ export const FormX = () => {
         );
     }
 
-    const SearchBar = ({ options, label, onChange }) => {
+    const SearchBar = ({ options, onChange }) => {
         return (
             <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                 <ThemeProvider theme={theme}>
@@ -261,7 +256,7 @@ export const FormX = () => {
     }
 
     const themometerOn = () => {
-        setSelectedPT(Object.keys(allWh[selectedWh.warehouseID]))
+        setSelectedPT(Object.keys(whConfig[selectedWh.warehouseID].products))
     }
 
     const themometerOff = () => {
@@ -271,22 +266,21 @@ export const FormX = () => {
     const SearchContent = () => {
         const [search, setSearch] = useState('');
 
-        if (!selectedWh || !allWh[selectedWh.warehouseID])
+        if (!selectedWh || !(whConfig[selectedWh.warehouseID]).products)
             return;
 
         const handleChange = (event) => {
             setSearch(event.target.value);
         };
 
-        const filteredPT = Object.keys(allWh[selectedWh.warehouseID]).filter(item => item.toLowerCase().includes(search.toLowerCase()));
+        const filteredPT = Object.keys((whConfig[selectedWh.warehouseID]).products).filter(item => item.toLowerCase().includes(search.toLowerCase()));
 
         const handleKeyDown = (event) => {
             if (event.key === 'Enter') {
                 event.preventDefault();
-                setSelectedPT(Object.keys(allWh[selectedWh.warehouseID]).filter(item => item.toLowerCase().includes(search.toLowerCase())));
+                setSelectedPT(Object.keys((whConfig[selectedWh.warehouseID].products)).filter(item => item.toLowerCase().includes(search.toLowerCase())));
             }
         };
-
 
         return (
             <div className='search-content'>
@@ -300,7 +294,7 @@ export const FormX = () => {
                                     {filteredPT.map((item, index) => (
                                         <div type='button' key={index} onClick={() => {
                                             setSearch(item);
-                                            setSelectedPT(Object.keys(allWh[selectedWh.warehouseID]).filter(item => item.toLowerCase().includes(search.toLowerCase())));
+                                            setSelectedPT(Object.keys((whConfig[selectedWh.warehouseID]).products).filter(item => item.toLowerCase().includes(search.toLowerCase())));
                                         }}>{item}</div>
                                     ))}
                                 </div>
@@ -364,11 +358,11 @@ export const FormX = () => {
             toConsumerMargin: 0,
             toWarehouseMargin: 0,
         }));
-
         if (conditionApi()) {
             const item = {
                 warehouse_name: selectedWh.warehouseID,
                 pskus: selectedSku.map(sku => sku.name_id),
+                total_cogs: selectedSku.reduce((total, sku) => total + sku._total_cogs, 0),
                 shipping_selection: { "courier": uiShipping.shipping, "type": uiShipping.type },
                 zone: "zone_1"
             }
@@ -379,19 +373,21 @@ export const FormX = () => {
                 country_input: uiShipping.country,
 
             }
+
             axios.post('http://localhost:8000/calculate', { item, option })
                 .then(response => {
-                    console.log(response.data);
                     setCalcOutput(prevState => ({
                         ...prevState,
                         priceWithoutDiscount: response.data,
+                        priceWithDiscount: uiDC ? (response.data * (1 - parseFloat(uiDC) / 100)) : 0,
+                        toConsumerMargin: parseFloat(uiOM),
+                        toWarehouseMargin: item.total_cogs / response.data * 100
                     }));
                 })
                 .catch(error => {
                     console.error(error);
                 });
         }
-
 
     }, [selectedSku, selectedWh, selectedPT, uiOM, uiDC, uiShipping, uiMk, uiOM, uiTax]);
 
@@ -509,10 +505,24 @@ export const FormX = () => {
                             </div>
                             <input className='input-secondary'
                                 type="number"
-                                placeholder='Objective Margin %'
+                                placeholder='%'
                                 value={uiOM}
                                 onChange={(e) => setUiOM(e.target.value)}
                                 style={{ backgroundColor: (uiOM === null || uiOM === '' || uiOM === '0') ? 'transparent' : '', width: '100%' }}
+                            />
+                        </div>
+                        <div className='d-flex flex-column justify-content-between' style={{ textAlign: 'left', width: '100%', marginLeft: 5 }}>
+                            <div style={{ paddingLeft: 2, display: 'flex', justifyContent: 'space-between', paddingLeft: 5 }}>
+                                <div>
+                                    Discount
+                                </div>
+                            </div>
+                            <input className='input-secondary'
+                                type="number"
+                                placeholder='%'
+                                value={uiDC}
+                                onChange={(e) => setUiDC(e.target.value)}
+                                style={{ backgroundColor: (uiDC === null || uiDC === '' || uiDC === '0') ? 'transparent' : '', width: '100%' }}
                             />
                         </div>
 
@@ -557,7 +567,7 @@ export const FormX = () => {
                     <div className='ck-container'>
                         <div className='ck-helloword'>Warehouse</div>
                         <div className='ck-search-bar'>
-                            <WarehouseSearch warehouses={allWh} onWarehouseSelect={(event, newValue) => setSelectedWh(newValue)} />
+                            <WarehouseSearch warehouses={whConfig} onWarehouseSelect={(event, newValue) => setSelectedWh(newValue)} />
                             <div className="btn" onClick={() => handleReset('wh')}>
                                 <i className="bi bi-repeat"></i>
                             </div>
@@ -580,27 +590,21 @@ export const FormX = () => {
                             {
                                 //dont touch this either
                                 selectedWh
-                                    ? (selectedWh && allWh[selectedWh.warehouseID] && Object.keys(allWh[selectedWh.warehouseID]).map((key, index) => (
+                                    ? (selectedWh && whConfig[selectedWh.warehouseID] && Object.keys(whConfig[selectedWh.warehouseID].products).map((key, index) => (
                                         <div role="button" key={index} onClick={() => handleWhToggleTag(key)} style={{ backgroundColor: selectedPT.includes(key) ? '#4a4444' : 'transparent' }}
                                         >
                                             {key}
                                         </div>
                                     )))
-                                    : (selectedSku.length > 0 && allWh
+                                    : (selectedSku.length > 0 && whConfig
                                         ? (
-                                            Object.values(allWh).map((warehouse, warehouseIndex) => {
-                                                const whPt = Object.keys(warehouse);
-                                                return getDataByTag(warehouse, selectedPT).map((item, itemIndex) => {
-                                                    // console.log('this is what needs checking to see if all keys are present in selectedPT, ', whPt);
-                                                    // console.log('vs ', selectedPT);
+                                            Object.values(whConfig).map((warehouse, warehouseIndex) => {
+                                                return getDataByTag(warehouse.products, selectedPT).map((item, itemIndex) => {
                                                     return (
                                                         <div className='d-flex flex-column' key={`${warehouseIndex}-${itemIndex}`} width='100%' onClick={() => selectWhifEmpty(item)}>
                                                             <div className='d-flex flex-row justify-content-between'>
                                                                 <div>
-                                                                    {` ${item.name_id}`}
-                                                                </div>
-                                                                <div>
-                                                                    {`${item.origin} `}
+                                                                    {` ${warehouse.name_id}`}
                                                                 </div>
                                                                 <div>
                                                                     {`${item.product_tag}`}
@@ -622,16 +626,17 @@ export const FormX = () => {
                                                 });
                                             })
                                         )
-                                        : WarehousesSort({ warehouses: allWh })
-                                            .filter(wh => uiShipping.country && uiShipping.country.length > 0 ? whConfig[wh.warehouseID].countries_to_ship.includes(uiShipping.country) : true)
+                                        : WarehousesSort({ warehouses: whConfig })
+                                            .filter(wh => 
+                                                uiShipping.country && uiShipping.country.length > 0 ? whConfig[wh.warehouseID].countries_to_ship.includes(uiShipping.country) : true)
                                             .map((wh, index) => (
                                                 <div key={index} onClick={() => setSelectedWh(wh)}>
                                                     <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', width: '100%' }}>
                                                         <div>
-                                                            {wh.originID}
+                                                            {wh.warehouseID}
                                                         </div>
                                                         <div>
-                                                            {wh.warehouseID}
+                                                            {wh.originID}
                                                         </div>
                                                     </div>
                                                 </div>
@@ -693,9 +698,9 @@ export const FormX = () => {
                         </div>
 
                         <div className='ck-context'>
-                            {selectedWh && allWh[selectedWh.warehouseID] ? (
+                            {selectedWh && whConfig[selectedWh.warehouseID] ? (
                                 allSku
-                                    .filter(sku => Object.keys(allWh[selectedWh.warehouseID]).includes(sku.product_tag)
+                                    .filter(sku => Object.keys((whConfig[selectedWh.warehouseID]).products).includes(sku.product_tag)
                                         && !selectedSku.includes(sku)
                                         && selectedPT.includes(sku.product_tag))
                                     .map((sku, index) => (
@@ -722,7 +727,7 @@ export const FormX = () => {
                     <div className='d-flex flex-row  justify-content-end align-items-baseline'
                         style={{ color: CalcOutput.toWarehouseMargin === 0 ? 'grey' : '' }}
                     >
-                        Margin to Warehouse
+                        Gross Margin
                         <div
                             className='d-target'
                         >
@@ -732,7 +737,7 @@ export const FormX = () => {
                     <div className='d-flex flex-row justify-content-between align-items-baseline flex-end'
                         style={{ color: CalcOutput.toConsumerMargin === 0 ? 'grey' : 'white' }}
                     >
-                        Margin to Consumer
+                        Contribution Margin
                         <span
                             className='d-target'
                         >

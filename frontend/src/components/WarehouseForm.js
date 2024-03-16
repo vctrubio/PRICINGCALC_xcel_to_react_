@@ -138,7 +138,7 @@ const WarehouseForm = ({ addWh }) => {
             let targetExists = Object.keys(allWh).includes(value);
 
             if (targetExists) {
-                console.log('targetExistsme: .....', targetExists)
+                // console.log('targetExistsme: .....', targetExists)
                 setNewWhColor(false);
             }
             else {
@@ -152,24 +152,6 @@ const WarehouseForm = ({ addWh }) => {
             const found = Object.values(allWh[whIdentity.name_id]).some(nestedDict => nestedDict.origin === value);
             setNewOriginColor(found);
         }
-        // for (let key in allWh[whIdentity.name_id]) {
-        //     let nestedDict = allWh[whIdentity.name_id][key];
-        //     for (let nestedKey in nestedDict) {
-        //         if (nestedKey === 'origin' && nestedDict[nestedKey] === value) {
-        //             console.log('Found a key named "origin" with a value equal to "value"');
-        //             found = true;
-        //             break;
-        //         }
-        //     }
-        //     if (found) {
-        //         break;
-        //     }
-        // }
-        // if (found) {
-        //     setNewWhColor(false);
-        // } else {
-        //     setNewWhColor(true);
-        // }
     }
 
     window.color = newOriginColor

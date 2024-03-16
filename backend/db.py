@@ -57,8 +57,12 @@ def do_warehouse_linking():
             for key, value in data.items():
                 if key != 'name_id':
                     db_model['WarehouseConfig'][data['name_id']][key] = value.split(' ')
-
+                else:
+                    db_model['WarehouseConfig'][data['name_id']][key] = value
+                db_model['WarehouseConfig'][data['name_id']]['products'] = db_model['Warehouse'][data['name_id']]
+                    # print(db_model['WarehouseConfig'][data['name_id']]['origin'])
             
+
 def do_shipping_db(full_path, courier, warehouse):
     courier_name = courier[:-5]
     type_courier = pd.ExcelFile(full_path + '/' + courier, engine='openpyxl').sheet_names

@@ -11,6 +11,7 @@ import { GridPsku } from './components/PskuView';
 import LastMileGrid from './components/LastMileView';
 import { Payments } from './components/PaymentsView';
 import { ProductTag } from './components/ProductTagview';
+import {ConfigTable} from './components/ConfigsNew'
 
 import { FormX } from './components/MenuX'
 function App() {
@@ -28,8 +29,10 @@ function App() {
             <Route path="/warehouse" element={<GridWarehouse />} />
             <Route path="/packaging" element={<GridPackaging />} />
             <Route path="/producttag" element={<ProductTag />} />
+            <Route path="/configs" element={<ConfigTable />} />
             <Route path="/lastmile" element={<LastMileGrid />} />
             <Route path="/payments" element={<Payments />} />
+
           </Routes>
         </div>
       </Router>

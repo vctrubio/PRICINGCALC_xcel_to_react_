@@ -54,11 +54,21 @@ async def custom(item: dict, option: dict):
     total = sum(parse_total_cost(r) for r in rtn)
     if total < 0:
         return None
+    
+    try:
+        ptr_country = db_model['PaymentProcessingCountry'][option['country_input']]
+        ptr_country.sales_fee_ 
+        ptr_country.sales_fee
+    except Exception as e:
+        print(f'Error: no country found in PaymentProcessingCountry: {str(e)}')
+    
+    total + ptr_country.sales_fee
     print(f'{type(total)} : {total}')
-    v = calculate_options(option['objective_margin'], option['tax'], option['marketing'], option['country_input'])
+    
+    v = calculate_options(option['objective_margin'], option['tax'], option['marketing'], ptr_country.sales_fee_)
     print(f'{type(v)} : {v}')
     
-    return 21.782
+    return total / v
 
 
 ''' VENDORS ''' 
@@ -376,6 +386,11 @@ async def root(name_id: str):
 @app.get("/warehouseconfig")
 async def root():
     return db_model['WarehouseConfig']
+
+@app.patch("/warehouseconfig/{name_id}")
+async def root():
+    return db_model['WarehouseConfig'][name_id]
+
 
 '''Zone'''
 @app.get("/zone")

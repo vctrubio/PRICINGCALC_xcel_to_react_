@@ -106,11 +106,6 @@ export const SearchBar = ({ title, titlecount, data, setData, search, setSearch,
 
     };
 
-    const helloworld = (e) => {
-        console.log('hello world', e.target.files[0]);
-        setSelectedFile(e.target.files[0])
-    }
-
     return (
         <div className="d-flex justify-content-between p-2 mt-2">
             <h1 style={{ fontFamily: 'Roboto', paddingTop: 16 }} >

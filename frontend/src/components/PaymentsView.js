@@ -44,7 +44,7 @@ const PaymentProcessingCard = () => {
     }
 
     return (
-        <div style={{ height: 320, width: 1270, marginBottom: 100 }}>
+        <div style={{ height: 380, width: 1270, marginBottom: 100 }}>
             <SearchBar title='PaymentProcessingCard' titlecount={rowData.length} search={null} setSearch={null} data={rowData} setData={setRowData} selectedRows={selectedRows} setRerender={setRerender}></SearchBar>
             <AgGridReact
                 columnDefs={colData}
@@ -92,7 +92,7 @@ const PaymentProcessingCountry = () => {
     }
 
     return (
-        <div style={{ height: 320, width: 1270, marginBottom: 100 }}>
+        <div style={{ height: 380, width: 1270, marginBottom: 100 }}>
             <SearchBar title='PaymentProcessingCountry' titlecount={rowData.length} search={null} setSearch={null} data={rowData} setData={setRowData} selectedRows={selectedRows} setRerender={setRerender}></SearchBar>
             <AgGridReact
                 columnDefs={colData}

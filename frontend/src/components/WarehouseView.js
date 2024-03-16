@@ -32,13 +32,13 @@ const GridWarehouse = () => {
                 headerCheckboxSelection: true,
                 headerCheckboxSelectionFilteredOnly: true
             },
-            { headerName: 'Product Tag', field: 'product_tag', width: 200 }, //dropdown for selecting product tag to do 
+            { headerName: 'Product Tag', field: 'product_tag', minWidth: 120 }, //dropdown for selecting product tag to do 
             {
-                headerName: 'Fees', children: [
-                    { headerName: 'Unit', field: 'unit_fee', editable: true, maxWidth: 100 },
-                    { headerName: 'Storage', field: 'storage_fee', editable: true, maxWidth: 140 },
-                    { headerName: 'Pick And Pack', field: 'pick_and_pack_fee', editable: true, maxWidth: 140 },
-                    { headerName: 'Custom', field: 'custom_fee', editable: true, maxWidth: 140 },]
+                headerName: 'Fees', minWidth: 400, children: [
+                    { headerName: 'Unit', field: 'unit_fee', editable: true, minWidth: 100 },
+                    { headerName: 'Storage', field: 'storage_fee', editable: true, minWidth: 140 },
+                    { headerName: 'Pick And Pack', field: 'pick_and_pack_fee', editable: true, minWidth: 180 },
+                    { headerName: 'Custom', field: 'custom_fee', editable: true, minWidth: 140 },]
             }
         ]
     )
