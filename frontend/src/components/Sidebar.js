@@ -21,9 +21,10 @@ function Sidebar() {
       <Link to="/packaging"><i className="fas fa-table"></i> Packaging</Link>
       <Link to="/lastmile"><i className="fas fa-table"></i> Last Mile</Link>
       <Link to="/payments"><i className="fas fa-table"></i> Payments</Link>
-      <Link to="/producttag"><i className="bi bi-mailbox2"></i> Notifications</Link>
-      <Link to="/configs"><i className="bi bi-book"></i> Configs</Link>
-      <Link to="/producttag"><i className="bi bi-book"></i> Configs2</Link>
+      <Link to="/notifications"><i className="bi bi-mailbox2"></i> Notifications</Link>
+      <Link to="/configs"><i className="bi bi-book"></i> Config</Link>
+
+      {/* <Link to="/producttag"><i className="bi bi-book"></i> Configs2</Link> */}
     
       {/* Control Bar Notifications. Where errors show.
         SKU with no vendor goes to defualt

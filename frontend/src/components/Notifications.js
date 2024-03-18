@@ -16,3 +16,12 @@ COuntry Zone
 
 
 */
+
+
+export const Notifications = () => {
+    return (
+        <div style={{color: 'white'}}>
+            <h1>Notifications</h1>
+        </div>
+    )
+}

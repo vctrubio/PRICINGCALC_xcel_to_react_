@@ -1,17 +1,40 @@
-import React, { useCallback, useEffect, useState } from 'react'
-import { Form, Button } from 'react-bootstrap';
+import React, { useEffect, useState } from 'react'
 import axios from 'axios'
+import { Modal, Button } from 'react-bootstrap';
 import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-quartz.css'
 import '../AppGrid.css';
-import { getData, useSkuForm } from './CskuForm';
-import { SearchBar } from './SearchBar';
+import '../App.css';
 
+
+
+async function fetchCountries() {
+    const res = await axios.get('http://localhost:8000/country');
+    return res.data;
+}
+
+const countries = fetchCountries();
+
+const ModalPopUp = ({ isOpen, handleClose, selectedItem, title }) => {
+    
+    return (
+        <Modal show={isOpen} onHide={handleClose} className='my-modal'>
+            <Modal.Header closeButton>
+                <Modal.Title>{title}</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>{selectedItem}</Modal.Body>
+            <Modal.Footer>
+                <Button variant="secondary" onClick={handleClose}>
+                    Close
+                </Button>
+            </Modal.Footer>
+        </Modal>
+    )
+}
 const CustomSearch = ({ title }) => {
 
     const handleExport = () => {
-        const title_name = title + '.xlsx';
-
+        // const title_name = title + '.xlsx';
 
         return 12;
     };
@@ -48,23 +71,33 @@ const CustomSearch = ({ title }) => {
 }
 
 const ConfigTableIt = ({ warehouse }) => {
+    const [isOpen, setIsOpen] = useState(false);
+    const handleOpen = () => setIsOpen(true);
+    const handleClose = () => setIsOpen(false);
+
+    
 
     return (
         <div>
             <div className='boxing-day'>
-                <CustomSearch title={warehouse} />
+                <CustomSearch title={warehouse.name_id} />
                 <div className='boxing-tide'>
                     <div>
                         <div className='boxing-title'>Origin</div>
-                        <div className='boxing-item'>one</div>
+                        <div className='boxing-item'>{warehouse.origin}</div>
                     </div>
                     <div>
                         <div className='boxing-title'>Product Tags</div>
-                        <div className='boxing-item'>one two three four five six</div>
+                        <div className='boxing-item'>
+                            {Object.keys(warehouse.products).join(', ')}
+                        </div>
                     </div>
                     <div>
                         <div className='boxing-title'>Shipping Countries</div>
-                        <div className='boxing-item'>one two three</div>
+                        <div className='boxing-item' onClick={handleOpen}>
+                            {Object.values(warehouse.countries).join(', ')}
+                        </div>
+                        <ModalPopUp isOpen={isOpen} handleClose={handleClose} title={'Countries'} selectedItem={warehouse.countries}/>
                     </div>
                 </div>
             </div>
@@ -75,25 +108,25 @@ const ConfigTableIt = ({ warehouse }) => {
 
 
 export const ConfigTable = () => {
-    // const [warehouses] = getData()
-    const { getData } = useSkuForm();
     const [wh, setWh] = useState();
     window.ww = wh;
 
     useEffect(() => {
         const fetchData = async () => {
             const res = await axios.get('http://localhost:8000/warehouseconfig');
-            console.log('wh res:', res.data);
             if (res.data) {
                 const data = res.data;
-                Object.entries(data).map(([wh_name, inside]) => {
-                    console.log('name. ', wh_name)
-                    console.log('origin: ', inside.origin[0])
-                    console.log('products: ', inside.products)
-                    console.log('countries: ', inside.countries_to_ship)
+                const obj = {}
+                Object.entries(data).forEach(([wh_name, inside]) => {
+                    obj[wh_name] = {
+                        name_id: wh_name,
+                        origin: inside.origin[0],
+                        products: inside.products,
+                        countries: inside.countries_to_ship
+                    }
+                    console.log('wh_name2:', wh_name);
                 })
-                const whNames = Object.keys(data);
-                setWh(whNames);
+                setWh(prev => ({ ...prev, ...obj }))
             }
         }
         fetchData();
@@ -101,9 +134,9 @@ export const ConfigTable = () => {
 
     return (
         <div>
-            {/* {wh.map((warehouse, index) => (
+            {wh && Object.values(wh).map((warehouse, index) => (
                 <ConfigTableIt key={index} warehouse={warehouse} />
-            ))} */}
+            ))}
         </div>
     )
 }

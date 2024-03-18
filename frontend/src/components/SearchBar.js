@@ -1,12 +1,10 @@
-import React, { useEffect, useRef, useState, useMemo } from 'react'
-import { Form, Dropdown, Button, ButtonGroup, Col } from 'react-bootstrap';
+import React, { useState } from 'react'
+import { Button } from 'react-bootstrap';
 import * as XLSX from 'xlsx';
 import { CSVLink } from 'react-csv';
 import axios from 'axios';
 
 export const SearchBar = ({ title, titlecount, data, setData, search, setSearch, selectedRows, setRerender }) => {
-    const [selectedFile, setSelectedFile] = useState(null);
-
     const deleteSelectedRows = async () => {
         try {
             const lowerCaseTitle = title.toLowerCase();
@@ -41,19 +39,15 @@ export const SearchBar = ({ title, titlecount, data, setData, search, setSearch,
         return header;
     }
 
-
     const handleExport = () => {
         const title_name = title + '.xlsx';
         if (!data)
             return;
-        console.log('date me: ', data)
         const transformedData = data.map((row, index) => {
             let transformedRow = {};
             for (let key in row) {
                 let value = row[key];
-                if (key == 'skus') {
-                    console.log('value before join:', value);
-                    console.log('value after join:', value.join(' '));
+                if (key === 'skus') {
                     transformedRow[transformBack(key)] = value.join(' ');
                 }
                 else if (typeof value === 'object' || value === '' || value === null) {

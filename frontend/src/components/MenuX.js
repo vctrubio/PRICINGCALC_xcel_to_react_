@@ -1,21 +1,19 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { Button, TextField, Grid, FormHelperText, Select, MenuItem, FormControl, InputLabel, Paper } from '@material-ui/core';
+import React, { useEffect, useState } from 'react';
+import { Button, TextField } from '@material-ui/core';
 import Autocomplete from '@material-ui/lab/Autocomplete';
-import { createTheme, createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
-import switchOff from '../assets/switchoff.png';
-import switchOn from '../assets/switchon.png';
+import { createTheme, ThemeProvider } from '@material-ui/core/styles';
 
 import axios from 'axios';
 import { useSkuForm } from './CskuForm';
 import '../App.css';
 
 function transformWarehouse2(warehouse) {
-
     const result = {
-        warehouseID: warehouse.name_id,
-        originID: warehouse.origin[0],
-        productTags: warehouse.products,
-        countries: warehouse.countries_to_ship
+        warehouseID: warehouse[0],
+        originID: warehouse[1].origin[0],
+        productTags: warehouse[1].products,
+        countries: warehouse[1].countries_to_ship,
+        shipping: warehouse[1].Shipping,
     };
     return result;
 }
@@ -49,9 +47,10 @@ const theme = createTheme({
 
 function WarehousesSort({ warehouses }) {
     // console.log('crashtest')
-    // console.log('warehouse:', warehouses)
+    console.log('warehouse:', warehouses)
+
     const transformedWarehouses = warehouses
-        ? Object.values(warehouses)
+        ? Object.entries(warehouses)
             .flatMap(transformWarehouse2)
             .filter(warehouse => Object.keys(warehouse).length !== 0)
         : [];
@@ -97,11 +96,9 @@ export const FormX = () => {
     window.selw = selectedWh
     window.selhey = selectedPT
     window.selship = shipping
-    window.selp = null
 
     const configWh = async (data) => {
-        // console.log('configwh: ', data)
-        for (const [key, obj] of Object.entries(data)) {
+        for (const [key] of Object.entries(data)) {
             const reply = await axios.get(`http://localhost:8000/warehouseconfig/${key}`);
             setWhConfig(prevWhConfig => ({ ...prevWhConfig, [key]: reply.data }));
         }
@@ -201,11 +198,8 @@ export const FormX = () => {
     }
 
     function WarehouseSearch({ warehouses, onWarehouseSelect }) {
-        // console.log('searching: ', warehouses);
         const transformedWarehouses = warehouses ? Object.values(warehouses).flatMap(transformWarehouse) : [];
-        // console.log('seeeing. ', transformWarehouse);
         const uniqueIds = Array.from(new Set(transformedWarehouses.map(item => JSON.stringify({ warehouseID: item.warehouseID, originID: item.originID }))), JSON.parse);
-        // console.log('knowing:,', uniqueIds);
         uniqueIds.sort((a, b) => a.originID.localeCompare(b.originID));
 
         return (
@@ -389,7 +383,7 @@ export const FormX = () => {
                 });
         }
 
-    }, [selectedSku, selectedWh, selectedPT, uiOM, uiDC, uiShipping, uiMk, uiOM, uiTax]);
+    }, [selectedSku, selectedWh, selectedPT, uiOM, uiDC, uiShipping, uiMk, uiTax]);
 
 
     const selectWhifEmpty = (item) => {
@@ -498,7 +492,7 @@ export const FormX = () => {
                 <div className='ck-head-in'>
                     <div className='airplane-titor'>
                         <div className='d-flex flex-column justify-content-between' style={{ textAlign: 'left', width: '100%' }}>
-                            <div style={{ paddingLeft: 2, display: 'flex', justifyContent: 'space-between', paddingLeft: 5 }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', paddingLeft: 5 }}>
                                 <div>
                                     Objective Margin
                                 </div>
@@ -512,7 +506,7 @@ export const FormX = () => {
                             />
                         </div>
                         <div className='d-flex flex-column justify-content-between' style={{ textAlign: 'left', width: '100%', marginLeft: 5 }}>
-                            <div style={{ paddingLeft: 2, display: 'flex', justifyContent: 'space-between', paddingLeft: 5 }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', paddingLeft: 5 }}>
                                 <div>
                                     Discount
                                 </div>
@@ -529,7 +523,7 @@ export const FormX = () => {
                     </div>
                     <div>
                         <div className='d-flex flex-column justify-content-between' style={{ textAlign: 'left', width: '80%' }}>
-                            <div style={{ paddingLeft: 2, display: 'flex', justifyContent: 'space-between', paddingLeft: 5 }}>
+                            <div style={{display: 'flex', justifyContent: 'space-between', paddingLeft: 5 }}>
                                 <div>
                                     Tax
                                 </div>
@@ -543,7 +537,7 @@ export const FormX = () => {
                             />
                         </div>
                         <div className='d-flex flex-column justify-content-between' style={{ textAlign: 'left', width: '80%', marginLeft: 4 }}>
-                            <div style={{ paddingLeft: 2, display: 'flex', justifyContent: 'space-between', paddingLeft: 5 }}>
+                            <div style={{display: 'flex', justifyContent: 'space-between', paddingLeft: 5 }}>
                                 <div>
                                     Marketing
                                 </div>

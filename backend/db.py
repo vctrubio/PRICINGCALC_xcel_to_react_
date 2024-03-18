@@ -57,8 +57,6 @@ def do_warehouse_linking():
             for key, value in data.items():
                 if key != 'name_id':
                     db_model['WarehouseConfig'][data['name_id']][key] = value.split(' ')
-                else:
-                    db_model['WarehouseConfig'][data['name_id']][key] = value
                 db_model['WarehouseConfig'][data['name_id']]['products'] = db_model['Warehouse'][data['name_id']]
                     # print(db_model['WarehouseConfig'][data['name_id']]['origin'])
             
@@ -73,8 +71,11 @@ def do_shipping_db(full_path, courier, warehouse):
         db_model['Shipping'] = []  
     db_model['Shipping'].append(shipping)
    
+   
     if warehouse in db_model['WarehouseConfig']:
-        db_model['WarehouseConfig'][warehouse]['Shipping'] = {courier_name: shipping}
+        if 'Shipping' not in db_model['WarehouseConfig'][warehouse]:
+            db_model['WarehouseConfig'][warehouse]['Shipping'] = {}
+        db_model['WarehouseConfig'][warehouse]['Shipping'][courier_name] = shipping
     else:
         print('Raise: Warehouse not found in WarehouseConfig')
 ##^dependency problem that when we change db_modelSHipping it will not change in WarehouseConfig WH SHipping    

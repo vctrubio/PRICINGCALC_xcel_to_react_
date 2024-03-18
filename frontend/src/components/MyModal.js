@@ -9,9 +9,6 @@ const MyModal = ({ isOpen, skuNames, selectedNames, onClose, onSelectSku }) => {
 
     const inputRef = useRef();
 
-    // useEffect(() => {
-    //     inputRef.current.focus();
-    // }, []);
 
     useEffect(() => {
         // Reset when the modal opens

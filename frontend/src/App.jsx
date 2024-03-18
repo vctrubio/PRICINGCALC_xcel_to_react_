@@ -12,8 +12,9 @@ import LastMileGrid from './components/LastMileView';
 import { Payments } from './components/PaymentsView';
 import { ProductTag } from './components/ProductTagview';
 import {ConfigTable} from './components/ConfigsNew'
-
+import { Notifications } from './components/Notifications';
 import { FormX } from './components/MenuX'
+
 function App() {
   return (
     <div className="App">
@@ -32,6 +33,7 @@ function App() {
             <Route path="/configs" element={<ConfigTable />} />
             <Route path="/lastmile" element={<LastMileGrid />} />
             <Route path="/payments" element={<Payments />} />
+            <Route path="/notifications" element={<Notifications />} />
 
           </Routes>
         </div>
