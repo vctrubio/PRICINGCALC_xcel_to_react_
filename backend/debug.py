@@ -3,6 +3,7 @@ from data_imports.get_data import *
 from db import db_model
 from models import *
 from calculation import calculate, parse_total_cost, calculate_options
+from db_write import db_write_all
 
 def models_in_globals():
     global_symbols = globals()
@@ -16,6 +17,7 @@ def models_in_globals():
         
     return class_names
 
+db_write_all()
 
 # w = db_model['Warehouse']
 # for i in w:

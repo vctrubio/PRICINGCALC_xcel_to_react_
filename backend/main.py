@@ -1,9 +1,12 @@
+import sys
+from typing import List, Optional
+from pydantic import BaseModel
 from fastapi import FastAPI, HTTPException, File, UploadFile, UploadFile, Form, Body
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from models import Vendor, SKU, PSKU, Warehouse, ProductTag, PackagingWarehouse, PackagingVendor, PaymentProcessingCard, PaymentProcessingCountry, PaymentPopCountry
 from db import db_model
-from calculation import calculate, Calculate, CalcOptions, parse_total_cost, calculate_options
+from calculation import calculate, parse_total_cost, calculate_options
 import json
 import os
 
@@ -13,8 +16,17 @@ warehouse = list(db_model['Warehouse'].values())
 # packagingWarehouse = list(db_model['PackagingWarehouse'].values())
 pskus = {v.name_id: v for v in db_model['PSKU'].values()}
 shipping = list(db_model['Shipping'])
+from run import server_manager
 
 app = FastAPI()
+
+
+@app.get("/exit")
+async def exit():
+    server_manager.print_pid()
+    print('hellofinish')
+    return {"message": "Exiting..."}
+
 
 app.add_middleware(
     CORSMiddleware,
@@ -23,7 +35,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
+class WarehouseConfigParams(BaseModel):
+    key: Optional[str] = None
+    value: Optional[List[str]] = None
 
 @app.get("/")
 async def get_disposable_models():
@@ -47,10 +61,7 @@ async def upload_file(file: UploadFile = File(...),  filename: str = Form(...)):
 
 @app.post("/calculate")
 async def custom(item: dict, option: dict):
-    print('total start:')
     rtn = calculate(item['warehouse_name'], item['pskus'], item['shipping_selection'], item['zone'])
-    print(f'{type(rtn)} : {rtn}')
-
     total = sum(parse_total_cost(r) for r in rtn)
     if total < 0:
         return None
@@ -63,11 +74,8 @@ async def custom(item: dict, option: dict):
         print(f'Error: no country found in PaymentProcessingCountry: {str(e)}')
     
     total + ptr_country.sales_fee
-    print(f'{type(total)} : {total}')
     
     v = calculate_options(option['objective_margin'], option['tax'], option['marketing'], ptr_country.sales_fee_)
-    print(f'{type(v)} : {v}')
-    
     return total / v
 
 
@@ -388,15 +396,19 @@ async def root():
     return db_model['WarehouseConfig']
 
 @app.patch("/warehouseconfig/{name_id}")
-async def root():
-    return db_model['WarehouseConfig'][name_id]
-
+async def root(name_id: str, item: WarehouseConfigParams):
+    try:
+        db_model['WarehouseConfig'][name_id][item.key] = item.value
+        return db_model['WarehouseConfig'][name_id]
+    except KeyError as e:
+        raise HTTPException(status_code=404, detail=f"WarehouseConfigPatchKey not found: {str(e)}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 '''Zone'''
 @app.get("/zone")
 async def root():
     return db_model['Zone']
-
 
 '''Country'''
 @app.get("/country")
@@ -425,10 +437,3 @@ async def root(name_id: str, courier: str):
 @app.get("/zone")
 async def root():
     return db_model['Zone']
-
-
-'''For Debugging'''
-@app.get("/test")
-async def test_route():
-    return skus[0].get_json()
-

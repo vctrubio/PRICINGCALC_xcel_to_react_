@@ -1,9 +1,8 @@
 import os
 from data_imports.get_data import *
+from data_imports.db_shipping import parse_shipping_table
+from data_imports.db_init import files_in_dir
 from models import *
-from db_shipping import parse_shipping_table
-from db_init import files_in_dir
-from models import Warehouse
 
 DATA_DIR = '../dataDir/'
 MODELS_DIR = f'{DATA_DIR}Models/'
@@ -57,6 +56,8 @@ def do_warehouse_linking():
             for key, value in data.items():
                 if key != 'name_id':
                     db_model['WarehouseConfig'][data['name_id']][key] = value.split(' ')
+                else:
+                    db_model['WarehouseConfig'][data['name_id']][key] = value
                 db_model['WarehouseConfig'][data['name_id']]['products'] = db_model['Warehouse'][data['name_id']]
                     # print(db_model['WarehouseConfig'][data['name_id']]['origin'])
             
@@ -166,15 +167,9 @@ for name in my_lst:
                 if name == 'PackagingWarehouse':
                     db_model[name].append(instance)
 
+
 do_warehouse_linking()
 do_country_list()
 do_shipping()
 
-
-
 #db_model['CLASS']['NAME ID']
-
-'''
-Shipping & Warehouse
-
-'''
