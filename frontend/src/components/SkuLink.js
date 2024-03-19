@@ -1,8 +1,6 @@
-import React, { useEffect, useMemo, useState } from 'react'
 import { Col } from 'react-bootstrap'
 
-
-export default function SkuLink({ name, index, onClick }) {
+export default function SkuLink({ name, onClick }) {
 
     return (
         <div className='sku-link' onClick={onClick}>

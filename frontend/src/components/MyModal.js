@@ -85,7 +85,7 @@ const MyModal = ({ isOpen, skuNames, selectedNames, onClose, onSelectSku }) => {
                 </ul>
             </Modal.Body>
 
-            <Modal.Footer>
+            <Modal.Footer style={{ display: 'flex', justifyContent: 'flex-start' }}>               
                 <Button variant="light" onClick={unselectAll}>
                     Deselect ALL
                 </Button>

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { Button } from 'react-bootstrap';
 
 import axios from 'axios'
@@ -28,8 +28,8 @@ const GridVendor = () => {
     const [showForm, setShowForm] = useState(false);
     const [rowData, setRowData] = useState([])
     const [rerender, setRerender] = useState(false);
-    const [gridKey, setGridKey] = useState(1);
-    const [colData, setColData] = useState(
+    const [gridKey] = useState(1);
+    const [colData] = useState(
         [
             {
                 headerName: 'Vendor ID', field: 'name_id',
@@ -75,6 +75,7 @@ const GridVendor = () => {
                 }
             }
             const response = await axios.patch(`http://localhost:8000/vendor/${event.data.name_id}`, event.data);
+            console.log('response:', response);
             //update all skus with vendor id... 
         } catch (error) {
             console.error('Error updating Vendor data:', error);

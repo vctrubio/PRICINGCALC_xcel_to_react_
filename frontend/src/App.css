@@ -42,6 +42,7 @@
 .boxing-tide {
   border: 1px solid white;
   box-shadow: 0px 4px 8px 0px var(--pillred);
+  width: 1250px;
 }
 
 
@@ -67,7 +68,7 @@
   opacity: 0.9;
 }
 
-.boxing-item {
+.boxing-item, .boxing-item-grey {
   grid-column: span 10;
   cursor: pointer;
   padding-left: 5px;
@@ -76,6 +77,11 @@
 .boxing-item:hover {
   background-color: var(--pillblue);
 }
+
+.boxing-item-grey:hover {
+  background-color: var(--grey);
+}
+
 
 .my-flex {
   display: flex;
@@ -700,6 +706,7 @@ input[type="search"] {
   position: fixed;
   top: 48%;
   left: 28%;
+  width: 150vw;
   transform: translate(-50%, -50%);
 }
 

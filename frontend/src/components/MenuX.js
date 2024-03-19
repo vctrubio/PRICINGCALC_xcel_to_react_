@@ -136,14 +136,14 @@ export const FormX = () => {
             try {
                 const response = await axios.get(`http://localhost:8000/shipping`)
                 if (response.data) {
-                    response.data.map(res => {
+                    response.data.forEach(res => {
                         const myDict = {
                             warehouse: res.warehouse,
                             courier: res.name_id,
                             types: Object.keys(res.shipping_table)
                         }
                         setShipping(prevShipping => [...prevShipping, myDict]);
-                        //needs to set the data, but also keep in mind whcih ids we have... also affects the types
+                        //needs to set the data, but also keep in mind which ids we have... also affects the types
                     })
                 }
             }
@@ -370,12 +370,13 @@ export const FormX = () => {
 
             axios.post('http://localhost:8000/calculate', { item, option })
                 .then(response => {
+                    console.log(': ', item.total_cogs, ' total price: ', response.data);
                     setCalcOutput(prevState => ({
                         ...prevState,
                         priceWithoutDiscount: response.data,
                         priceWithDiscount: uiDC ? (response.data * (1 - parseFloat(uiDC) / 100)) : 0,
                         toConsumerMargin: parseFloat(uiOM),
-                        toWarehouseMargin: item.total_cogs / response.data * 100
+                        toWarehouseMargin: (response.data - item.total_cogs)  / response.data * 100
                     }));
                 })
                 .catch(error => {
@@ -719,7 +720,7 @@ export const FormX = () => {
                 <div className='d-flex'>
 
                     <div className='d-flex flex-row  justify-content-end align-items-baseline'
-                        style={{ color: CalcOutput.toWarehouseMargin === 0 ? 'grey' : '' }}
+                        style={{ color: CalcOutput.toWarehouseMargin === 0 ? 'grey' : 'white' }}
                     >
                         Gross Margin
                         <div
@@ -752,7 +753,7 @@ export const FormX = () => {
                         </span>
                     </div>
                     <div className='d-flex flex-row justify-content-between align-items-baseline'
-                        style={{ color: (uiDC === 0 || uiDC === null) ? 'grey' : 'white' }}
+                        style={{ color: (uiDC === 0 || uiDC === '') ? 'grey' : 'white' }}
                     >
                         Pricing WITH Discount
                         <span

@@ -4,7 +4,6 @@ import enum
 
 class Warehouse(BaseModel):
     name_id: str
-    origin: str
     product_tag: str
     unit_fee: int
     storage_fee: int

@@ -1,8 +1,11 @@
 all: back front
 
-#NORMAL
+env:
+	source backend/venv_python/bin/activate
+
 back:
-	cd backend && uvicorn main:app --reload 
+	cd backend && python3 run.py
+	# cd backend && uvicorn main:app --reload 
 
 front:
 	cd frontend && npm start
@@ -10,6 +13,8 @@ front:
 debug:
 	cd backend && python3 -i debug.py
 
+kill8000:
+	kill -9 $(lsof -t -i:8000)
 
 #DOCKER
 start: build run

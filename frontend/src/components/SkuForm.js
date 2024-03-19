@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import Modal from 'react-modal';
 import Alert from '@mui/material/Alert';
-
 import axios from 'axios';
-import { Form, Dropdown, Button, ButtonGroup, Col } from 'react-bootstrap';
+import { Form,  Button, Col } from 'react-bootstrap';
 import PskuForm from './PskuForm';
-import { getData, vendorData, setVendorData, mySku, generatePId, pskuData, setPskuData, useSkuForm } from './CskuForm';
+import { getData,  mySku, generatePId, useSkuForm } from './CskuForm';
 import SkuLink from './SkuLink';
 import MyModal from './MyModal';
 import { NavPskuBar } from './PskuView';
@@ -20,8 +18,7 @@ export const SkuForm = ({ addSku, rowData }) => {
     const [formDataArray, setFormDataArray] = useState([]);
     const [nextIndex, setNextIndex] = useState(0);
 
-    const [skuLink, setSkuLink] = useState([]);
-    const [passVendor, setPassVendor] = useState(null); //used as localstate for now
+     // const [passVendor, setPassVendor] = useState(null); //used as localstate for now
     const [pskuId, setPskuId] = useState(generatePId())
 
     const [vendorData, setVendorData] = useState([])
@@ -33,9 +30,9 @@ export const SkuForm = ({ addSku, rowData }) => {
     const [showSuccessMessage, setShowSuccessMessage] = useState(false);
     const [showSkuMessage, setShowSkuMessage] = useState(false);
     const [showPskuMessage, setShowPskuMessage] = useState(false);
-    const [successMessage, setSuccessMessage] = useState(''); //todo
-
-    const [isValidPskuName, setIsValidPskuName] = useState(false);
+    
+    // const [successMessage, setSuccessMessage] = useState(''); //todo
+    // const [isValidPskuName, setIsValidPskuName] = useState(false);
     const [isValidName, setIsValidName] = useState(true);
     const [showModal, setShowModal] = useState(false);
     const [selectedNames, setSelectedNames] = useState([]);
@@ -44,6 +41,7 @@ export const SkuForm = ({ addSku, rowData }) => {
     const [pskuNames, setPskuNames] = useState([]);
 
     const [missingFields, setMissingFields] = useState([]);
+
     {
         missingFields.length > 0 && (
             <Alert variant="danger">
@@ -80,7 +78,7 @@ export const SkuForm = ({ addSku, rowData }) => {
             }
             setPskuDes(descriptions.join(' '));
 
-            if (formData.name_id && formDataArray.length == 0)
+            if (formData.name_id && formDataArray.length === 0)
                 setPskuId(formData.name_id)
         }
         setShowPskuBar(!showPskuBar);
@@ -124,20 +122,11 @@ export const SkuForm = ({ addSku, rowData }) => {
     const handleRemoveLink = (nameToRemove) => {
         setSelectedNames(selectedNames.filter(name => name !== nameToRemove));
     };
-    const handleProductTagSelect = (tag) => {
-        setSelectedProductTag(tag);
-    }
 
     //USE EFFECTS
     useEffect(() => {
         setNextIndex(formDataArray.length);
     }, [formDataArray]);
-
-    useEffect(() => {
-        const initialVendorId = localStorage.getItem('lastSelectedVendor');
-        setPassVendor(initialVendorId);
-    }, [localStorage.getItem('lastSelectedVendor')]); //not using atm.... 
-
 
     useEffect(() => {
         if (!isLoadingVendors && vendorData.length > 0) {
@@ -221,7 +210,7 @@ export const SkuForm = ({ addSku, rowData }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if ((formData.name_id.length == 0) && (!showPskuBar)) {
+        if ((formData.name_id.length === 0) && (!showPskuBar)) {
             setShowSkuMessage(true);
             setTimeout(() => {
                 setShowSkuMessage(false);
@@ -310,14 +299,6 @@ export const SkuForm = ({ addSku, rowData }) => {
     window.pt = selectedProductTag
     window.post = pskuPost;
     window.d = pskuDes
-
-    const setBtnDefault = () => {
-        setSelectedProductTag(null);
-        setPskuPost([])
-        setSkuLink([])
-        setSelectedNames([])
-        setFormDataArray([])
-    }
 
     return (
         <div className='p-1'>

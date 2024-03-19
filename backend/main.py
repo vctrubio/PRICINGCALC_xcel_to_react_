@@ -1,36 +1,20 @@
-import sys
+import os
 from typing import List, Optional
 from pydantic import BaseModel
 from fastapi import FastAPI, HTTPException, File, UploadFile, UploadFile, Form, Body
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from models import Vendor, SKU, PSKU, Warehouse, ProductTag, PackagingWarehouse, PackagingVendor, PaymentProcessingCard, PaymentProcessingCountry, PaymentPopCountry
+from models import Vendor, SKU, PSKU, Warehouse, ProductTag, PackagingWarehouse, PackagingVendor, PaymentProcessingCard, PaymentProcessingCountry
 from db import db_model
+from db_write import db_write_all
 from calculation import calculate, parse_total_cost, calculate_options
-import json
-import os
-
-vendors = {v.name_id: v for v in db_model['Vendor'].values()}
-skus = {v.name_id: v for v in db_model['SKU'].values()}
-warehouse = list(db_model['Warehouse'].values())
-# packagingWarehouse = list(db_model['PackagingWarehouse'].values())
-pskus = {v.name_id: v for v in db_model['PSKU'].values()}
-shipping = list(db_model['Shipping'])
 from run import server_manager
 
 app = FastAPI()
 
-
-@app.get("/exit")
-async def exit():
-    server_manager.print_pid()
-    print('hellofinish')
-    return {"message": "Exiting..."}
-
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # Replace with the actual URL of your React app
+    allow_origins=["http://localhost:3000"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -41,10 +25,21 @@ class WarehouseConfigParams(BaseModel):
 
 @app.get("/")
 async def get_disposable_models():
-    # lst = [model.lower() for model in db_model]
     lst = [model for model in db_model]
     return {'Models': lst}
-   
+
+@app.get("/exit")
+async def exit():
+    server_manager.print_pid()
+    print('hellofinish')
+    return {"message": "Exiting..."}
+
+@app.get("/save")
+async def save():
+    db_write_all()
+    # exit()
+    return {"message": "Saving..."}
+ 
 @app.post("/upload")
 async def upload_file(file: UploadFile = File(...),  filename: str = Form(...)):
     print(f"Uploading file: {filename}")
@@ -65,7 +60,6 @@ async def custom(item: dict, option: dict):
     total = sum(parse_total_cost(r) for r in rtn)
     if total < 0:
         return None
-    
     try:
         ptr_country = db_model['PaymentProcessingCountry'][option['country_input']]
         ptr_country.sales_fee_ 
@@ -82,73 +76,68 @@ async def custom(item: dict, option: dict):
 ''' VENDORS ''' 
 @app.get("/vendor")
 async def root():
-    return vendors
+    return db_model['Vendor']
 
 @app.get("/vendor/{name_id}/sku")
 async def root(name_id: str): 
-    if name_id in vendors:
-            return vendors[name_id].get_skus()
+    if name_id in db_model['Vendor']:
+            return db_model['Vendor'][name_id].get_skus()
     raise HTTPException(status_code=404, detail="Vendor not found")
 
 @app.patch("/vendor/{name_id}")
 async def update_vendor(vendor: Vendor):
     print(f'patching vendor {vendor}')
-    if vendor.name_id in vendors:  # check if the vendor exists in the vendors dictionary
-        vendors[vendor.name_id] = vendor.dict()  # update the vendor
+    if vendor.name_id in db_model['Vendor']:
+        db_model['Vendor'][vendor.name_id] = vendor.dict()  # update the vendor
         return {"message": "Vendor updated successfully", "vendor": vendor.dict}
     raise HTTPException(status_code=404, detail="Vendor not found")
 
 @app.post("/vendor")
 async def create_vendor(vendor: Vendor):
-    if vendor.name_id in vendors:
+    if vendor.name_id in db_model['Vendor']:
         raise HTTPException(status_code=400, detail="Vendor already exists")      
-    vendors[vendor.name_id] = vendor
     db_model['Vendor'][vendor.name_id] = vendor
     return {"message": "Vendor created successfully"}
 
 @app.delete("/vendor/{name_id}")
 async def delete_vendor(name_id: str):
-    if name_id in vendors:
-        del vendors[name_id]
+    if name_id in db_model['Vendor']:
+        del db_model['Vendor'][name_id]
         return {"message": "Vendor deleted successfully"}
     raise HTTPException(status_code=404, detail="Vendor not found")
-
-
 
 
 ''' SKUS '''
 @app.get("/sku")
 async def root():
-    return [sku.get_json() for sku in skus.values()]  # Extract values
-
+    return [sku.get_json() for sku in db_model['SKU'].values()]  # Extract values
 
 @app.patch("/sku/{name_id}")
 async def update_sku(name_id: str, sku: SKU):
-    if name_id in skus:
-        skus[name_id] = sku
+    print('heloooooo.workd')
+    if name_id in db_model['SKU']:
+        db_model['SKU'][name_id] = sku
         return {"message": "SKU updated successfully"}
     raise HTTPException(status_code=404, detail="SKU not found")
 
-
 @app.get("/sku/{name_id}")
 async def get_sku(name_id: str):
-    if name_id in skus:
-        return skus[name_id].get_json()
+    if name_id in db_model['SKU']:
+        return db_model['SKU'][name_id].get_json()
     raise HTTPException(status_code=404, detail="SKU not found")
-
 
 @app.post("/sku")
 async def create_sku(sku: SKU):
     print('post to sku')
     print(sku)
-    if sku.name_id in skus:
+    if sku.name_id in db_model['SKU']:
         raise HTTPException(status_code=402, detail="SKU already exists")
-    if sku.vendor_id not in vendors:
+    if sku.vendor_id not in db_model['Vendor']:
         raise HTTPException(status_code=400, detail="Invalid vendor_id. Vendor not found.")
     try:
         sku_obj = SKU(**sku.dict())
         print(sku_obj.get_json())
-        skus[sku.name_id] = sku_obj
+        db_model['SKU'][sku.name_id] = sku_obj
         return {"message": "SKU created successfully"}
     except Exception as e:
         raise HTTPException(status_code=422, detail=str(e))
@@ -157,66 +146,49 @@ async def create_sku(sku: SKU):
 @app.get("/psku")
 async def root():
     try:
-        return [sku.get_json() for sku in pskus.values()]
+        return [sku.get_json() for sku in db_model['PSKU'].values()]
     except Exception as e:
         raise HTTPException(status_code=422, detail=str(e))
-
 
 @app.patch("/psku/{name_id}")
 async def update_psku(psku: PSKU):
-    if psku.name_id in pskus:
-        pskus[psku.name_id] = psku
+    if psku.name_id in db_model['PSKU']:
+        db_model['PSKU'][psku.name_id] = psku
         return {"message": "PSKU updated successfully"}
     raise HTTPException(status_code=404, detail="PSKU not found")
- 
- 
-@app.get("/pskujson")
-async def root():
-    try:
-        return [psku.get_json() for psku in pskus.values()]
-    except Exception as e:
-        raise HTTPException(status_code=422, detail=str(e))
-    
 
 @app.post("/psku")
 async def create_psku(psku: PSKU):
-    print('post to psku')
-    print(psku)
-    print('-----------')
-    if psku.name_id in pskus:
+    if psku.name_id in db_model['PSKU']:
         raise HTTPException(status_code=400, detail="PSKU already exists")
     try:
         psku_dict = psku.dict()
         psku_dict['skus'] = ' '.join(psku_dict['skus'])
         psku_obj = PSKU(**psku_dict)
-        pskus[psku_obj.name_id] = psku_obj
         db_model['PSKU'][psku_obj.name_id] = psku_obj
         return {"message": "PSKU created successfully"}
     except Exception as e:
         raise HTTPException(status_code=422, detail=str(e))
    
-    
 @app.get("/psku/{name_id}")
 async def get_psku(name_id: str):
-    if name_id in pskus:
-        return pskus[name_id].dict()
+    if name_id in db_model['PSKU']:
+        return db_model['PSKU'][name_id].dict()
     raise HTTPException(status_code=404, detail="PSKU not found")
 
 @app.patch("/psku/{name_id}")
 async def update_psku(name_id: str, psku: PSKU):
-    if name_id in pskus:
-        #checkl to see what fields are input and only change those 
-        pskus[name_id] = psku
+    if name_id in db_model['PSKU']:
+        db_model['PSKU'][name_id] = psku
         return {"message": "PSKU updated successfully"}
     raise HTTPException(status_code=404, detail="PSKU not found")
 
 @app.delete("/psku/{name_id}")
 async def delete_psku(name_id: str):
-    if name_id in pskus:
-        del pskus[name_id]
+    if name_id in db_model['PSKU']:
+        del db_model['PSKU'][name_id]
         return {"message": "PSKU deleted successfully"}
     raise HTTPException(status_code=404, detail="PSKU not found")
-
 
 
 '''Warehouse'''
@@ -224,17 +196,11 @@ async def delete_psku(name_id: str):
 async def root():
     return db_model['Warehouse']
 
-
 @app.post("/warehouse")
 async def create_warehouse(ptr: Warehouse):
     print('post to warehouse')
     try:
-
             warehouse_obj = Warehouse(**ptr.dict())
-            print(warehouse_obj)
-            
-            print(ptr.product_tag)
-            print(warehouse_obj)
             key = {k: v for k, v in warehouse_obj.__dict__.items() if k != 'product_tag'}            
             
             if ptr.name_id not in db_model['Warehouse']:
@@ -246,7 +212,6 @@ async def create_warehouse(ptr: Warehouse):
             
             db_model['Warehouse'][ptr.name_id][ptr.product_tag] = key
             
-            #if product tag is not in product tag. api post to product tag
             if ptr.product_tag not in db_model['ProductTag']:
                 db_model['ProductTag'][ptr.product_tag] = ptr.product_tag
                 
@@ -289,7 +254,6 @@ async def update_packagingvendor(packaging: PackagingVendor):
             return {"message": "PackagingVendor updated successfully"}
     raise HTTPException(status_code=404, detail="PackagingVendor not found")   
 
-
 @app.get("/packagingwarehouse")
 async def root():
     return db_model['PackagingWarehouse']
@@ -319,7 +283,6 @@ async def update_packagingwarehouse(packaging: PackagingWarehouse):
 async def root():
     return db_model['ProductTag']
 
-#post product tag
 @app.post("/producttag")
 async def create_producttag(product_tag: ProductTag):
     if product_tag.name_id not in db_model['ProductTag']:
@@ -327,7 +290,6 @@ async def create_producttag(product_tag: ProductTag):
         return {"message": "ProductTag created successfully"}
     raise HTTPException(status_code=400, detail="ProductTag already exists")
 
-#delete product tag
 @app.delete("/producttag/{name_id}")
 async def delete_producttag(name_id: str):
     if name_id in db_model['ProductTag']:
@@ -335,8 +297,8 @@ async def delete_producttag(name_id: str):
         return {"message": "ProductTag deleted successfully"}
     raise HTTPException(status_code=404, detail="ProductTag not found")
 
-'''Paymensts'''
 
+'''Paymensts'''
 @app.get("/paymentprocessingcard")
 async def root():
     return db_model["PaymentProcessingCard"]
@@ -348,7 +310,6 @@ async def update_paymentprocessingcard(card: PaymentProcessingCard):
         db_model["PaymentProcessingCard"][name_id] = card
         return {"message": "PaymentProcessingCard updated successfully"}
     raise HTTPException(status_code=404, detail="PaymentProcessingCard not found")
-
 
 @app.get("/paymentprocessingcountry")
 async def root():
@@ -384,6 +345,7 @@ async def update_paymentpopcountry(name_id: str, country: dict = Body(...)):
         return {"message": f"PaymentPopCountry {name_id} updated successfully"}
     raise HTTPException(status_code=404, detail="PaymentPopCountry not found")
 
+
 '''WarehouseConfig'''
 @app.get("/warehouseconfig/{name_id}")
 async def root(name_id: str):
@@ -405,15 +367,18 @@ async def root(name_id: str, item: WarehouseConfigParams):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
 '''Zone'''
 @app.get("/zone")
 async def root():
     return db_model['Zone']
 
+
 '''Country'''
 @app.get("/country")
 async def root():
     return db_model['Country']
+
 
 '''Shipping'''
 @app.get("/shipping")
@@ -432,6 +397,7 @@ async def root(name_id: str, courier: str):
         if courier in db_model['WarehouseConfig'][name_id]['Shipping']:
             return db_model['WarehouseConfig'][name_id]['Shipping'][courier]
     raise HTTPException(status_code=404, detail="Shipping not found")
+
 
 '''Zone'''
 @app.get("/zone")
