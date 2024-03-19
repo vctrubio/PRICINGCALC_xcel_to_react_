@@ -1,6 +1,5 @@
 from db import db_model, DATA_DIR, MODELS_DIR, MODELS_DIR, MODELS_DIR 
 import pandas as pd
-import os
 import numpy as np
 from models import *
 from db import db_model
@@ -8,10 +7,8 @@ from data_imports.db_init import models_in_globals
 from data_imports.get_data import *
 
 def rtn_attr_to_header(attr):
-    # print('attr:', attr)
     if attr.endswith('_'):
         attr = attr[:-1] + '%'
-    
     attr = attr.replace('_', ' ')
     attr = attr.strip().title()
     return attr
@@ -54,7 +51,6 @@ def write_to_xlsx(model_name, models):
                 df.columns = [rtn_attr_to_header(attr) for attr in df.columns]
                 df.to_excel(MODELS_DIR + model_name + '.xlsx', index=False)
                 return 
-            
     except Exception as e:
         print(f"An error occurred when writting to file: {str(e)}")
 
@@ -77,12 +73,10 @@ def db_write_all():
                 product_tag.append(keys)
             all.append({'name_id': name_id, 'origin': origin, 'product_tag': product_tag, 'countries_to_ship': countries_to_ship})
         df = pd.DataFrame(all)
-        df['product_tag'] = df['product_tag'].apply(lambda x: ' '.join(x))
+        # df['product_tag'] = df['product_tag'].apply(lambda x: ' '.join(x)) #PT can be removed 
         df['countries_to_ship'] = df['countries_to_ship'].apply(lambda x: ' '.join(x))  
         df['origin'] = df['origin'].apply(lambda x: ' '.join(x))
         df.columns = [rtn_attr_to_header(attr) for attr in df.columns]
         df.to_excel(MODELS_DIR + 'WarehouseConfig' + '.xlsx', index=False)
-            
     except Exception as e:
         print(f"Error no WarehouseConfig Found: {str(e)}")
-        

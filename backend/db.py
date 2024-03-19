@@ -111,6 +111,11 @@ def do_country_list():
     for leftover in set_countries:
         countries[leftover] = 'Zone_0'             
     
+    for zone, countries_in_zone in db_model['Zone'].items():
+        for country in countries_in_zone:
+            if country not in countries:
+                countries[country] = zone
+    
     db_model['Country'] = {k: countries[k] for k in sorted(countries)}
 
 
@@ -125,6 +130,7 @@ for name in my_lst:
         continue
        
     dataframe, attr = read_excel_to_json(MODELS_DIR + name + '.xlsx')
+
     # print(f'hellomyniger {attr} : {name}')
     ptr_model = locals()[name]
     

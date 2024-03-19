@@ -7,8 +7,6 @@ from db_write import db_write_all
 
 def models_in_globals():
     global_symbols = globals()
-
-    
     defined_classes = [value for key, value in global_symbols.items() if isinstance(value, type) and key != 'BaseModel']
     class_names = [class_obj.__name__ for class_obj in defined_classes]
 
@@ -19,7 +17,3 @@ def models_in_globals():
 
 db_write_all()
 
-# w = db_model['Warehouse']
-# for i in w:
-#     print(f'Warehouse Name: {i}')
-    

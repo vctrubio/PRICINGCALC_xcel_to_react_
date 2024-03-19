@@ -8,7 +8,7 @@ from models import Vendor, SKU, PSKU, Warehouse, ProductTag, PackagingWarehouse,
 from db import db_model
 from db_write import db_write_all
 from calculation import calculate, parse_total_cost, calculate_options
-from run import server_manager
+from init import server_manager
 
 app = FastAPI()
 
@@ -19,6 +19,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 class WarehouseConfigParams(BaseModel):
     key: Optional[str] = None
     value: Optional[List[str]] = None
@@ -128,8 +129,6 @@ async def get_sku(name_id: str):
 
 @app.post("/sku")
 async def create_sku(sku: SKU):
-    print('post to sku')
-    print(sku)
     if sku.name_id in db_model['SKU']:
         raise HTTPException(status_code=402, detail="SKU already exists")
     if sku.vendor_id not in db_model['Vendor']:

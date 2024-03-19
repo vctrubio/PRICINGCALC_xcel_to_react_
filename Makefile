@@ -4,7 +4,7 @@ env:
 	source backend/venv_python/bin/activate
 
 back:
-	cd backend && python3 run.py
+	cd backend && python3 init.py
 	# cd backend && uvicorn main:app --reload 
 
 front:

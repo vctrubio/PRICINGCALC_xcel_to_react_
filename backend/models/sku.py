@@ -4,7 +4,6 @@ from .producttag import ProductTag
 from typing import Optional, List
 import json
 
-
 class SKU(BaseModel): 
     name_id: str
     vendor_id: str
