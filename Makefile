@@ -16,6 +16,13 @@ debug:
 kill8000:
 	kill -9 $(lsof -t -i:8000)
 
+install:
+	pip install -r backend/requirements.txt
+
+
+
+
+
 #DOCKER
 start: build run
 
