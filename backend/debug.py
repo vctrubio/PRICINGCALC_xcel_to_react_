@@ -1,5 +1,5 @@
+import os
 from data_imports.get_data import *
-
 from db import db_model
 from models import *
 from calculation import calculate, parse_total_cost, calculate_options
@@ -15,5 +15,8 @@ def models_in_globals():
         
     return class_names
 
-db_write_all()
+#db_write_all()
 
+if __name__ == '__main__':
+    file_dir = os.path.dirname(os.path.abspath(__file__))
+    print(file_dir)

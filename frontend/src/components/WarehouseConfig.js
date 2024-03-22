@@ -10,12 +10,6 @@ import { SearchBar } from './SearchBar';
 
 export const GridWarehouseConfig = () => {
     const [rowData, setRowData] = useState({})
-    // const colData = {
-    //     'Warehouse',
-    //     'Origin',
-    //     'Countries',
-    //     'Shipping'
-    // }
 
     useEffect(() => {
         const fetchData = async () => {
@@ -24,9 +18,6 @@ export const GridWarehouseConfig = () => {
         }
         fetchData();
     }, []);
-
-
-    window.tra = rowData
 
     return (
         <div style={{ color: 'white',  border: '1px solid black'}}>

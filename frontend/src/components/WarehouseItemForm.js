@@ -4,7 +4,7 @@ import { useSkuForm } from './CskuForm';
 
 
 export const WarehouseItemForm = ({ whItem, setWhItem, index, onRemove, usableCDs }) => {
-    const { isFormValidated, setIsFormValidated, mySku, vendorData, isLoadingVendors, validateForm, productTag, setProductTag } = useSkuForm();
+    const { productTag } = useSkuForm();
 
     const [showInput, setShowInput] = useState(false);
     const [newPtColor, setNewPtColor] = useState(false);
@@ -20,9 +20,6 @@ export const WarehouseItemForm = ({ whItem, setWhItem, index, onRemove, usableCD
         whItem.product_tag = productTagItem;
     }, [whItem.product_tag]);
 
-
-    window.pp0 = whItem.product_tag
-
     useEffect(() => {
         let total = (parseFloat(whItem.unit_fee) || 0) + (parseFloat(whItem.storage_fee) || 0) + (parseFloat(whItem.pick_and_pack_fee) || 0) + (parseFloat(whItem.custom_fee) || 0);
         setCalc(total)
@@ -33,7 +30,6 @@ export const WarehouseItemForm = ({ whItem, setWhItem, index, onRemove, usableCD
         setWhItem(prevData => prevData.map((item, i) => i === index ? { ...item, [name]: name !== 'product_tag' ? Number(value) : value } : item));
 
     };
-
 
     const handlePT = (tag) => () => {
         localStorage.setItem('productTagItem', tag);
@@ -49,9 +45,6 @@ export const WarehouseItemForm = ({ whItem, setWhItem, index, onRemove, usableCD
         else
             setNewPtColor(false)
     };
-
-    window.l = localStorage.getItem('productTagItem')
-    window.debug = productPtr
 
     return (
         <form onSubmit={(event) => {
@@ -138,12 +131,6 @@ export const WarehouseItemForm = ({ whItem, setWhItem, index, onRemove, usableCD
                 </Col>
                 <Col md={1}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', height: 38, marginLeft: 0 }}>
-                        <Button variant='secondary'
-                            style={{ paddingTop: 0, backgroundColor: 'rgba(0, 128, 0, 0.3)', color: 'rgba(144, 238, 144, 0.6)' }}
-                        >
-                            {calc}
-                        </Button>
-
                         <Button
                             variant="dark"
                             onClick={onRemove}

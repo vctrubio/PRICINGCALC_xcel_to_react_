@@ -167,14 +167,11 @@ const LastMileGrid = () => {
         event.node.setSelected(!event.node.isSelected());
     };
 
-
-    //dropdown to show type.... 
-
     return (
         <div className="ag-theme-quartz-dark" style={{ height: 800, width: 1270 }}>
             <SearchBar title='Last Mile' titlecount={null} search={search} setSearch={setSearch} data={rowData} setData={setRowData} selectedRows={selectedRows} setRerender={null} />
-
-            {/* <div className='d-flex flex-start pb-2'>
+{/* 
+            <div className='d-flex flex-start pb-2'>
                 <Dropdown>
                     <Dropdown.Toggle variant="light" id="dropdown-basic" className="align-items-baseline" style={{ width: '256px', height: '38px', textDecoration: 'none', fontSize: 18, textAlign: 'left' }}>
                         {selectedWarehouse ? `${selectedWarehouse.name_id}` : 'Select Warehouse'}
@@ -189,8 +186,8 @@ const LastMileGrid = () => {
                         ))}
                     </Dropdown.Menu>
                 </Dropdown>
-            </div> */}
-            <h4>dropdown courier dropdown type</h4>
+            </div>
+             */}
             <AgGridReact
                 onGridReady={onGridReady}
                 columnDefs={colData}
@@ -206,19 +203,3 @@ const LastMileGrid = () => {
 }
 
 export default LastMileGrid;
-
-
-/*
-    const warehouses = [
-        { name_id: 'SwiftStore Warehousing', origin: 'Spain' },
-        { name_id: 'Atlas Logistics Center', origin: 'France' },
-        { name_id: 'Evergreen Distribution Hub', origin: 'Germany' },
-        { name_id: 'Apex Fulfillment Services', origin: 'China' },
-        { name_id: 'Horizon Storage Solutions', origin: 'California' }
-    ];
-
-    const handleSelect = (warehouse) => {
-        console.log('warehouse: ', JSON.stringify(warehouse));
-        setSelectedWarehouse(warehouse);
-    };
-*/

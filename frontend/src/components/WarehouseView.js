@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import axios from 'axios'
 import { AgGridReact } from 'ag-grid-react'
 import 'ag-grid-community/styles/ag-grid.css'
@@ -17,9 +17,9 @@ async function getData(model) {
     }
 }
 
-
 const GridWarehouse = () => {
     const [gridApi, setGridApi] = useState(null);
+    const [gridKey] = useState(1);
     const [rerender, setRerender] = useState(false)
     const [selectedRows, setSelectedRows] = useState([]);
     const [search, setSearch] = useState('');
@@ -44,9 +44,16 @@ const GridWarehouse = () => {
     )
 
     const updateWhData = (data) => {
-        setRowData(prevRowData => [...prevRowData, data]);
-    };
+        setRowData(prevRowData => {
+            const index = prevRowData.findIndex(item => item.name_id === data.name_id && item.product_tag === data.product_tag);
 
+            if (index !== -1) {
+                return prevRowData.map((item, i) => i === index ? data : item);
+            } else {
+                return prevRowData.concat(data);
+            }
+        });
+    };
 
     useEffect(() => {
         getData('warehouse').then(data => {
@@ -83,10 +90,9 @@ const GridWarehouse = () => {
                     return;
                 }
             }
-            const response = await axios.patch(`http://localhost:8000/warehouse/${event.data.name_id}/${event.data.product_tag}`, event.data);
+            await axios.patch(`http://localhost:8000/warehouse/${event.data.name_id}/${event.data.product_tag}`, event.data);
         } catch (error) {
-            console.error('Error updating Warehouse data:', error);
-            // Handle error appropriately (e.g., display a message)
+            console.error('Error:', error);
         }
     }
 
@@ -94,7 +100,7 @@ const GridWarehouse = () => {
         setGridApi(params.api);
     };
 
-    const onSelectionChanged = (param) => {
+    const onSelectionChanged = () => {
         setSelectedRows(gridApi.getSelectedRows());
     };
 
@@ -102,14 +108,15 @@ const GridWarehouse = () => {
         event.node.setSelected(!event.node.isSelected());
     };
 
-
     return (
         <div className="ag-theme-quartz-dark" style={{ height: '70vh', width: 1270 }}>
             <SearchBar title='Warehouse' titlecount={rowData.length} search={search} setSearch={setSearch} data={rowData} setData={setRowData} selectedRows={selectedRows} setRerender={setRerender} />
             <AgGridReact
+                key={gridKey}
+                onGridReady={onGridReady}
                 columnDefs={colData}
-                defaultColDef={{ flex: 1, filter: true, sortable: true, floatingFilter: true}}              
-                  rowData={rowData}
+                rowData={rowData}
+                defaultColDef={{ flex: 1, filter: true, sortable: true, floatingFilter: true }}
                 onCellValueChanged={handleCellValueChanged}
                 onSelectionChanged={onSelectionChanged}
                 onRowClicked={onRowClicked}

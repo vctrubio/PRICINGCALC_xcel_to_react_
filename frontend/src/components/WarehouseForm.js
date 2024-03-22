@@ -39,13 +39,11 @@ export const useWarehouseData = () => {
     return [allWh, setAllWh];
 };
 const WarehouseForm = ({ addWh }) => {
-    const { getData, productTag } = useSkuForm();
     const [whId, setWhId] = useState([]);
     const [allWh, setAllWh] = useWarehouseData();
 
 
     const [showInputId, setShowInputId] = useState(false);
-    const [showInputOrigin, setShowInputOrigin] = useState(false);
     const [approvedWh, setApprovedWh] = useState(false);
     const [newWhColor, setNewWhColor] = useState(false);
     const [newOriginColor, setNewOriginColor] = useState(false);
@@ -58,8 +56,10 @@ const WarehouseForm = ({ addWh }) => {
     });
 
     window.pick = allWh
-
-
+    window.color = newOriginColor
+    window.wh = whIdentity;
+    window.all = whData;
+    window.ids = whId
 
     useEffect(() => {
         if (whIdentity.name_id)
@@ -94,15 +94,6 @@ const WarehouseForm = ({ addWh }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
-        // if (whId[whIdentity.name_id] !== whIdentity.origin && whId[whIdentity.name_id]) {
-        //     setShowSuccessMessage(true);
-        //     setTimeout(() => {
-        //         setShowSuccessMessage(false);
-        //     }, 3000);
-        //     return
-        // }
-
         try {
             const do_response = async (form) => {
                 const response = await axios.post('http://localhost:8000/warehouse', form);
@@ -138,26 +129,13 @@ const WarehouseForm = ({ addWh }) => {
             let targetExists = Object.keys(allWh).includes(value);
 
             if (targetExists) {
-                // console.log('targetExistsme: .....', targetExists)
                 setNewWhColor(false);
             }
             else {
-                console.log('.. ', Object.keys(allWh).includes(value))
                 setNewWhColor(true)
             }
         }
-
-
-        else if (name === 'origin_id') {
-            const found = Object.values(allWh[whIdentity.name_id]).some(nestedDict => nestedDict.origin === value);
-            setNewOriginColor(found);
-        }
     }
-
-    window.color = newOriginColor
-    window.wh = whIdentity;
-    window.all = whData;
-    window.ids = whId
 
     const handleDropDownChange = (e) => {
         const { name, value } = e.target;
@@ -165,11 +143,8 @@ const WarehouseForm = ({ addWh }) => {
             setWhIdentity({ ...whIdentity, name_id: value });
             localStorage.setItem('ptrWhNameId', JSON.stringify(value));
         }
-        if (name === 'origin_id') {
-            setWhIdentity({ ...whIdentity, origin: value });
-        }
-    };
 
+    };
 
     return (
         <div className="mt-2 border rounded-top border-secondary p-2">
@@ -185,7 +160,6 @@ const WarehouseForm = ({ addWh }) => {
                             <div className='d-flex justify-content-around mb-2'>
                                 <div className='' style={{ marginRight: 8 }}>
                                     <h6 style={{ textAlign: 'left' }}>Warehouse ID</h6>
-
                                     <ButtonGroup style={{ width: '300px', height: '40px', paddingBottom: 2 }}>
                                         {!showInputId && (
 
@@ -215,76 +189,20 @@ const WarehouseForm = ({ addWh }) => {
                                                 style={{ width: '280px', border: !newWhColor ? '' : '2px solid orange' }}
                                             />
                                         )}
-                                        <Button onClick={() => setShowInputId(!showInputId)}>^</Button>
+                                        {/* <Button onClick={() => setShowInputId(!showInputId)}>^</Button> */}
                                     </ButtonGroup>
-
                                 </div>
-
-                                {
-                                    whIdentity.name_id && (
-
-                                        <div className='' style={{ marginRight: 8 }}>
-                                            <h6 style={{ textAlign: 'left' }}>Origin</h6>
-                                            <ButtonGroup style={{ width: '250px', height: '40px', paddingBottom: 2 }}>
-                                                {!showInputOrigin && (
-                                                    <Dropdown >
-                                                        <Dropdown.Toggle variant="light" id="dropdown-basic" className="align-items-baseline" style={{ width: '206px', height: '38px', textDecoration: 'none', fontSize: 18, textAlign: 'left' }}>
-
-                                                            {whIdentity.origin}
-                                                        </Dropdown.Toggle>
-
-                                                        <Dropdown.Menu className="align-dropdown-right">
-                                                            {Object.keys(allWh).map((key, index) => {
-                                                                if (key === whIdentity.name_id) {
-                                                                    const innerKeys = Object.keys(allWh[key]);
-                                                                    const uniqueOrigins = [...new Set(innerKeys.map(innerKey => allWh[key][innerKey].origin))];
-                                                                    return uniqueOrigins.map((origin, originIndex) => (
-                                                                        <Dropdown.Item key={originIndex}
-                                                                            onClick={() => setWhIdentity({ ...whIdentity, origin: origin })}
-                                                                        >
-                                                                            <div className="text-center">{origin}</div>
-                                                                        </Dropdown.Item>
-                                                                    ));
-                                                                }
-                                                                return null;
-                                                            })}
-                                                        </Dropdown.Menu>
-                                                    </Dropdown>
-                                                )}
-
-                                                {showInputOrigin && (
-                                                    <Form.Control
-                                                        type="text"
-                                                        name="origin_id"
-                                                        onChange={handleDropDownChange}
-                                                        onBlur={handleDropDownBlur}
-                                                        placeholder="Origin"
-                                                        style={{ width: '280px', border: newOriginColor ? '' : '2px solid orange' }}
-                                                    />
-                                                )}
-                                                <Button onClick={() => setShowInputOrigin(!showInputOrigin)}>^</Button>
-                                            </ButtonGroup>
-
-                                        </div>
-                                    )
-                                }
-
-
-
                             </div>
 
                             <div className='pt-3'>
-
                                 {whData.length > 0 && (
                                     <Button variant="dark" className="me-3" onClick={setEmptywhData}>
                                         <i className="bi bi-trash"></i>
                                     </Button>
                                 )}
-                                {approvedWh && (
-                                    <Button variant="secondary" className="me-3" onClick={handleAddWhData}>
-                                        Add Fees
-                                    </Button>
-                                )}
+                                <Button variant="secondary" className="me-3" onClick={handleAddWhData}>
+                                    Add Fees
+                                </Button>
                                 <Button variant="primary" type="submit" onClick={handleSubmit}>
                                     Submit
                                 </Button>

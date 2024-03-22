@@ -5,13 +5,10 @@ import 'ag-grid-community/styles/ag-theme-quartz.css'
 import '../AppGrid.css';
 
 import axios from 'axios'
-import { getData, useSkuForm } from './CskuForm';
-import { SkuForm } from './SkuForm';
-import { Form, Button } from 'react-bootstrap';
+import { getData} from './CskuForm';
 import { SearchBar } from './SearchBar';
 
 const PaymentProcessingCard = () => {
-    const [gridApi, setGridApi] = useState(null);
     const [selectedRows, setSelectedRows] = useState([]);
     const [rerender, setRerender] = useState(false);
     const [rowData, setRowData] = useState([]);
@@ -27,14 +24,12 @@ const PaymentProcessingCard = () => {
         });
     }, []);
 
-    window.ppc = rowData
-
     const handleChangeCell = async (event) => {
         try {
             for (let key in event.data) {
                 if (event.data[key] === undefined || event.data[key] === null) {
                     console.error(`Error: ${key} is empty`);
-                    return;  // Exit the function if an empty field is found
+                    return;
                 }
             }
             const response = await axios.patch(`http://localhost:8000/paymentprocessingcard/${event.data.name_id}`, event.data);
@@ -48,7 +43,7 @@ const PaymentProcessingCard = () => {
             <SearchBar title='PaymentProcessingCard' titlecount={rowData.length} search={null} setSearch={null} data={rowData} setData={setRowData} selectedRows={selectedRows} setRerender={setRerender}></SearchBar>
             <AgGridReact
                 columnDefs={colData}
-                defaultColDef={{ flex: 1 }}
+                defaultColDef={{ flex: 1, filter: true, sortable: true, floatingFilter: true}}
                 rowData={rowData}
                 onCellValueChanged={handleChangeCell}
             >
@@ -59,7 +54,6 @@ const PaymentProcessingCard = () => {
 
 
 const PaymentProcessingCountry = () => {
-    const [gridApi, setGridApi] = useState(null);
     const [selectedRows, setSelectedRows] = useState([]);
     const [rerender, setRerender] = useState(false);
     const [rowData, setRowData] = useState([]);
@@ -75,14 +69,12 @@ const PaymentProcessingCountry = () => {
         });
     }, []);
 
-    window.ppc = rowData
-
     const handleChangeCell = async (event) => {
         try {
             for (let key in event.data) {
                 if (event.data[key] === undefined || event.data[key] === null) {
                     console.error(`Error: ${key} is empty`);
-                    return;  // Exit the function if an empty field is found
+                    return;
                 }
             }
             const response = await axios.patch(`http://localhost:8000/paymentprocessingcountry/${event.data.name_id}`, event.data);
@@ -96,8 +88,9 @@ const PaymentProcessingCountry = () => {
             <SearchBar title='PaymentProcessingCountry' titlecount={rowData.length} search={null} setSearch={null} data={rowData} setData={setRowData} selectedRows={selectedRows} setRerender={setRerender}></SearchBar>
             <AgGridReact
                 columnDefs={colData}
-                defaultColDef={{ flex: 1 }}
+                defaultColDef={{ flex: 1, filter: true, sortable: true, floatingFilter: true}}
                 rowData={rowData}
+                editable
                 onCellValueChanged={handleChangeCell}
             >
             </AgGridReact>
@@ -106,7 +99,6 @@ const PaymentProcessingCountry = () => {
 }
 
 const PaymentDf = () => {
-    const [gridApi, setGridApi] = useState(null);
     const [selectedRows, setSelectedRows] = useState([]);
     const [rowData, setRowData] = useState([]);
     const [colData, setColData] = useState([]);
@@ -135,7 +127,7 @@ const PaymentDf = () => {
             ptrCol.map((col) => ({
                 headerName: col,
                 field: col,
-                editable: col != 'Country',
+                editable: col !== 'Country',
                 minWidth: 50,
             }))
         );
@@ -156,16 +148,14 @@ const PaymentDf = () => {
 
     const handleChangeCell = async (event) => {
         const { data, colDef, newValue } = event;
-        const countryId = data['Country']; // Assuming 'Country' is the key for country names
+        const countryId = data['Country'];
 
-        // Make API call to update the specific cell value
         const apiUrl = `http://localhost:8000/paymentpopcountry/${countryId}`;
         const payload = { [colDef.field]: newValue };
 
         axios.patch(apiUrl, payload)
             .catch(error => console.error(error));
     };
-
 
     return (
         <div style={{ height: 420, width: 1270, marginBottom: 100 }}>
@@ -179,13 +169,10 @@ const PaymentDf = () => {
             </AgGridReact>
         </div>
     )
-
-
 }
 
 
 export const Payments = () => {
-
     return (
         <div className='ag-theme-quartz-dark'>
             <PaymentProcessingCountry />

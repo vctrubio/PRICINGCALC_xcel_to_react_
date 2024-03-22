@@ -13,7 +13,6 @@ async function getData(model) {
     try {
         const response = await axios.get(`http://localhost:8000/${model}`);
         const dataArray = Object.values(response.data);
-        window.ptr = dataArray;
         return dataArray;
     } catch (error) {
         console.error('There was a BIGFAT error!', error);
@@ -98,7 +97,6 @@ const GridVendor = () => {
         event.node.setSelected(!event.node.isSelected());
     };
 
-    window.trow = selectedRows
     return (
         <div className="ag-theme-quartz-dark" style={{ height: '70vh', width: 1270 }}>
             <SearchBar title='Vendor' titlecount={rowData.length} search={search} setSearch={setSearch} data={rowData} setData={setRowData} selectedRows={selectedRows} setRerender={setRerender} />

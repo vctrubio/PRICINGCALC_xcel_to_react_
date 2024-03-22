@@ -1,4 +1,5 @@
 import os
+import signal
 from typing import List, Optional
 from pydantic import BaseModel
 from fastapi import FastAPI, HTTPException, File, UploadFile, UploadFile, Form, Body
@@ -8,7 +9,7 @@ from models import Vendor, SKU, PSKU, Warehouse, ProductTag, PackagingWarehouse,
 from db import db_model
 from db_write import db_write_all
 from calculation import calculate, parse_total_cost, calculate_options
-from init import server_manager
+from init import stop
 
 app = FastAPI()
 
@@ -31,8 +32,7 @@ async def get_disposable_models():
 
 @app.get("/exit")
 async def exit():
-    server_manager.print_pid()
-    print('hellofinish')
+    await stop()
     return {"message": "Exiting..."}
 
 @app.get("/save")

@@ -15,6 +15,18 @@
   --pillred: #E13424;
 }
 
+.footer-name{
+  position: fixed;
+  bottom: 0;
+  margin-left: 30px;
+  margin-bottom: 4px;
+  font-family: Monaco;
+  font-size: 10px;
+  color: white;
+  z-index: 10;
+  cursor: none;
+}
+
 .carglass {
   width: 100%;
 }
@@ -68,7 +80,8 @@
   opacity: 0.9;
 }
 
-.boxing-item, .boxing-item-grey {
+.boxing-item,
+.boxing-item-grey {
   grid-column: span 10;
   cursor: pointer;
   padding-left: 5px;
@@ -283,7 +296,8 @@
   width: 250px;
   background-color: #333;
   color: #fff;
-  padding: 30px;
+  padding: 28px;
+  padding-top: 0px;
 
   display: flex;
   flex-direction: column;
@@ -298,13 +312,30 @@
   }
 
   >*:hover {
-    color: #ffcc00;
+    color: var(--pillred);
+    opacity: 0.9;
     /* Change color on hover */
     transform: scale(1.2);
     /* Grow on hover */
   }
 }
 
+.sex-call {
+  background-image: url('../public/smd.png');
+  background-size: cover;
+  background-position: center;
+  height: 185px;
+  transition: transform 0.5s ease;
+  margin: 0 !important;
+}
+
+
+.hov-blue:hover {
+  color: var(--pillblue);
+  /* Change color on hover */
+  transform: scale(1.2);
+  /* Grow on hover */
+}
 
 .sku-input {
   display: flex;
