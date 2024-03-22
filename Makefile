@@ -18,10 +18,7 @@ kill8000:
 
 install:
 	pip install -r backend/requirements.txt
-
-
-
-
+	yarn install
 
 #DOCKER
 start: build run
