@@ -9,7 +9,6 @@ import Alert from '@mui/material/Alert';
 import { SearchBar } from './SearchBar'
 import { getData } from './CskuForm'
 import { Button } from 'react-bootstrap'
-import { GridWarehouseConfig } from './WarehouseConfig'
 
 
 export function toTitleCase(str) {
@@ -122,7 +121,6 @@ export const ProductTag = () => {
                     </div>
                     <div className='d-flex flex-start'>
                     </div>
-                    <GridWarehouseConfig />
                 </main>
 
                 <div className='row'>

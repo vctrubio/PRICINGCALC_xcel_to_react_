@@ -145,7 +145,7 @@ const CustomSearchBar = ({ title }) => {
             <h1 style={{ fontFamily: 'Roboto', paddingTop: 16, textAlign: 'left' }} >
                 {title}
             </h1>
-            <div style={{ paddingTop: 22 }}>
+            {/* <div style={{ paddingTop: 22 }}>
                 <button className="btn btn-dark"
                     style={{ marginLeft: '10px', fontSize: '20px', textAlign: 'center' }}
                     title={`Upload: '${title}'`}
@@ -160,7 +160,7 @@ const CustomSearchBar = ({ title }) => {
                 >
                     <i className="bi bi-cloud-download"></i>
                 </button>
-            </div>
+            </div> */}
         </div>
     )
 }
