@@ -6,7 +6,6 @@ import axios from 'axios';
 
 export const WhItem =
 {
-    product_tag: '',
     unit_fee: '',
     storage_fee: '',
     pick_and_pack_fee: '',

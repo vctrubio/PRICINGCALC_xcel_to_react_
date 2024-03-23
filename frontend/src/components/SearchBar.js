@@ -7,9 +7,26 @@ import axios from 'axios';
 export const SearchBar = ({ title, titlecount, data, setData, search, setSearch, selectedRows, setRerender }) => {
     const deleteSelectedRows = async () => {
         try {
-            const lowerCaseTitle = title.toLowerCase();
-            const promises = selectedRows.map(row => axios.delete(`http://localhost:8000/${lowerCaseTitle}/${row.name_id}`));
-            await Promise.all(promises);
+            const onlyWh = async () => {
+                const promises = selectedRows.map(row => {
+                    return axios.delete(`http://localhost:8000/${row.name_id}/${row.product_tag}`);
+                });
+                await Promise.all(promises);
+            }
+
+            const onlyAll = async () => {
+                const lowerCaseTitle = title.toLowerCase();
+                const promises = selectedRows.map(row => {
+                    return axios.delete(`http://localhost:8000/${lowerCaseTitle}/${row.name_id}`);
+                });
+                await Promise.all(promises);
+            }
+
+            if (title=== 'Warehouse') {
+                await onlyWh();
+            } else 
+                await onlyAll();
+
             const newData = data.filter(d => !selectedRows.some(row => row.name_id === d.name_id));
             setData(newData);
         } catch (error) {

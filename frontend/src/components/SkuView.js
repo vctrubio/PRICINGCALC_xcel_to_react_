@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import axios from 'axios'
 import { AgGridReact } from 'ag-grid-react'
 import 'ag-grid-community/styles/ag-grid.css'
@@ -38,7 +38,10 @@ const GridSku = () => {
             { headerName: 'Weight KG', field: 'weight_kg', editable: true, width: 110 },
             { headerName: 'PP Supplier', field: '_pp_supplier', width: 120, valueFormatter: params => `${parseFloat(params.value).toFixed(2)}` },
             { headerName: 'Exchange Fee', field: '_exchange_fee', width: 120, valueFormatter: params => `${parseFloat(params.value).toFixed(2)}` },
-            { headerName: 'Total', field: '_total_cost', width: 150, valueFormatter: params => `${parseFloat(params.value).toFixed(2)}` },
+            {
+                headerName: 'Total', field: '_total_cost', width: 150, valueFormatter: params => `${parseFloat(params.value).toFixed(2)}`,
+                cellRenderer: 'agAnimateShowChangeCellRenderer'
+            },
         ]
     )
 
@@ -58,7 +61,10 @@ const GridSku = () => {
         });
     }, []);
 
-    window.row = rowData
+    const getrowId = useCallback(params => {
+        return params.data.name_id
+    })
+
     const handleCellValueChanged = async (event) => {
         try {
             for (let key in event.data) {
@@ -69,8 +75,8 @@ const GridSku = () => {
             }
             const response = await axios.patch(`http://localhost:8000/sku/${event.data.name_id}`, event.data);
             setRowData(prevData => {
-                const newData = [...prevData]; // create a copy of the array
-                newData[event.rowIndex] = response.data.object; // replace the element at event.rowIndex
+                const newData = [...prevData];
+                newData[event.rowIndex] = response.data.object;
                 return newData;
             })
 
@@ -78,10 +84,6 @@ const GridSku = () => {
             console.error('Error updating SKU data:', error);
         }
     }
-
-    const getrowId = useCallback(params => {
-        return params.data.name_id
-    })
 
     const onGridReady = params => {
         setGridApi(params.api);
@@ -99,10 +101,9 @@ const GridSku = () => {
     return (
         <div className="ag-theme-quartz-dark" style={{ height: '68vh', width: 1270 }}>
 
-            <SearchBar title='SKU' titlecount={rowData.length} search={search} setSearch={setSearch} data={rowData}  setData={setRowData} selectedRows={selectedRows} setRerender={setRerender}/>
+            <SearchBar title='SKU' titlecount={rowData.length} search={search} setSearch={setSearch} data={rowData} setData={setRowData} selectedRows={selectedRows} setRerender={setRerender} />
             <AgGridReact
                 onGridReady={onGridReady}
-                enableCellChangeFlash={true}
                 columnDefs={colData}
                 defaultColDef={{ flex: 1, filter: true, sortable: true, floatingFilter: true }} rowData={rowData}
                 onCellValueChanged={handleCellValueChanged}

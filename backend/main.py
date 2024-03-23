@@ -89,7 +89,7 @@ async def root(name_id: str):
 async def update_vendor(vendor: Vendor):
     print(f'patching vendor {vendor}')
     if vendor.name_id in db_model['Vendor']:
-        db_model['Vendor'][vendor.name_id] = vendor  # update the vendor
+        db_model['Vendor'][vendor.name_id] = vendor
         return {"message": "Vendor updated successfully", "vendor": vendor}
     raise HTTPException(status_code=404, detail="Vendor not found")
 
@@ -141,6 +141,14 @@ async def create_sku(sku: SKU):
         return {"message": "SKU created successfully"}
     except Exception as e:
         raise HTTPException(status_code=422, detail=str(e))
+
+@app.delete("/sku/{name_id}")
+async def delete_sku(name_id: str):
+    if name_id in db_model['SKU']:
+        del db_model['SKU'][name_id]
+        return {"message": "SKU deleted successfully"}
+    else:
+        raise HTTPException(status_code=404, detail="SKU not found")
 
 '''PSKU'''
 @app.get("/psku")
@@ -227,6 +235,17 @@ async def update_warehouse(warehouse: Warehouse):
         db_model['Warehouse'][warehouse.name_id][warehouse.product_tag] = warehouse
         return {"message": "Warehouse updated successfully"}
     raise HTTPException(status_code=404, detail="Warehouse not found")
+
+@app.delete("/warehouse/{name_id}/")
+async def delete(warehouse: Warehouse):
+    print('warehouse. ', warehouse)
+    if warehouse.name_id in db_model['Warehouse'] and warehouse.product_tag in db_model['Warehouse'][warehouse.name_id]:
+        del db_model['Warehouse'][warehouse.name_id][warehouse.product_tag]
+        print('succ')
+        return {'message': 'that was good'}
+    else:
+        print('no sex o')
+    raise HTTPException(status_code=404, detail="Warehouse Product not found")
 
 '''PackagingVendor and PackagingWarehouse'''
 @app.get("/packagingvendor")
