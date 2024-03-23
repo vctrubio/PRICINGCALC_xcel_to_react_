@@ -15,8 +15,6 @@ const GridPackaging = () => {
     const [gridApi2, setGridApi2] = useState(null);
     const [selectedRows, setSelectedRows] = useState([]);
     const [selectedRows2, setSelectedRows2] = useState([]);
-    const [rerender, setRerender] = useState(false);
-    const [rerender2, setRerender2] = useState(false);
     const [rowData, setRowData] = useState([])
     const [rowData2, setRowData2] = useState([])
     const [colData, setColData] = useState(
@@ -31,10 +29,10 @@ const GridPackaging = () => {
             { headerName: 'Cost of Packaging Fee', field: 'cost_of_packaging', editable: true, width: 200 },
         ]
     )
-    const [colData2, setColData2] = useState(
+    const [colData2] = useState(
         [
             {
-                headerName: 'Product Tag', field: 'product_tag', width: 150,
+                headerName: 'Product Tag', field: 'name_id', width: 150,
                 checkboxSelection: true,
                 headerCheckboxSelection: true,
                 headerCheckboxSelectionFilteredOnly: true
@@ -143,6 +141,18 @@ const GridPackaging = () => {
         }
     }
 
+    const onGridReady = params => {
+        setGridApi(params.api);
+    };
+
+    const onSelectionChanged = (param) => {
+        setSelectedRows(gridApi.getSelectedRows());
+    };
+
+    const onRowClicked = (event) => {
+        event.node.setSelected(!event.node.isSelected());
+    };
+
     const handleCellValueChangedVendor = async (event) => {
         try {
             for (let key in event.data) {
@@ -173,43 +183,32 @@ const GridPackaging = () => {
         }
     }
 
-    const onGridReady = params => {
-        setGridApi(params.api);
-    };
-
-    const onSelectionChanged = (param) => {
-        setSelectedRows(gridApi.getSelectedRows());
-    };
-
-    const onRowClicked = (event) => {
-        event.node.setSelected(!event.node.isSelected());
-    };
-
     const onGridReady2 = params => {
         setGridApi2(params.api);
     };
 
     const onSelectionChanged2 = (param) => {
-        setSelectedRows2(gridApi.getSelectedRows());
+        setSelectedRows2(gridApi2.getSelectedRows());
     };
 
     const onRowClicked2 = (event) => {
         event.node.setSelected(!event.node.isSelected());
     };
 
+    const getrowId = (params) => {
+        return params.data.name_id
+    }
 
     return (
         <div className='mt-3 d-flex' style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
-
-            
-
             <div className="ag-theme-quartz-dark" style={{ height: 700, width: 1270, textAlign: 'left' }}>
-                <SearchBar title='PackagingWarehouse' titlecount={rowData2.length} search={''} setSearch={''} data={rowData2} setData={rowData2} selectedRows={selectedRows2} setRerender={setRerender2} />
+                <SearchBar title='PackagingWarehouse' titlecount={rowData2.length} data={rowData2} setData={setRowData2} selectedRows={selectedRows2}/>
                 <AgGridReact
                     onGridReady={onGridReady2}
                     columnDefs={colData2}
-                    defaultColDef={{ flex: 1, filter: true, sortable: true, floatingFilter: true }}
+                    getRowId={getrowId}
                     rowData={rowData2}
+                    defaultColDef={{ flex: 1, filter: true, sortable: true, floatingFilter: true }}
                     onCellValueChanged={handleCellValueChangedWarehouse}
                     onSelectionChanged={onSelectionChanged2}
                     onRowClicked={onRowClicked2}
@@ -263,7 +262,6 @@ const GridPackaging = () => {
             </div>
         </div>
     )
-
 }
 
 export default GridPackaging;

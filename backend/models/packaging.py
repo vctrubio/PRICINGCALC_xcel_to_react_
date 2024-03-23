@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 
 class PackagingWarehouse(BaseModel):
-    product_tag: str # link to product tag
+    name_id: str # link to product tag
     cost_of_packaging: float
     
 class PackagingVendor(BaseModel):

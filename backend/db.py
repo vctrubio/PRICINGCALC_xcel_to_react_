@@ -160,17 +160,16 @@ for name in my_lst:
                     if name_id not in db_model[name]:
                         db_model[name][name_id] = {}
                     db_model[name][name_id][key] = values
-            
+                elif name == 'PackagingWarehouse':
+                    db_model[name].append(instance)
                 else:
                     db_model[name][instance.name_id] = instance
-                    
+                
             elif hasattr(instance, 'int_id'):
                 db_model[name][instance.int_id] = instance
             
             else:
                 if name == 'PackagingVendor':
-                    db_model[name].append(instance)
-                if name == 'PackagingWarehouse':
                     db_model[name].append(instance)
 
 

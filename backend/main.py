@@ -238,14 +238,9 @@ async def update_warehouse(warehouse: Warehouse):
 
 @app.delete("/warehouse/{name_id}/{product_tag}")
 async def delete(name_id: str, product_tag: str):
-    # print(f'patching warehouse {name_id} and {product_tag}')
-    
     if name_id in db_model['Warehouse'] and product_tag in db_model['Warehouse'][name_id]:
         del db_model['Warehouse'][name_id][product_tag]
-        print('succ')
         return {'message': 'that was good'}
-    else:
-        print('no sex o')
     raise HTTPException(status_code=404, detail="Warehouse Product not found")
 
 '''PackagingVendor and PackagingWarehouse'''
@@ -296,6 +291,14 @@ async def update_packagingwarehouse(packaging: PackagingWarehouse):
         if list.product_tag == packaging.product_tag:
             list.cost_of_packaging = packaging.cost_of_packaging
             return {"message": "PackagingWarehouse updated successfully"}
+    raise HTTPException(status_code=404, detail="PackagingWarehouse not found")
+
+@app.delete("/packagingwarehouse/{name_id}")
+async def delete_packagingwarehouse(name_id: str):
+    for list in db_model['PackagingWarehouse']:
+        if list.name_id == name_id:
+            db_model['PackagingWarehouse'].remove(list)
+            return {"message": "PackagingWarehouse deleted successfully"}
     raise HTTPException(status_code=404, detail="PackagingWarehouse not found")
 
 '''ProductTag'''
