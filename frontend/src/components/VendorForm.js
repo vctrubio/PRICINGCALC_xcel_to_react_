@@ -39,12 +39,12 @@ const VendorForm = ({ addVendor, rowData }) => {
         event.preventDefault();
 
         const newMissingFields = Object.keys(vendorData).filter(key => !vendorData[key]);
-        setMissingFields(newMissingFields);
+        // setMissingFields(newMissingFields);
 
-        if (newMissingFields.length > 0) { // Form has missing values
+        if (newMissingFields.length > 0) {
             setMissingFields(newMissingFields);
-            setIsFormValidated(true); // Display validation styles
-            return; // Don't submit when there are missing fields
+            setIsFormValidated(true);
+            return;
         }
 
         setIsFormValidated(true); // Show success styles if needed //but this is all BS, we qare not using it 
@@ -87,7 +87,6 @@ const VendorForm = ({ addVendor, rowData }) => {
                                 isInvalid={isFormValidated && !vendorData.name_id}
                                 isValid={isFormValidated && vendorData.name_id}
                                 style={{ backgroundColor: isValidName ? 'white' : 'rgba(225, 0, 0, 0.6)' }}
-                                required
                             />
                         </Form.Group>
                     </div>

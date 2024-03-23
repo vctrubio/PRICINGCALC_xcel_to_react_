@@ -19,14 +19,12 @@ async function getData(model) {
     }
 }
 
-
 const GridVendor = () => {
     const [gridApi, setGridApi] = useState(null);
     const [selectedRows, setSelectedRows] = useState([]);
     const [search, setSearch] = useState('');
     const [showForm, setShowForm] = useState(false);
     const [rowData, setRowData] = useState([])
-    const [rerender, setRerender] = useState(false);
     const [gridKey] = useState(1);
     const [colData] = useState(
         [
@@ -42,14 +40,10 @@ const GridVendor = () => {
         ]
     )
 
-
     useEffect(() => {
-        if (rerender) {
-            console.log('rerendering needed');
-        }
+
         
         const fetchData = async () => {
-            console.log('fetching data');
             const data = await getData('vendor');
             setRowData(data);
             if (gridApi) {
@@ -59,7 +53,7 @@ const GridVendor = () => {
             }
         };
         fetchData();
-    }, [rerender]);
+    }, []);
 
     const updateVendorData = useCallback((param) => {
         setRowData([param, ...rowData])
@@ -74,8 +68,6 @@ const GridVendor = () => {
                 }
             }
             const response = await axios.patch(`http://localhost:8000/vendor/${event.data.name_id}`, event.data);
-            console.log('response:', response);
-            //update all skus with vendor id... 
         } catch (error) {
             console.error('Error updating Vendor data:', error);
         }
@@ -99,7 +91,7 @@ const GridVendor = () => {
 
     return (
         <div className="ag-theme-quartz-dark" style={{ height: '70vh', width: 1270 }}>
-            <SearchBar title='Vendor' titlecount={rowData.length} search={search} setSearch={setSearch} data={rowData} setData={setRowData} selectedRows={selectedRows} setRerender={setRerender} />
+            <SearchBar title='Vendor' titlecount={rowData.length} search={search} setSearch={setSearch} data={rowData} setData={setRowData} selectedRows={selectedRows}  />
             <AgGridReact
                 key={gridKey}
                 onGridReady={onGridReady}
@@ -109,7 +101,7 @@ const GridVendor = () => {
                 defaultColDef={{ flex: 1, filter: true, sortable: true, floatingFilter: true }}
                 onCellValueChanged={handleCellValueChanged}
                 onSelectionChanged={onSelectionChanged}
-                // onRowClicked={onRowClicked}
+                onRowClicked={onRowClicked}
                 suppressRowClickSelection={true}
                 animateRows={false}
                 rowSelection={'multiple'}

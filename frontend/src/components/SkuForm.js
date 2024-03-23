@@ -18,7 +18,6 @@ export const SkuForm = ({ addSku, rowData }) => {
     const [formDataArray, setFormDataArray] = useState([]);
     const [nextIndex, setNextIndex] = useState(0);
 
-     // const [passVendor, setPassVendor] = useState(null); //used as localstate for now
     const [pskuId, setPskuId] = useState(generatePId())
 
     const [vendorData, setVendorData] = useState([])
@@ -219,9 +218,7 @@ export const SkuForm = ({ addSku, rowData }) => {
         }
 
         if ((!pskuDes || !pskuId || !selectedProductTag) && showPskuBar)
-        {
             return
-        }   
 
         formData.vendor_id = localStorage.getItem('lastSelectedVendor');
 
@@ -245,8 +242,8 @@ export const SkuForm = ({ addSku, rowData }) => {
         try {
             const do_response = async (form) => {
                 try{
-                    console.log('printing. . . . ')
-                    console.log(form)
+                    // console.log('printing. . . . ')
+                    // console.log(form)
                     const response = await axios.post('http://localhost:8000/sku', form);
                     if (addSku)
                         addSku(response.data);

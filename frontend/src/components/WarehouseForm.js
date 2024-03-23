@@ -9,7 +9,8 @@ export const WhItem =
     product_tag: '',
     unit_fee: '',
     storage_fee: '',
-    pick_and_pack_fee: ''
+    pick_and_pack_fee: '',
+    custom_fee: ''
 }
 
 export const useWarehouseData = () => {
@@ -92,8 +93,10 @@ const WarehouseForm = ({ addWh }) => {
         setWhData([]);
     }
 
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+
         try {
             const do_response = async (form) => {
                 const response = await axios.post('http://localhost:8000/warehouse', form);
@@ -101,11 +104,23 @@ const WarehouseForm = ({ addWh }) => {
                     addWh(form);
             }
 
+            const isWhDataValid = whData.every(data =>
+                data.unit_fee >= 0 && data.unit_fee !== '' &&
+                data.storage_fee >= 0 && data.storage_fee !== '' &&
+                data.pick_and_pack_fee >= 0 && data.pick_and_pack_fee !== '' &&
+                data.custom_fee >= 0 && data.custom_fee !== ''
+            );
+            if (!isWhDataValid) {
+                setShowSuccessMessage(true);
+                setTimeout(() => {
+                    setShowSuccessMessage(false);
+                }, 3000);
+                return;
+            }
             const whDataWithIdentity = whData.map(data => ({ ...whIdentity, ...data }));
 
-            for (let i = 0; i < whDataWithIdentity.length; i++) {
-                do_response((whDataWithIdentity[i]));
-            }
+            await Promise.all(whDataWithIdentity.map(do_response));
+
             resestWhatWasSubmitted();
         }
         catch (error) {
@@ -113,7 +128,7 @@ const WarehouseForm = ({ addWh }) => {
         }
     };
 
-    const handleAddWhData = (e) => {
+    const handleAddWhData = () => {
         setWhData(prevWhData => [...prevWhData, WhItem]);
     }
 
@@ -150,7 +165,7 @@ const WarehouseForm = ({ addWh }) => {
         <div className="mt-2 border rounded-top border-secondary p-2">
             {showSuccessMessage && (
                 <div className="alert alert-warning mt-2" role="alert">
-                    <p style={{ fontWeight: 'bold', fontSize: '2em' }}>  Warehouse ID ≠ {whId[whIdentity.name_id]}</p>
+                    <p style={{ fontWeight: 'bold', fontSize: '2em' }}>  Warehouse Item Fees Missing. {whId[whIdentity.name_id]}</p>
                 </div>
             )}
             <div className="row g-3">

@@ -8,22 +8,17 @@ import '../AppGrid.css';
 import { SkuForm } from './SkuForm';
 import { SearchBar } from './SearchBar';
 
-
 async function getData(model) {
     try {
         const response = await axios.get(`http://localhost:8000/${model}`);
-        const dataArray = Object.values(response.data);
-        window.ptr = dataArray;
-        return dataArray;
+        return Object.values(response.data);
     } catch (error) {
         console.error('There was a BIGFAT error!', error);
     }
 }
 
-
-
-const GridTwo = () => {
-    const [rerender, setRerender] = useState(false); // State for triggering a re-render
+const GridSku = () => {
+    const [rerender, setRerender] = useState(false);
     const [gridApi, setGridApi] = useState(null);
     const [selectedRows, setSelectedRows] = useState([]);
     const [search, setSearch] = useState('');
@@ -54,11 +49,8 @@ const GridTwo = () => {
             setRowData(updatedData);
         } catch (error) {
             console.error('Error updating SKU data:', error);
-            // Handle error appropriately (e.g., display a message)
         }
     };
-
-    const [showAddVendor, setShowAddVendor] = useState(false);
 
     useEffect(() => {
         getData('sku').then(data => {
@@ -66,19 +58,24 @@ const GridTwo = () => {
         });
     }, []);
 
-    window.test = rowData
+    window.row = rowData
     const handleCellValueChanged = async (event) => {
         try {
             for (let key in event.data) {
                 if (event.data[key] === undefined || event.data[key] === null) {
                     console.error(`Error: ${key} is empty`);
-                    return;  // Exit the function if an empty field is found
+                    return;
                 }
             }
             const response = await axios.patch(`http://localhost:8000/sku/${event.data.name_id}`, event.data);
+            setRowData(prevData => {
+                const newData = [...prevData]; // create a copy of the array
+                newData[event.rowIndex] = response.data.object; // replace the element at event.rowIndex
+                return newData;
+            })
+
         } catch (error) {
             console.error('Error updating SKU data:', error);
-            // Handle error appropriately (e.g., display a message)
         }
     }
 
@@ -121,4 +118,4 @@ const GridTwo = () => {
     )
 }
 
-export default GridTwo;
+export default GridSku;

@@ -3,7 +3,7 @@ import { Form, Dropdown, ButtonGroup, Button, Col, Row } from 'react-bootstrap';
 import { useSkuForm } from './CskuForm';
 
 
-export const WarehouseItemForm = ({ whItem, setWhItem, index, onRemove, usableCDs }) => {
+export const WarehouseItemForm = ({ whItem, setWhItem, index, onRemove }) => {
     const { productTag } = useSkuForm();
 
     const [showInput, setShowInput] = useState(false);
@@ -11,8 +11,6 @@ export const WarehouseItemForm = ({ whItem, setWhItem, index, onRemove, usableCD
     const [productPtr, setProductPtr] = useState(
         localStorage.getItem('productTagItem') || productTag[0]
     );
-
-    const [calc, setCalc] = useState('');
 
     useEffect(() => {
         let productTagItem = localStorage.getItem('productTagItem');
@@ -22,7 +20,6 @@ export const WarehouseItemForm = ({ whItem, setWhItem, index, onRemove, usableCD
 
     useEffect(() => {
         let total = (parseFloat(whItem.unit_fee) || 0) + (parseFloat(whItem.storage_fee) || 0) + (parseFloat(whItem.pick_and_pack_fee) || 0) + (parseFloat(whItem.custom_fee) || 0);
-        setCalc(total)
     }, [whItem.unit_fee, whItem.storage_fee, whItem.pick_and_pack_fee, whItem.custom_fee])
 
     const handleChange = (e) => {
@@ -37,7 +34,6 @@ export const WarehouseItemForm = ({ whItem, setWhItem, index, onRemove, usableCD
     };
 
     const hadlePTBlur = (e) => {
-        console.log('blur: ', e.target.value)
         localStorage.setItem('productTagItem', e.target.value);
         setWhItem(prevData => prevData.map((item, i) => i === index ? { ...item, ['product_tag']: e.target.value } : item));
         if (e.target.value && !productTag.includes(e.target.value))
@@ -46,10 +42,11 @@ export const WarehouseItemForm = ({ whItem, setWhItem, index, onRemove, usableCD
             setNewPtColor(false)
     };
 
+    const handleSubmit = (e) => {
+        console.log('handleeeee. ', e);
+    }
     return (
-        <form onSubmit={(event) => {
-            event.preventDefault();
-        }}>
+        <Form onSubmit={handleSubmit}>
             <Row className='p-2'>
                 <Col md={3}>
                     <Form.Group controlId="productTag" style={{ textAlign: 'left' }}>
@@ -93,6 +90,9 @@ export const WarehouseItemForm = ({ whItem, setWhItem, index, onRemove, usableCD
                             value={whItem.unit_fee}
                             onChange={handleChange}
                             placeholder="Unit Fee"
+                            isInvalid={whItem.unit_fee < 0}
+                            isValid={whItem.unit_fee >= 0 && whItem.unit_fee}
+                            required
                         />
                     </Form.Group>
                 </Col>
@@ -104,6 +104,9 @@ export const WarehouseItemForm = ({ whItem, setWhItem, index, onRemove, usableCD
                             value={whItem.storage_fee}
                             onChange={handleChange}
                             placeholder="Storage Fee"
+                            isInvalid={whItem.storage_fee < 0}
+                            isValid={whItem.storage_fee >= 0 && whItem.storage_fee}
+                            required
                         />
                     </Form.Group>
                 </Col>
@@ -115,6 +118,9 @@ export const WarehouseItemForm = ({ whItem, setWhItem, index, onRemove, usableCD
                             value={whItem.pick_and_pack_fee}
                             onChange={handleChange}
                             placeholder="Pick and Pack Fee"
+                            isInvalid={whItem.pick_and_pack_fee < 0}
+                            isValid={whItem.pick_and_pack_fee >= 0 && whItem.pick_and_pack_fee}
+                            required
                         />
                     </Form.Group>
                 </Col>
@@ -126,6 +132,9 @@ export const WarehouseItemForm = ({ whItem, setWhItem, index, onRemove, usableCD
                             value={whItem.custom_fee}
                             onChange={handleChange}
                             placeholder="Custom Fee"
+                            isInvalid={whItem.custom_fee < 0}
+                            isValid={whItem.custom_fee >= 0 && whItem.custom_fee}
+                            required
                         />
                     </Form.Group>
                 </Col>
@@ -141,6 +150,6 @@ export const WarehouseItemForm = ({ whItem, setWhItem, index, onRemove, usableCD
                     </div>
                 </Col>
             </Row >
-        </form>
+        </Form>
     );
 }

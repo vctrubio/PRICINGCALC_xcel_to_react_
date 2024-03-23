@@ -79,18 +79,18 @@ async def custom(item: dict, option: dict):
 async def root():
     return db_model['Vendor']
 
-@app.get("/vendor/{name_id}/sku")
+@app.get("/vendor/{name_id}")
 async def root(name_id: str): 
     if name_id in db_model['Vendor']:
-            return db_model['Vendor'][name_id].get_skus()
+        return db_model['Vendor'][name_id].get_skus()
     raise HTTPException(status_code=404, detail="Vendor not found")
 
 @app.patch("/vendor/{name_id}")
 async def update_vendor(vendor: Vendor):
     print(f'patching vendor {vendor}')
     if vendor.name_id in db_model['Vendor']:
-        db_model['Vendor'][vendor.name_id] = vendor.dict()  # update the vendor
-        return {"message": "Vendor updated successfully", "vendor": vendor.dict}
+        db_model['Vendor'][vendor.name_id] = vendor  # update the vendor
+        return {"message": "Vendor updated successfully", "vendor": vendor}
     raise HTTPException(status_code=404, detail="Vendor not found")
 
 @app.post("/vendor")
@@ -118,7 +118,8 @@ async def update_sku(name_id: str, sku: SKU):
     print('heloooooo.workd')
     if name_id in db_model['SKU']:
         db_model['SKU'][name_id] = sku
-        return {"message": "SKU updated successfully"}
+        return {"message": "SKU updated successfully",
+                "object": sku.get_json()}
     raise HTTPException(status_code=404, detail="SKU not found")
 
 @app.get("/sku/{name_id}")

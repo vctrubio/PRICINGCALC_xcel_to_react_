@@ -11,7 +11,6 @@ const MyModal = ({ isOpen, skuNames, selectedNames, onClose, onSelectSku }) => {
 
 
     useEffect(() => {
-        // Reset when the modal opens
         setTempSelectedNames([...selectedNames]);
     }, [isOpen]);
 
@@ -46,9 +45,25 @@ const MyModal = ({ isOpen, skuNames, selectedNames, onClose, onSelectSku }) => {
         setTempSelectedNames([]);
     }
 
+    const selectAll = () => {
+        setTempSelectedNames(skuNames);
+    }
+
     const handleSearchChange = (event) => {
         setSearchTerm(event.target.value);
     };
+
+    const handleEnter = (event) => {
+        if (event.key === 'Enter') {
+            const searchResults = skuNames.filter(name => name.toLowerCase().includes(searchTerm.toLowerCase()));
+            if (searchResults.every(name => tempSelectedNames.includes(name))) {
+                setTempSelectedNames(prevNames => prevNames.filter(name => !searchResults.includes(name)));
+            }
+            else
+                setTempSelectedNames(prevNames => [...new Set([...prevNames, ...searchResults])]);
+        }
+    }
+
 
     const filteredSkuNames = skuNames.filter(skuName => skuName.toLowerCase().includes(searchTerm.toLowerCase()));
 
@@ -63,6 +78,7 @@ const MyModal = ({ isOpen, skuNames, selectedNames, onClose, onSelectSku }) => {
                         placeholder="Search SKU"
                         value={searchTerm}
                         onChange={handleSearchChange}
+                        onKeyDown={handleEnter}
                         style={{ marginLeft: '5px' }}
                     />
                 </div>
@@ -85,9 +101,12 @@ const MyModal = ({ isOpen, skuNames, selectedNames, onClose, onSelectSku }) => {
                 </ul>
             </Modal.Body>
 
-            <Modal.Footer style={{ display: 'flex', justifyContent: 'flex-start' }}>               
-                <Button variant="light" onClick={unselectAll}>
-                    Deselect ALL
+            <Modal.Footer style={{ display: 'flex', justifyContent: 'flex-start' }}>
+                <Button variant="light" onClick={unselectAll}
+                    className="bi bi-thermometer">
+                </Button>
+                <Button variant="light" onClick={selectAll}
+                    className="bi bi-thermometer-high">
                 </Button>
                 <Button variant="secondary" onClick={handleClose}>
                     Close
