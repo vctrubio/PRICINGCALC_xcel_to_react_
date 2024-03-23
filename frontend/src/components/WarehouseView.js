@@ -108,6 +108,7 @@ const GridWarehouse = () => {
         event.node.setSelected(!event.node.isSelected());
     };
 
+    
     return (
         <div className="ag-theme-quartz-dark" style={{ height: '70vh', width: 1270 }}>
             <SearchBar title='Warehouse' titlecount={rowData.length} search={search} setSearch={setSearch} data={rowData} setData={setRowData} selectedRows={selectedRows} setRerender={setRerender} />
@@ -117,13 +118,7 @@ const GridWarehouse = () => {
                 columnDefs={colData}
                 rowData={rowData}
                 defaultColDef={{
-                    flex: 1, filter: true, sortable: true, floatingFilter: true,
-                    // onFilterChanged: function (params) {
-                    //     if (params.event.keyCode === 13) { // 13 is the key code for enter
-                    //         params.api.selectAll();
-                    //         console.log('ehlllo')
-                    //     }
-                    // }
+                    flex: 1, filter: true, sortable: true, floatingFilter: true
                 }}
                 onCellValueChanged={handleCellValueChanged}
                 onSelectionChanged={onSelectionChanged}

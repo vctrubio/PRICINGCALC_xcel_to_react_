@@ -46,9 +46,6 @@ const theme = createTheme({
 });
 
 function WarehousesSort({ warehouses }) {
-    // console.log('crashtest')
-    console.log('warehouse:', warehouses)
-
     const transformedWarehouses = warehouses
         ? Object.entries(warehouses)
             .flatMap(transformWarehouse2)
@@ -240,10 +237,8 @@ export const FormX = () => {
     const handleWhToggleTag = (key) => {
         setSelectedPT(prevSelectedPT => {
             if (prevSelectedPT.includes(key)) {
-                // If key is already in selectedPT, remove it
                 return prevSelectedPT.filter(k => k !== key);
             } else {
-                // If key is not in selectedPT, add it
                 return [...prevSelectedPT, key];
             }
         });
@@ -442,7 +437,6 @@ export const FormX = () => {
                                                 }));
                                                 toggleDropdown('shippingName');
                                             }}
-                                        // >{shipping.courier} - {shipping.warehouse}</div>
                                         >{shipping.courier}</div>
                                     ))}
                                 </div>
@@ -583,7 +577,6 @@ export const FormX = () => {
                         </div>
                         <div className='ck-context'>
                             {
-                                //dont touch this either
                                 selectedWh
                                     ? (selectedWh && whConfig[selectedWh.warehouseID] && Object.keys(whConfig[selectedWh.warehouseID].products).map((key, index) => (
                                         <div role="button" key={index} onClick={() => handleWhToggleTag(key)} style={{ backgroundColor: selectedPT.includes(key) ? '#4a4444' : 'transparent' }}
