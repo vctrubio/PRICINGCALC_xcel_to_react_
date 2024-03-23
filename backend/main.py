@@ -236,11 +236,12 @@ async def update_warehouse(warehouse: Warehouse):
         return {"message": "Warehouse updated successfully"}
     raise HTTPException(status_code=404, detail="Warehouse not found")
 
-@app.delete("/warehouse/{name_id}/")
-async def delete(warehouse: Warehouse):
-    print('warehouse. ', warehouse)
-    if warehouse.name_id in db_model['Warehouse'] and warehouse.product_tag in db_model['Warehouse'][warehouse.name_id]:
-        del db_model['Warehouse'][warehouse.name_id][warehouse.product_tag]
+@app.delete("/warehouse/{name_id}/{product_tag}")
+async def delete(name_id: str, product_tag: str):
+    # print(f'patching warehouse {name_id} and {product_tag}')
+    
+    if name_id in db_model['Warehouse'] and product_tag in db_model['Warehouse'][name_id]:
+        del db_model['Warehouse'][name_id][product_tag]
         print('succ')
         return {'message': 'that was good'}
     else:

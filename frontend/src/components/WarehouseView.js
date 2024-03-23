@@ -116,7 +116,15 @@ const GridWarehouse = () => {
                 onGridReady={onGridReady}
                 columnDefs={colData}
                 rowData={rowData}
-                defaultColDef={{ flex: 1, filter: true, sortable: true, floatingFilter: true }}
+                defaultColDef={{
+                    flex: 1, filter: true, sortable: true, floatingFilter: true,
+                    // onFilterChanged: function (params) {
+                    //     if (params.event.keyCode === 13) { // 13 is the key code for enter
+                    //         params.api.selectAll();
+                    //         console.log('ehlllo')
+                    //     }
+                    // }
+                }}
                 onCellValueChanged={handleCellValueChanged}
                 onSelectionChanged={onSelectionChanged}
                 onRowClicked={onRowClicked}

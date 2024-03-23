@@ -22,8 +22,9 @@ export const useWarehouseData = () => {
                     getData('warehouse', 'value'),
                 ]);
 
+                
                 const tempWh = wh.reduce((acc, warehouse) => {
-                    const warehouseId = Object.values(warehouse)[0].name_id;
+                    const warehouseId = Object.values(warehouse)[0].name_id; //TODO ... its actually ok. its just an empty dict
                     acc[warehouseId] = warehouse;
                     return acc;
                 }, {});

@@ -4,14 +4,18 @@ import * as XLSX from 'xlsx';
 import { CSVLink } from 'react-csv';
 import axios from 'axios';
 
-export const SearchBar = ({ title, titlecount, data, setData, search, setSearch, selectedRows, setRerender }) => {
+export const SearchBar = ({ title, titlecount, data, setData, selectedRows, setRerender }) => {
+
     const deleteSelectedRows = async () => {
         try {
             const onlyWh = async () => {
                 const promises = selectedRows.map(row => {
-                    return axios.delete(`http://localhost:8000/${row.name_id}/${row.product_tag}`);
+                    const lowerCaseTitle = title.toLowerCase();
+                    return axios.delete(`http://localhost:8000/${lowerCaseTitle}/${row.name_id}/${row.product_tag}`);
                 });
                 await Promise.all(promises);
+                const newData = data.filter(d => !selectedRows.some(row => row.name_id === d.name_id && row.product_tag === d.product_tag));
+                return newData;
             }
 
             const onlyAll = async () => {
@@ -20,14 +24,16 @@ export const SearchBar = ({ title, titlecount, data, setData, search, setSearch,
                     return axios.delete(`http://localhost:8000/${lowerCaseTitle}/${row.name_id}`);
                 });
                 await Promise.all(promises);
+                const newData = data.filter(d => !selectedRows.some(row => row.name_id === d.name_id));
+                return newData;
             }
 
-            if (title=== 'Warehouse') {
-                await onlyWh();
-            } else 
-                await onlyAll();
+            let newData;
+            if (title === 'Warehouse') {
+                newData = await onlyWh();
+            } else
+                newData = await onlyAll();
 
-            const newData = data.filter(d => !selectedRows.some(row => row.name_id === d.name_id));
             setData(newData);
         } catch (error) {
             console.error('Error deleting rows:', error);
