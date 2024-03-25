@@ -195,8 +195,8 @@ export const FormX = () => {
     }
 
     function WarehouseSearch({ warehouses, onWarehouseSelect }) {
-        const transformedWarehouses = warehouses ? Object.values(warehouses).flatMap(transformWarehouse) : [];
-        const uniqueIds = Array.from(new Set(transformedWarehouses.map(item => JSON.stringify({ warehouseID: item.warehouseID, originID: item.originID }))), JSON.parse);
+        const tw = warehouses ? Object.entries(warehouses) : [];
+        const uniqueIds = Array.from(new Set(tw.map(item => JSON.stringify({ warehouseID: item[0], originID: item[1].origin[0] }))), JSON.parse);
         uniqueIds.sort((a, b) => a.originID.localeCompare(b.originID));
 
         return (
@@ -204,7 +204,9 @@ export const FormX = () => {
                 <Autocomplete
                     id="combo-box-wh"
                     options={uniqueIds}
-                    getOptionLabel={(option) => `${option.originID}    (${option.warehouseID}) `}
+                    getOptionLabel={(option) => {
+                        return `${option.warehouseID}, ${option.originID}`;
+                    }}
                     style={{ width: 300 }}
                     onChange={onWarehouseSelect}
                     renderInput={(params) => (
@@ -371,7 +373,7 @@ export const FormX = () => {
                         priceWithoutDiscount: response.data,
                         priceWithDiscount: uiDC ? (response.data * (1 - parseFloat(uiDC) / 100)) : 0,
                         toConsumerMargin: parseFloat(uiOM),
-                        toWarehouseMargin: (response.data - item.total_cogs)  / response.data * 100
+                        toWarehouseMargin: (response.data - item.total_cogs) / response.data * 100
                     }));
                 })
                 .catch(error => {
@@ -382,9 +384,9 @@ export const FormX = () => {
     }, [selectedSku, selectedWh, selectedPT, uiOM, uiDC, uiShipping, uiMk, uiTax]);
 
 
-    const selectWhifEmpty = (item) => {
+    const selectWhifEmpty = (warehouse) => {
         if (!selectedWh) {
-            setSelectedWh({ warehouseID: item.name_id, originID: item.origin });
+            setSelectedWh({ warehouseID: warehouse.name_id, originID: warehouse.origin[0] });
         }
     }
 
@@ -518,7 +520,7 @@ export const FormX = () => {
                     </div>
                     <div>
                         <div className='d-flex flex-column justify-content-between' style={{ textAlign: 'left', width: '80%' }}>
-                            <div style={{display: 'flex', justifyContent: 'space-between', paddingLeft: 5 }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', paddingLeft: 5 }}>
                                 <div>
                                     Tax
                                 </div>
@@ -532,7 +534,7 @@ export const FormX = () => {
                             />
                         </div>
                         <div className='d-flex flex-column justify-content-between' style={{ textAlign: 'left', width: '80%', marginLeft: 4 }}>
-                            <div style={{display: 'flex', justifyContent: 'space-between', paddingLeft: 5 }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', paddingLeft: 5 }}>
                                 <div>
                                     Marketing
                                 </div>
@@ -589,7 +591,7 @@ export const FormX = () => {
                                             Object.values(whConfig).map((warehouse, warehouseIndex) => {
                                                 return getDataByTag(warehouse.products, selectedPT).map((item, itemIndex) => {
                                                     return (
-                                                        <div className='d-flex flex-column' key={`${warehouseIndex}-${itemIndex}`} width='100%' onClick={() => selectWhifEmpty(item)}>
+                                                        <div className='d-flex flex-column' key={`${warehouseIndex}-${itemIndex}`} width='100%' onClick={() => selectWhifEmpty(warehouse)}>
                                                             <div className='d-flex flex-row justify-content-between'>
                                                                 <div>
                                                                     {` ${warehouse.name_id}`}
@@ -615,7 +617,7 @@ export const FormX = () => {
                                             })
                                         )
                                         : WarehousesSort({ warehouses: whConfig })
-                                            .filter(wh => 
+                                            .filter(wh =>
                                                 uiShipping.country && uiShipping.country.length > 0 ? whConfig[wh.warehouseID].countries_to_ship.includes(uiShipping.country) : true)
                                             .map((wh, index) => (
                                                 <div key={index} onClick={() => setSelectedWh(wh)}>
