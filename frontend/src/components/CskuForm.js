@@ -44,10 +44,10 @@ export const useSkuForm = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [vendors, tags, psku] = await Promise.all([
+                const [vendors, tags, psku, vendortag] = await Promise.all([
                     getData('vendor', 'value'),
                     getData('producttag', 'key'),
-                    getData('psku', 'value')
+                    getData('psku', 'value'),
                 ]);
                 setVendorData(vendors);
                 setProductTag(tags);

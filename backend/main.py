@@ -1,5 +1,4 @@
 import os
-import signal
 from typing import List, Optional
 from pydantic import BaseModel
 from fastapi import FastAPI, HTTPException, File, UploadFile, UploadFile, Form, Body
@@ -96,7 +95,11 @@ async def update_vendor(vendor: Vendor):
 @app.post("/vendor")
 async def create_vendor(vendor: Vendor):
     if vendor.name_id in db_model['Vendor']:
-        raise HTTPException(status_code=400, detail="Vendor already exists")      
+        raise HTTPException(status_code=400, detail="Vendor already exists")
+    if vendor.vendor_tag:
+        if vendor.vendor_tag not in db_model['VendorTag']:
+            db_model['VendorTag'][vendor.vendor_tag] = []
+        db_model['VendorTag'][vendor.vendor_tag].append(vendor.name_id)
     db_model['Vendor'][vendor.name_id] = vendor
     return {"message": "Vendor created successfully"}
 

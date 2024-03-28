@@ -770,9 +770,6 @@ input[type="number"]::-webkit-outer-spin-button {
   padding-left: 2px;
 }
 
-
-.shoot-me-foot {}
-
 .input-found {
   border: 1px solid rgba(26, 169, 26, 0.708);
 }
@@ -862,7 +859,7 @@ li {
 }
 
 @keyframes dropdown {
-  0% {
+  /* 0% {
     transform: translateY(-100%);
     opacity: 0;
   }
@@ -870,58 +867,5 @@ li {
   100% {
     transform: translateY(0);
     opacity: 1;
-  }
+  } */
 }
-
-/* 
-@media (max-width: 200px) {
-  .sidebar.collapsed {
-    display: none;
-  }
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-
-
-@keyframes dropup {
-  0% {
-    opacity: 1;
-  }
-
-  100% {
-    opacity: 100;
-  }
-}
-
-.dropup {
-  animation-name: dropup;
-  animation-duration: 0.3s;
-  animation-fill-mode: forwards;
-}
-
-@keyframes fadeup {
-  0% {
-    transform: translateY(100%);
-    opacity: 0;
-  }
-
-  100% {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-.fadeup {
-  animation-name: fadeup;
-  animation-duration: 1s;
-  animation-fill-mode: forwards;
-} */

@@ -8,8 +8,8 @@ class SKU(BaseModel):
     name_id: str
     vendor_id: str
     description: Optional[str]
-    cogs: int
-    first_mile: Optional[int] = 0
+    cogs: float
+    first_mile: Optional[float] = 0
     weight_kg: Optional[float] = None
     
     def __init__(self, **data):

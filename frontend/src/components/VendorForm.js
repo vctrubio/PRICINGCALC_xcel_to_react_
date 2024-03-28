@@ -1,21 +1,43 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Form, Button } from 'react-bootstrap';
+import { Form, Button, Dropdown, ButtonGroup } from 'react-bootstrap';
 import Alert from '@mui/material/Alert';
+import { getData } from './CskuForm';
+
+
 
 const VendorForm = ({ addVendor, rowData }) => {
 
+    // const { vendorTag } = useSkuForm();
     const [isValidName, setIsValidName] = useState(true);
+    const [newPtColor, setNewPtColor] = useState(false);
     const sku_names = rowData.map(row => row.name_id);
     const [isFormValidated, setIsFormValidated] = useState(false);
+    const [vendorTag, setVendorTag] = useState([]);
+    const [showInput, setShowInput] = useState(false);
+    const [productPtr, setProductPtr] = useState([]);
 
+    useEffect(() => {
+        const getVendorTag = () => {
+            getData('vendortag', '').then((data) => {
+                setVendorTag(data);
+            });
+        }
+        getVendorTag();
+        setProductPtr(localStorage.getItem('vendorTagItem') || vendorTag[0])
+    }, [addVendor]);
+
+    window.pv = vendorTag;
+    window.ppp = productPtr;
     const [vendorData, setVendorData] = useState({
         name_id: '',
         origin: '',
         pp_rate_: '',
         exchange_rate_: '',
+        vendor_tag: '',
     });
 
+    window.user = vendorData;
     const [missingFields, setMissingFields] = useState([]);
 
     {
@@ -26,7 +48,7 @@ const VendorForm = ({ addVendor, rowData }) => {
         )
     }
 
-    
+
     const handleChange = (event) => {
         const { name, value } = event.target;
         setVendorData({ ...vendorData, [name]: value });
@@ -58,6 +80,7 @@ const VendorForm = ({ addVendor, rowData }) => {
                 origin: '',
                 pp_rate_: '',
                 exchange_rate_: '',
+                vendor_tag: ''
             });
             setIsFormValidated(false);
         } catch (error) {
@@ -71,10 +94,25 @@ const VendorForm = ({ addVendor, rowData }) => {
         }
     };
 
+    const handlePT = (tag) => () => {
+        localStorage.setItem('vendorTagItem', tag);
+        setProductPtr(tag);
+        setVendorData({ ...vendorData, ['vendor_tag']: tag });
+    };
+
+    const hadlePTBlur = (e) => {
+        localStorage.setItem('vendorTagItem', e.target.value);
+        setVendorData({ ...vendorData, ['vendor_tag']: e.target.value });
+        if (e.target.value && !vendorTag.includes(e.target.value))
+            setNewPtColor(true)
+        else
+            setNewPtColor(false)
+    };
+
     return (
-        <div className='d-flex flex-row flex-start justify-content-between' onKeyDown={handleKeyPress} style={{ marginLeft: 42, marginRight: 42, marginTop: 24}}>
+        <div className='d-flex flex-row flex-start justify-content-between' onKeyDown={handleKeyPress} style={{ marginLeft: 42, marginRight: 42, marginTop: 24 }}>
             <Form onSubmit={handleSubmit}>
-                <div className="d-flex flex-row justify-content-between" style={{ width: '100%' }}>
+                <div className="d-flex flex-row justify-content-between" style={{ width: '100%', textAlign: 'left' }}>
                     <div className="m-1">
                         <Form.Label>Vendor ID</Form.Label>
                         <Form.Group controlId="name_id">
@@ -83,7 +121,7 @@ const VendorForm = ({ addVendor, rowData }) => {
                                 name="name_id"
                                 value={vendorData.name_id}
                                 onChange={handleChange}
-                                placeholder="Enter Vendor ID"
+                                placeholder="Name"
                                 isInvalid={isFormValidated && !vendorData.name_id}
                                 isValid={isFormValidated && vendorData.name_id}
                                 style={{ backgroundColor: isValidName ? 'white' : 'rgba(225, 0, 0, 0.6)' }}
@@ -91,7 +129,6 @@ const VendorForm = ({ addVendor, rowData }) => {
                         </Form.Group>
                     </div>
                     <div className="m-1">
-
                         <Form.Group controlId="origin">
                             <Form.Label>Origin</Form.Label>
                             <Form.Control
@@ -99,7 +136,7 @@ const VendorForm = ({ addVendor, rowData }) => {
                                 name="origin"
                                 value={vendorData.origin}
                                 onChange={handleChange}
-                                placeholder="Enter Origin"
+                                placeholder="Country"
                                 isInvalid={isFormValidated && !vendorData.origin}
                                 isValid={isFormValidated && vendorData.origin}
                                 required
@@ -107,8 +144,6 @@ const VendorForm = ({ addVendor, rowData }) => {
                         </Form.Group>
                     </div>
                     <div className='m-1'>
-
-
                         <Form.Group controlId="pp_rate_">
                             <Form.Label>PP Rate</Form.Label>
                             <Form.Control
@@ -116,7 +151,7 @@ const VendorForm = ({ addVendor, rowData }) => {
                                 name="pp_rate_"
                                 value={vendorData.pp_rate_}
                                 onChange={handleChange}
-                                placeholder="Enter PP Rate %"
+                                placeholder="%"
                                 isInvalid={isFormValidated && !vendorData.pp_rate_}
                                 isValid={isFormValidated && vendorData.pp_rate_}
                                 required
@@ -124,7 +159,6 @@ const VendorForm = ({ addVendor, rowData }) => {
                         </Form.Group>
                     </div>
                     <div className='m-1'>
-
                         <Form.Group controlId="exchange_rate_">
                             <Form.Label>Exchange Rate</Form.Label>
                             <Form.Control
@@ -132,11 +166,45 @@ const VendorForm = ({ addVendor, rowData }) => {
                                 name="exchange_rate_"
                                 value={vendorData.exchange_rate_}
                                 onChange={handleChange}
-                                placeholder="Enter Exchange Rate %"
+                                placeholder="%"
                                 isInvalid={isFormValidated && !vendorData.exchange_rate_}
                                 isValid={isFormValidated && vendorData.exchange_rate_}
                                 required
                             />
+                        </Form.Group>
+                    </div>
+                    <div className='m-1'>
+                        <Form.Group controlId="vendor_tag">
+                            <Form.Label>Vendor Tag</Form.Label>
+                            <ButtonGroup style={{ width: '250px', height: '38px'}}>
+                                {!showInput && (
+                                    <Dropdown >
+                                        <Dropdown.Toggle variant="light" id="dropdown-basic" className="align-items-baseline" style={{ width: '220px', height: '37px', textDecoration: 'none', fontSize: 18, textAlign: 'left' }}>
+                                            {productPtr}
+                                        </Dropdown.Toggle>
+
+                                        <Dropdown.Menu className="align-dropdown-right">
+                                            {vendorTag.map((tag, index) => (
+                                                <Dropdown.Item key={index} onClick={handlePT(tag)}>
+                                                    <div className="text-center">{tag}</div>
+                                                </Dropdown.Item>
+                                            ))}
+                                        </Dropdown.Menu>
+                                    </Dropdown>
+                                )}
+                                {showInput && (
+                                    <Form.Control
+                                        type="string"
+                                        name="vendor_tag"
+                                        value={vendorData.vendor_tag}
+                                        onChange={handleChange}
+                                        onBlur={hadlePTBlur}
+                                        placeholder="Search or Create"
+                                        style={{ width: '280px', border: newPtColor ? '2px solid orange' : '' }}
+                                    />
+                                )}
+                                <Button onClick={() => setShowInput(!showInput)}>^</Button>
+                            </ButtonGroup>
                         </Form.Group>
                     </div>
                 </div>
