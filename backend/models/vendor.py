@@ -4,6 +4,7 @@ from typing import Optional, List
 class Vendor(BaseModel):
     name_id: str
     origin: str
+    vendor_tag: Optional[str] = "default"
     pp_rate_: Optional[float]
     exchange_rate_: Optional[float]
     

@@ -7,7 +7,7 @@ from watchgod import awatch
 
 class ServerManager:
     def __init__(self):
-        print('init called', os.getpid())
+        # print('init called', os.getpid())
         self.process = None
 
     async def run_server(self):

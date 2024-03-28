@@ -21,7 +21,6 @@ except Exception as e:
 def do_psku(instance):
     global db_model
     product_tag = instance.product_tag #.lower() but also need to change it in the productDB
-   
     try:
         ProductTag = db_model['ProductTag'][product_tag]
     except:
@@ -118,7 +117,7 @@ def do_country_list():
     
     db_model['Country'] = {k: countries[k] for k in sorted(countries)}
 
-
+db_model['VendorTag'] = {}
 ptr_model = None
 for name in my_lst:
     if name == 'PaymentPopCountry':
@@ -163,8 +162,14 @@ for name in my_lst:
                 elif name == 'PackagingWarehouse':
                     db_model[name].append(instance)
                 else:
+                    if name == 'Vendor':
+                        vendor_tag = instance.vendor_tag
+                        if vendor_tag:
+                            if vendor_tag not in db_model['VendorTag']:
+                                db_model['VendorTag'][vendor_tag] = []
+                            if instance.name_id not in db_model['VendorTag'][vendor_tag]:
+                                db_model['VendorTag'][vendor_tag].append(instance.name_id)
                     db_model[name][instance.name_id] = instance
-                
             elif hasattr(instance, 'int_id'):
                 db_model[name][instance.int_id] = instance
             

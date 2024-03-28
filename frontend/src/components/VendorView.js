@@ -35,6 +35,7 @@ const GridVendor = () => {
                 headerCheckboxSelectionFilteredOnly: true
             },
             { headerName: 'Origin', field: 'origin', editable: true },
+            { headerName: 'Vendor Tag', field: 'vendor_tag'},
             { headerName: 'PP Rate', field: 'pp_rate_', editable: true, valueFormatter: params => `${params.value}%` },
             { headerName: 'Ex Rate', field: 'exchange_rate_', editable: true, valueFormatter: params => `${params.value}%` },
         ]

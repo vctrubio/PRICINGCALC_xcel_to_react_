@@ -107,6 +107,18 @@ async def delete_vendor(name_id: str):
         return {"message": "Vendor deleted successfully"}
     raise HTTPException(status_code=404, detail="Vendor not found")
 
+'''VendorTag'''
+@app.post("/vendortag")
+async def create_vendortag(vendor_tag: str, vendor_id: str):
+    if not vendor_tag in db_model['VendorTag']:
+        db_model['VendorTag'][vendor_tag] = []
+    if vendor_id not in db_model['VendorTag'][vendor_tag]:
+        db_model['VendorTag'][vendor_tag].append(vendor_id)
+    return {"message": "VendorTag created successfully", "vendor_tag": vendor_tag, "vendor_id": vendor_id}
+
+@app.get("/vendortag")
+async def root():
+    return db_model['VendorTag']
 
 ''' SKUS '''
 @app.get("/sku")

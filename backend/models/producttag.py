@@ -6,4 +6,6 @@ class ProductTag(BaseModel):
     name_id: str
     # bundle: List['ProductTag'] = []
 
-    
+class VendorTag(BaseModel):
+    name_id: str
+    # bundle: List['VendorTag'] = []
